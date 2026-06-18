@@ -27,7 +27,7 @@ class BooksActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.toolbar.title = getString(R.string.books_title)
-        binding.toolbar.setNavigationIcon(android.R.drawable.ic_menu_revert)
+        binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
@@ -35,7 +35,7 @@ class BooksActivity : AppCompatActivity() {
 
         binding.fab.text = getString(R.string.new_book)
         binding.fab.setOnClickListener { showBookDialog(null) }
-        binding.empty.text = getString(R.string.no_books)
+        binding.emptyText.text = getString(R.string.no_books)
     }
 
     override fun onResume() {

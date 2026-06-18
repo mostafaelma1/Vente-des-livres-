@@ -4,12 +4,16 @@
 
     <!-- Dashboard -->
     <string name="dashboard_subtitle">Gestion des ventes · تسيير المبيعات</string>
+    <string name="dashboard_hello">Bienvenue · مرحبًا 👋</string>
     <string name="menu_invoices">Factures · الفواتير</string>
     <string name="menu_clients">Clients · الزبناء</string>
     <string name="menu_books">Livres · الكتب</string>
+    <string name="menu_invoices_desc">Créer et suivre les ventes · إنشاء وتتبّع المبيعات</string>
+    <string name="menu_clients_desc">Clients, types et remises · الزبناء والتخفيضات</string>
+    <string name="menu_books_desc">Catalogue et prix · الكتالوج والأثمنة</string>
     <string name="summary_title">Résumé · ملخّص</string>
     <string name="summary_unpaid">Reste à encaisser · الباقي</string>
-    <string name="summary_revenue">Chiffre d\'affaires · رقم المعاملات</string>
+    <string name="summary_revenue">Chiffre d\'affaires · المبيعات</string>
     <string name="summary_invoices">Factures · الفواتير</string>
 
     <!-- Common -->

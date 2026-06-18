@@ -9,13 +9,13 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
+            android:background="@drawable/bg_toolbar_gradient"
             app:navigationIconTint="@color/on_primary"
             app:titleTextColor="@color/on_primary" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -25,19 +25,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="96dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="100dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/empty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textColor="@color/text_secondary"
-        android:textSize="16sp"
+        android:gravity="center"
+        android:orientation="vertical"
         android:visibility="gone"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ImageView
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:alpha="0.7"
+            android:src="@drawable/ic_empty" />
+
+        <TextView
+            android:id="@+id/emptyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp" />
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab"
@@ -47,5 +62,6 @@
         android:layout_margin="20dp"
         android:textColor="@color/on_primary"
         app:backgroundTint="@color/primary"
+        app:icon="@drawable/ic_add"
         app:iconTint="@color/on_primary" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

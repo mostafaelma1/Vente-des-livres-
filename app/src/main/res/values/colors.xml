@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Clean, business-friendly light palette. -->
-    <color name="bg">#F4F6FA</color>
+    <!-- ===== Modern, elegant palette ===== -->
+    <color name="bg">#F5F6FB</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#EEF1F6</color>
-    <color name="stroke">#DCE2EC</color>
+    <color name="surface_variant">#F0F1F8</color>
+    <color name="stroke">#E7E9F3</color>
 
-    <color name="primary">#1E5BB8</color>      <!-- trust blue -->
-    <color name="primary_dark">#16448C</color>
+    <!-- Indigo / violet brand -->
+    <color name="primary">#5B5BD6</color>
+    <color name="primary_dark">#4B45C6</color>
+    <color name="primary_light">#EEEEFC</color>
+    <color name="gradient_start">#6D6BEF</color>
+    <color name="gradient_end">#4F46E5</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <color name="text_primary">#16202B</color>
-    <color name="text_secondary">#5E6B7A</color>
+    <!-- Text -->
+    <color name="text_primary">#1B1E2B</color>
+    <color name="text_secondary">#6B7180</color>
+    <color name="on_primary_dim">#DDDCFA</color>
 
-    <color name="paid">#1B873F</color>          <!-- payée -->
-    <color name="partial">#C77700</color>       <!-- partielle -->
-    <color name="unpaid">#C62828</color>        <!-- impayée -->
+    <!-- Status -->
+    <color name="paid">#16A34A</color>
+    <color name="paid_tint">#E7F6EC</color>
+    <color name="partial">#D97706</color>
+    <color name="partial_tint">#FCF1E1</color>
+    <color name="unpaid">#DC2626</color>
+    <color name="unpaid_tint">#FBE9E9</color>
+
+    <!-- Accent tints for stat / menu icons -->
+    <color name="tint_indigo">#EAEAFB</color>
+    <color name="tint_green">#E7F6EC</color>
+    <color name="tint_amber">#FCF1E1</color>
+    <color name="tint_teal">#E2F6F3</color>
+    <color name="teal">#0EA5A5</color>
 
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>

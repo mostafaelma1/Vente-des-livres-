@@ -8,13 +8,14 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
+            android:background="@drawable/bg_toolbar_gradient"
             app:navigationIconTint="@color/on_primary"
             app:titleTextColor="@color/on_primary" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -316,16 +317,20 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/save"
                 style="@style/PrimaryButton"
-                android:layout_marginTop="16dp"
-                android:text="@string/save" />
+                android:layout_marginTop="18dp"
+                android:text="@string/save"
+                app:icon="@drawable/ic_check"
+                app:iconGravity="textStart"
+                app:iconTint="@color/on_primary" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/share"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/share_invoice" />
+                style="@style/OutlineButton"
+                android:layout_marginTop="10dp"
+                android:text="@string/share_invoice"
+                app:icon="@drawable/ic_share"
+                app:iconGravity="textStart"
+                app:iconTint="@color/primary" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

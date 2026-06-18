@@ -9,12 +9,12 @@
         android:pathData="M54,38 C48,33 40,33 34,35 V72 C40,70 48,70 54,74 Z" />
     <path android:fillColor="#FFFFFF"
         android:pathData="M54,38 C60,33 68,33 74,35 V72 C68,70 60,70 54,74 Z" />
-    <path android:strokeColor="#1E5BB8" android:strokeWidth="2"
+    <path android:strokeColor="#5B5BD6" android:strokeWidth="2"
         android:fillColor="#00000000"
         android:pathData="M54,38 V74" />
     <!-- Page lines -->
-    <path android:strokeColor="#1E5BB8" android:strokeWidth="1.5"
+    <path android:strokeColor="#5B5BD6" android:strokeWidth="1.5"
         android:pathData="M39,44 H50 M39,50 H50 M39,56 H50" />
-    <path android:strokeColor="#1E5BB8" android:strokeWidth="1.5"
+    <path android:strokeColor="#5B5BD6" android:strokeWidth="1.5"
         android:pathData="M58,44 H69 M58,50 H69 M58,56 H69" />
 </vector>

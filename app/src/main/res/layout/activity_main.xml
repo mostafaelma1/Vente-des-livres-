@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,133 +10,165 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- ===== Gradient header ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:background="@drawable/bg_header_gradient"
+            android:orientation="vertical"
+            android:paddingHorizontal="22dp"
+            android:paddingTop="22dp"
+            android:paddingBottom="26dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="@string/dashboard_subtitle"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dashboard_hello"
+                android:textColor="@color/on_primary_dim"
+                android:textSize="14sp" />
 
-        <com.google.android.material.card.MaterialCardView
-            style="@style/CardSection"
-            android:layout_marginTop="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/app_name"
+                android:textColor="@color/on_primary"
+                android:textSize="23sp"
+                android:textStyle="bold" />
 
+            <!-- Stat pill -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    style="@style/SectionTitle"
-                    android:text="@string/summary_title" />
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_stat_pill"
+                android:baselineAligned="false"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
+                    android:layout_weight="1.3"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/summaryUnpaid"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:fontFamily="sans-serif-medium"
+                        android:text="0 DH"
+                        android:textColor="@color/on_primary"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/summaryUnpaid"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 DH"
-                            android:textColor="@color/unpaid"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/summary_unpaid"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:layout_marginTop="2dp"
+                        android:text="@string/summary_unpaid"
+                        android:textColor="@color/on_primary_dim"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/summaryRevenue"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0 DH"
-                            android:textColor="@color/paid"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="4dp"
+                    android:background="#33FFFFFF" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/summary_revenue"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.3"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/summaryRevenue"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:fontFamily="sans-serif-medium"
+                        android:text="0 DH"
+                        android:textColor="@color/on_primary"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/summaryCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="@color/text_primary"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/summary_revenue"
+                        android:textColor="@color/on_primary_dim"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/summary_invoices"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginVertical="4dp"
+                    android:background="#33FFFFFF" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/summaryCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="0"
+                        android:textColor="@color/on_primary"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/summary_invoices"
+                        android:textColor="@color/on_primary_dim"
+                        android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnInvoices"
-            style="@style/PrimaryButton"
-            android:layout_marginTop="22dp"
-            android:text="@string/menu_invoices" />
+        <!-- ===== Menu ===== -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="22dp"
+            android:paddingBottom="24dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClients"
-            style="@style/PrimaryButton"
-            android:layout_marginTop="14dp"
-            android:text="@string/menu_clients" />
+            <include
+                android:id="@+id/btnInvoices"
+                layout="@layout/include_menu_card" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnBooks"
-            style="@style/PrimaryButton"
-            android:layout_marginTop="14dp"
-            android:text="@string/menu_books" />
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <include
+                android:id="@+id/btnClients"
+                layout="@layout/include_menu_card" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <include
+                android:id="@+id/btnBooks"
+                layout="@layout/include_menu_card" />
+        </LinearLayout>
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

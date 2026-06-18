@@ -26,7 +26,7 @@ class ClientsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.toolbar.title = getString(R.string.clients_title)
-        binding.toolbar.setNavigationIcon(android.R.drawable.ic_menu_revert)
+        binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
@@ -34,7 +34,7 @@ class ClientsActivity : AppCompatActivity() {
 
         binding.fab.text = getString(R.string.new_client)
         binding.fab.setOnClickListener { showClientDialog(null) }
-        binding.empty.text = getString(R.string.no_clients)
+        binding.emptyText.text = getString(R.string.no_clients)
     }
 
     override fun onResume() {

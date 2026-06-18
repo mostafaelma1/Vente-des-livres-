@@ -46,7 +46,7 @@ class InvoiceEditActivity : AppCompatActivity() {
 
         invoiceId = intent.getLongExtra(EXTRA_INVOICE_ID, 0L)
 
-        binding.toolbar.setNavigationIcon(android.R.drawable.ic_menu_revert)
+        binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.toolbar.title = if (invoiceId == 0L)
             getString(R.string.new_invoice) else "Facture #$invoiceId"

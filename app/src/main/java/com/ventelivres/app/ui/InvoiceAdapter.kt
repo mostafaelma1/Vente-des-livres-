@@ -36,17 +36,22 @@ class InvoiceAdapter(
         val ctx = holder.b.root.context
         holder.b.clientName.text = row.invoice.clientName
         holder.b.meta.text = "Facture #${row.invoice.id} · ${Format.date(row.invoice.date)}"
-        holder.b.total.text = "Total : ${Format.money(row.total)}"
-        holder.b.rest.text = "Reste : ${Format.money(row.rest)}"
+        holder.b.total.text = Format.money(row.total)
+        holder.b.rest.text = Format.money(row.rest)
 
-        val (label, colorRes) = when (row.status) {
-            InvoiceWithTotals.STATUS_PAID -> R.string.status_paid to R.color.paid
-            InvoiceWithTotals.STATUS_PARTIAL -> R.string.status_partial to R.color.partial
-            else -> R.string.status_unpaid to R.color.unpaid
+        val (label, colorRes, tintRes) = when (row.status) {
+            InvoiceWithTotals.STATUS_PAID ->
+                Triple(R.string.status_paid, R.color.paid, R.color.paid_tint)
+            InvoiceWithTotals.STATUS_PARTIAL ->
+                Triple(R.string.status_partial, R.color.partial, R.color.partial_tint)
+            else ->
+                Triple(R.string.status_unpaid, R.color.unpaid, R.color.unpaid_tint)
         }
-        holder.b.badge.text = ctx.getString(label)
         val color = ContextCompat.getColor(ctx, colorRes)
-        holder.b.badge.backgroundTintList = ColorStateList.valueOf(color)
+        val tint = ContextCompat.getColor(ctx, tintRes)
+        holder.b.badge.text = ctx.getString(label)
+        holder.b.badge.backgroundTintList = ColorStateList.valueOf(tint)
+        holder.b.badge.setTextColor(color)
         holder.b.rest.setTextColor(color)
 
         holder.b.root.setOnClickListener { onClick(row.invoice.id) }
