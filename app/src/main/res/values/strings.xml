@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Vente Livres · بيع الكتب</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_subtitle">Gestion des ventes · تسيير المبيعات</string>
+    <string name="menu_invoices">Factures · الفواتير</string>
+    <string name="menu_clients">Clients · الزبناء</string>
+    <string name="menu_books">Livres · الكتب</string>
+    <string name="summary_title">Résumé · ملخّص</string>
+    <string name="summary_unpaid">Reste à encaisser · الباقي</string>
+    <string name="summary_revenue">Chiffre d\'affaires · رقم المعاملات</string>
+    <string name="summary_invoices">Factures · الفواتير</string>
+
+    <!-- Common -->
+    <string name="save">Enregistrer · حفظ</string>
+    <string name="cancel">Annuler · إلغاء</string>
+    <string name="delete">Supprimer · حذف</string>
+    <string name="add">Ajouter · إضافة</string>
+    <string name="edit">Modifier · تعديل</string>
+    <string name="currency">DH</string>
+    <string name="confirm_delete">Supprimer ? · هل تريد الحذف؟</string>
+
+    <!-- Clients -->
+    <string name="clients_title">Clients · الزبناء</string>
+    <string name="client_name">Nom · الاسم</string>
+    <string name="client_phone">Téléphone · الهاتف</string>
+    <string name="client_remise">Remise %% · التخفيض %%</string>
+    <string name="client_type">Type · النوع</string>
+    <string name="type_gros">Gros · بالجملة</string>
+    <string name="type_detail">Détail · بالتقسيط</string>
+    <string name="client_notes">Notes · ملاحظات</string>
+    <string name="new_client">Nouveau client · زبون جديد</string>
+    <string name="no_clients">Aucun client · لا يوجد زبناء</string>
+
+    <!-- Books -->
+    <string name="books_title">Livres · الكتب</string>
+    <string name="book_title">Titre · العنوان</string>
+    <string name="book_author">Auteur · المؤلف</string>
+    <string name="book_price_gros">Prix gros · ثمن الجملة</string>
+    <string name="book_price_detail">Prix détail · ثمن التقسيط</string>
+    <string name="new_book">Nouveau livre · كتاب جديد</string>
+    <string name="no_books">Aucun livre · لا يوجد كتب</string>
+
+    <!-- Invoices -->
+    <string name="invoices_title">Factures · الفواتير</string>
+    <string name="new_invoice">Nouvelle facture · فاتورة جديدة</string>
+    <string name="no_invoices">Aucune facture · لا توجد فواتير</string>
+    <string name="invoice_client">Client · الزبون</string>
+    <string name="invoice_date">Date · التاريخ</string>
+    <string name="invoice_type">Type de vente · نوع البيع</string>
+    <string name="invoice_remise">Remise %% · التخفيض %%</string>
+    <string name="invoice_note">Note · ملاحظة</string>
+    <string name="invoice_items">Articles · المواد</string>
+    <string name="add_item">+ Ajouter un livre · إضافة كتاب</string>
+    <string name="invoice_subtotal">Sous-total · المجموع الفرعي</string>
+    <string name="invoice_remise_amount">Remise · التخفيض</string>
+    <string name="invoice_total">Total · المجموع</string>
+    <string name="invoice_paid">Payé · المدفوع</string>
+    <string name="invoice_rest">Reste · الباقي</string>
+    <string name="payments">Paiements · الأداءات</string>
+    <string name="add_payment">+ Ajouter un paiement · إضافة أداء</string>
+    <string name="payment_amount">Montant · المبلغ</string>
+    <string name="payment_method">Mode · الطريقة</string>
+    <string name="payment_note">Note · ملاحظة</string>
+    <string name="share_invoice">Partager la facture · مشاركة الفاتورة</string>
+    <string name="select_book">Choisir un livre · اختر كتابًا</string>
+    <string name="manual_entry">Saisie manuelle · إدخال يدوي</string>
+    <string name="quantity">Quantité · الكمية</string>
+    <string name="unit_price">Prix unitaire · الثمن للوحدة</string>
+
+    <!-- Status -->
+    <string name="status_paid">Payée · مؤداة</string>
+    <string name="status_partial">Partielle · جزئية</string>
+    <string name="status_unpaid">Impayée · غير مؤداة</string>
+
+    <!-- Payment methods -->
+    <string name="method_cash">Espèces · نقدا</string>
+    <string name="method_cheque">Chèque · شيك</string>
+    <string name="method_transfer">Virement · تحويل</string>
+    <string name="method_other">Autre · أخرى</string>
+
+    <!-- Validation -->
+    <string name="err_name_required">Le nom est obligatoire · الاسم إجباري</string>
+    <string name="err_no_client">Choisissez un client · اختر زبونًا</string>
+    <string name="err_no_items">Ajoutez au moins un article · أضف مادة واحدة على الأقل</string>
+</resources>

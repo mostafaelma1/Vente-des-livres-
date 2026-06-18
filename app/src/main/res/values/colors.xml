@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Clean, business-friendly light palette. -->
+    <color name="bg">#F4F6FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#EEF1F6</color>
+    <color name="stroke">#DCE2EC</color>
+
+    <color name="primary">#1E5BB8</color>      <!-- trust blue -->
+    <color name="primary_dark">#16448C</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <color name="text_primary">#16202B</color>
+    <color name="text_secondary">#5E6B7A</color>
+
+    <color name="paid">#1B873F</color>          <!-- payée -->
+    <color name="partial">#C77700</color>       <!-- partielle -->
+    <color name="unpaid">#C62828</color>        <!-- impayée -->
+
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>

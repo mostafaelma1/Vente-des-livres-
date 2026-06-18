@@ -1,0 +1,5 @@
+# Copy this file to "local.properties" and fill in your values.
+# local.properties is git-ignored and never committed.
+
+# Path to your Android SDK (Android Studio fills this automatically).
+# sdk.dir=/Users/you/Library/Android/sdk
