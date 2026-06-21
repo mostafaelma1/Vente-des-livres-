@@ -1,7 +1,10 @@
 package com.ventelivres.app
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,6 +13,8 @@ import com.ventelivres.app.data.Employee
 import com.ventelivres.app.databinding.ActivityListBinding
 import com.ventelivres.app.databinding.DialogEmployeeBinding
 import com.ventelivres.app.ui.EmployeeAdapter
+import com.ventelivres.app.util.DocumentExporter
+import com.ventelivres.app.util.EmployeeCsv
 import com.ventelivres.app.util.Format
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,6 +26,11 @@ class EmployeesActivity : AppCompatActivity() {
     private val dao get() = (application as VenteApp).db.dao()
     private val adapter = EmployeeAdapter { showEmployeeDialog(it) }
 
+    private val importLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            uri?.let { importFrom(it) }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
@@ -29,6 +39,15 @@ class EmployeesActivity : AppCompatActivity() {
         binding.toolbar.title = getString(R.string.employees_title)
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
+
+        binding.toolbar.inflateMenu(R.menu.menu_employees)
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_import -> { importLauncher.launch(arrayOf("*/*")); true }
+                R.id.action_template -> { shareTemplate(); true }
+                else -> false
+            }
+        }
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
@@ -116,5 +135,50 @@ class EmployeesActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    /** Shares the fill-in CSV template (opens in Excel / Sheets). */
+    private fun shareTemplate() {
+        val file = EmployeeCsv.writeTemplate(this)
+        DocumentExporter.share(this, file, "text/csv")
+    }
+
+    /**
+     * Imports employees from the picked CSV. Existing rows are matched by CIN
+     * (else by name) and updated; unknown rows are added automatically.
+     */
+    private fun importFrom(uri: Uri) = lifecycleScope.launch {
+        val text = withContext(Dispatchers.IO) {
+            runCatching {
+                contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
+            }.getOrNull().orEmpty()
+        }
+        val parsed = EmployeeCsv.parse(text)
+        if (parsed.isEmpty()) {
+            Toast.makeText(this@EmployeesActivity, R.string.import_empty, Toast.LENGTH_LONG).show()
+            return@launch
+        }
+        val (added, updated) = withContext(Dispatchers.IO) {
+            val existing = dao.employees()
+            val byCin = existing.filter { it.carteNationale.isNotBlank() }
+                .associateBy { it.carteNationale.trim().lowercase() }
+            val byName = existing.associateBy { "${it.nom}|${it.prenom}".trim().lowercase() }
+            var a = 0
+            var u = 0
+            for (p in parsed) {
+                val match = (if (p.carteNationale.isNotBlank()) byCin[p.carteNationale.trim().lowercase()] else null)
+                    ?: byName["${p.nom}|${p.prenom}".trim().lowercase()]
+                if (match != null) {
+                    dao.upsertEmployee(p.copy(id = match.id, actif = match.actif))
+                    u++
+                } else {
+                    dao.upsertEmployee(p)
+                    a++
+                }
+            }
+            a to u
+        }
+        refresh()
+        Toast.makeText(this@EmployeesActivity, getString(R.string.import_result, added, updated), Toast.LENGTH_LONG).show()
     }
 }

@@ -67,6 +67,40 @@
             android:orientation="vertical"
             android:padding="18dp">
 
+            <!-- Type filter: separate Virement / Mise à disposition -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/typeFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/typeAll"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/filter_all" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/typeVir"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/filter_virement" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/typeMise"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/filter_mise" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
             <!-- Account card -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/CardSection">

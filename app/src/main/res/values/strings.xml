@@ -42,6 +42,10 @@
     <string name="emp_salaire">Salaire mensuel · الأجر الشهري</string>
     <string name="emp_type_virement">Type de virement · نوع التحويل</string>
     <string name="emp_actif">Salarié actif · أجير نشيط</string>
+    <string name="emp_import">Importer (Excel/CSV) · استيراد</string>
+    <string name="emp_template">Modèle Excel · نموذج إكسل</string>
+    <string name="import_result">%1$d ajoutés · %2$d mis à jour</string>
+    <string name="import_empty">Fichier vide ou illisible · ملف فارغ</string>
 
     <!-- Payroll / pointage -->
     <string name="payroll_title">Pointage &amp; Salaires · التنقيط</string>
@@ -62,6 +66,9 @@
     <string name="virement_count">%1$d salariés · %2$s</string>
     <string name="virement_empty">Aucun salarié à virer · لا يوجد</string>
     <string name="virement_amount_words">Montant en lettres · المبلغ بالحروف</string>
+    <string name="filter_all">Tous · الكل</string>
+    <string name="filter_virement">Virement · تحويل</string>
+    <string name="filter_mise">Mise dispo. · وضع رهن</string>
 
     <!-- History -->
     <string name="history_title">Historique · الأرشيف</string>

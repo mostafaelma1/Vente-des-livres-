@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.ventelivres.app.data.Employee
 import com.ventelivres.app.data.Pointage
 import com.ventelivres.app.databinding.ActivityVirementBinding
 import com.ventelivres.app.util.DocumentExporter
@@ -24,6 +25,9 @@ class VirementActivity : AppCompatActivity() {
 
     private var year = 0
     private var month = 0
+
+    /** "" = all, else "VIREMENT" / "MISE DISPOSITION". */
+    private var typeFilter = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +52,17 @@ class VirementActivity : AppCompatActivity() {
         binding.nextMonth.setOnClickListener { changeMonth(1) }
         binding.pdfBtn.setOnClickListener { export(pdf = true) }
         binding.excelBtn.setOnClickListener { export(pdf = false) }
+
+        binding.typeFilter.check(binding.typeAll.id)
+        binding.typeFilter.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            typeFilter = when (checkedId) {
+                binding.typeVir.id -> Employee.TYPE_VIREMENT
+                binding.typeMise.id -> Employee.TYPE_MISE_DISPOSITION
+                else -> ""
+            }
+            refresh()
+        }
     }
 
     override fun onResume() {
@@ -92,6 +107,7 @@ class VirementActivity : AppCompatActivity() {
         val base = settings.joursBase
         return withContext(Dispatchers.IO) {
             val employees = dao.activeEmployees()
+                .filter { typeFilter.isEmpty() || it.typeVirement == typeFilter }
             val pointages = dao.pointages(year, month).associateBy { it.employeeId }
             employees.map { e ->
                 PayrollRow(e, pointages[e.id]?.jours ?: Pointage.DEFAULT_JOURS, base)
@@ -120,7 +136,8 @@ class VirementActivity : AppCompatActivity() {
             accountRib = account?.rib ?: "",
             year = year,
             month = month,
-            rows = rows
+            rows = rows,
+            typeFilter = typeFilter
         )
 
         try {

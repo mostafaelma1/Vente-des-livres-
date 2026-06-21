@@ -29,7 +29,9 @@ object DocumentExporter {
         val accountRib: String,
         val year: Int,
         val month: Int,
-        val rows: List<PayrollRow>
+        val rows: List<PayrollRow>,
+        /** Empty for all employees, else "VIREMENT" / "MISE DISPOSITION". */
+        val typeFilter: String = ""
     ) {
         val total: Double get() = rows.sumOf { it.salaireAPayer }
         val periode: String get() = Format.period(year, month)
@@ -101,7 +103,7 @@ object DocumentExporter {
         drawPageFooter(c, pageNo)
         doc.finishPage(page)
 
-        val file = outFile(context, "Ordre_virement_${safe(data.periode)}.pdf")
+        val file = outFile(context, "Ordre_virement_${safe(data.periode)}${typeTag(data)}.pdf")
         file.outputStream().use { doc.writeTo(it) }
         doc.close()
         return file
@@ -133,7 +135,7 @@ object DocumentExporter {
         line("", "TOTAL", "", "", Format.amount(data.total), "")
         line("Montant en lettres", MoneyWords.money(data.total))
 
-        val file = outFile(context, "Ordre_virement_${safe(data.periode)}.csv")
+        val file = outFile(context, "Ordre_virement_${safe(data.periode)}${typeTag(data)}.csv")
         file.writeText(sb.toString(), Charsets.UTF_8)
         return file
     }
@@ -201,8 +203,13 @@ object DocumentExporter {
         }
         c.drawText("ORDRE DE VIREMENT", PAGE_W / 2f, y, t)
         y += 16f
+        val typeSuffix = when (data.typeFilter) {
+            "VIREMENT" -> "  ·  Virement"
+            "MISE DISPOSITION" -> "  ·  Mise à disposition"
+            else -> ""
+        }
         c.drawText(
-            "Salaires du mois de ${data.periode}", PAGE_W / 2f, y,
+            "Salaires du mois de ${data.periode}$typeSuffix", PAGE_W / 2f, y,
             paint(10.5f, GRAY).apply { textAlign = Paint.Align.CENTER }
         )
         return y + 8f
@@ -392,6 +399,12 @@ object DocumentExporter {
     }
 
     private fun safe(s: String) = s.replace(Regex("[^A-Za-z0-9]+"), "_")
+
+    private fun typeTag(data: OrderData) = when (data.typeFilter) {
+        "VIREMENT" -> "_Virement"
+        "MISE DISPOSITION" -> "_MiseDisposition"
+        else -> ""
+    }
 
     private fun escape(s: String): String =
         if (s.contains(';') || s.contains('"') || s.contains('\n')) "\"" + s.replace("\"", "\"\"") + "\"" else s
