@@ -44,25 +44,27 @@ class SettingsActivity : AppCompatActivity() {
         loadAccounts()
     }
 
-    private fun loadAccounts() = lifecycleScope.launch {
-        val accounts = withContext(Dispatchers.IO) { dao.accounts() }
-        binding.accountsContainer.removeAllViews()
-        binding.noAccounts.visibility = if (accounts.isEmpty()) View.VISIBLE else View.GONE
+    private fun loadAccounts() {
+        lifecycleScope.launch {
+            val accounts = withContext(Dispatchers.IO) { dao.accounts() }
+            binding.accountsContainer.removeAllViews()
+            binding.noAccounts.visibility = if (accounts.isEmpty()) View.VISIBLE else View.GONE
 
-        accounts.forEach { acc ->
-            val row = ItemAccountBinding.inflate(layoutInflater, binding.accountsContainer, false)
-            row.label.text = acc.label
-            row.rib.text = acc.rib
-            row.radio.isChecked = acc.id == settings.activeAccountId
-            val select = {
-                settings.activeAccountId = acc.id
-                loadAccounts()
+            accounts.forEach { acc ->
+                val row = ItemAccountBinding.inflate(layoutInflater, binding.accountsContainer, false)
+                row.label.text = acc.label
+                row.rib.text = acc.rib
+                row.radio.isChecked = acc.id == settings.activeAccountId
+                val select: () -> Unit = {
+                    settings.activeAccountId = acc.id
+                    loadAccounts()
+                }
+                row.radio.setOnClickListener { select() }
+                row.label.setOnClickListener { select() }
+                row.rib.setOnClickListener { select() }
+                row.editIcon.setOnClickListener { showAccountDialog(acc) }
+                binding.accountsContainer.addView(row.root)
             }
-            row.radio.setOnClickListener { select() }
-            row.label.setOnClickListener { select() }
-            row.rib.setOnClickListener { select() }
-            row.editIcon.setOnClickListener { showAccountDialog(acc) }
-            binding.accountsContainer.addView(row.root)
         }
     }
 
