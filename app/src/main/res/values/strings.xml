@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RECO RESTAU · الأجور</string>
+    <string name="app_name">Reco Salaire</string>
+    <string name="app_tagline">RECO RESTAU · الأجور</string>
 
     <!-- Dashboard -->
     <string name="dashboard_subtitle">Gestion des salaires · تسيير الأجور</string>
