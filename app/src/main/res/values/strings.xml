@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Vente Livres · بيع الكتب</string>
+    <string name="app_name">RECO RESTAU · الأجور</string>
 
     <!-- Dashboard -->
-    <string name="dashboard_subtitle">Gestion des ventes · تسيير المبيعات</string>
-    <string name="dashboard_hello">Bienvenue · مرحبًا 👋</string>
-    <string name="menu_invoices">Factures · الفواتير</string>
-    <string name="menu_clients">Clients · الزبناء</string>
-    <string name="menu_books">Livres · الكتب</string>
-    <string name="menu_invoices_desc">Créer et suivre les ventes · إنشاء وتتبّع المبيعات</string>
-    <string name="menu_clients_desc">Clients, types et remises · الزبناء والتخفيضات</string>
-    <string name="menu_books_desc">Catalogue et prix · الكتالوج والأثمنة</string>
-    <string name="summary_title">Résumé · ملخّص</string>
-    <string name="summary_unpaid">Reste à encaisser · الباقي</string>
-    <string name="summary_revenue">Chiffre d\'affaires · المبيعات</string>
-    <string name="summary_invoices">Factures · الفواتير</string>
+    <string name="dashboard_subtitle">Gestion des salaires · تسيير الأجور</string>
+    <string name="menu_employees">Salariés · الأجراء</string>
+    <string name="menu_employees_desc">Liste et fiches des employés · لائحة الموظفين</string>
+    <string name="menu_payroll">Pointage &amp; Salaires · التنقيط والأجور</string>
+    <string name="menu_payroll_desc">Jours travaillés et calcul auto · أيام العمل والحساب</string>
+    <string name="menu_virement">Ordre de virement · إذن بالتحويل</string>
+    <string name="menu_virement_desc">Liste banque, PDF &amp; Excel · لائحة البنك</string>
+    <string name="menu_settings">Paramètres · الإعدادات</string>
+    <string name="menu_settings_desc">Société, banque et comptes · الشركة والبنك</string>
+    <string name="summary_employees">Salariés · الأجراء</string>
+    <string name="summary_total">Total du mois · مجموع الشهر</string>
+    <string name="summary_period">Période · الفترة</string>
 
     <!-- Common -->
     <string name="save">Enregistrer · حفظ</string>
@@ -25,67 +25,57 @@
     <string name="currency">DH</string>
     <string name="confirm_delete">Supprimer ? · هل تريد الحذف؟</string>
 
-    <!-- Clients -->
-    <string name="clients_title">Clients · الزبناء</string>
-    <string name="client_name">Nom · الاسم</string>
-    <string name="client_phone">Téléphone · الهاتف</string>
-    <string name="client_remise">Remise %% · التخفيض %%</string>
-    <string name="client_type">Type · النوع</string>
-    <string name="type_gros">Gros · بالجملة</string>
-    <string name="type_detail">Détail · بالتقسيط</string>
-    <string name="client_notes">Notes · ملاحظات</string>
-    <string name="new_client">Nouveau client · زبون جديد</string>
-    <string name="no_clients">Aucun client · لا يوجد زبناء</string>
+    <!-- Employees -->
+    <string name="employees_title">Salariés · الأجراء</string>
+    <string name="new_employee">Nouveau salarié · أجير جديد</string>
+    <string name="no_employees">Aucun salarié · لا يوجد أجراء</string>
+    <string name="emp_nom">Nom · الاسم العائلي</string>
+    <string name="emp_prenom">Prénom · الاسم الشخصي</string>
+    <string name="emp_poste">Poste · المنصب</string>
+    <string name="emp_lieu">Lieu de travail · مكان العمل</string>
+    <string name="emp_phone">Téléphone · الهاتف</string>
+    <string name="emp_cin">N° Carte Nationale · رقم البطاقة الوطنية</string>
+    <string name="emp_compte">N° de compte / RIB · رقم الحساب</string>
+    <string name="emp_salaire">Salaire mensuel · الأجر الشهري</string>
+    <string name="emp_type_virement">Type de virement · نوع التحويل</string>
+    <string name="emp_actif">Salarié actif · أجير نشيط</string>
 
-    <!-- Books -->
-    <string name="books_title">Livres · الكتب</string>
-    <string name="book_title">Titre · العنوان</string>
-    <string name="book_author">Auteur · المؤلف</string>
-    <string name="book_price_gros">Prix gros · ثمن الجملة</string>
-    <string name="book_price_detail">Prix détail · ثمن التقسيط</string>
-    <string name="new_book">Nouveau livre · كتاب جديد</string>
-    <string name="no_books">Aucun livre · لا يوجد كتب</string>
+    <!-- Payroll / pointage -->
+    <string name="payroll_title">Pointage &amp; Salaires · التنقيط</string>
+    <string name="payroll_days">Jours · الأيام</string>
+    <string name="payroll_total">Total à payer · المجموع للأداء</string>
+    <string name="payroll_base">Base : %1$s jours · الأساس</string>
+    <string name="payroll_saved">Pointage enregistré · تم الحفظ</string>
+    <string name="prev_month">‹</string>
+    <string name="next_month">›</string>
 
-    <!-- Invoices -->
-    <string name="invoices_title">Factures · الفواتير</string>
-    <string name="new_invoice">Nouvelle facture · فاتورة جديدة</string>
-    <string name="no_invoices">Aucune facture · لا توجد فواتير</string>
-    <string name="invoice_client">Client · الزبون</string>
-    <string name="invoice_date">Date · التاريخ</string>
-    <string name="invoice_type">Type de vente · نوع البيع</string>
-    <string name="invoice_remise">Remise %% · التخفيض %%</string>
-    <string name="invoice_note">Note · ملاحظة</string>
-    <string name="invoice_items">Articles · المواد</string>
-    <string name="add_item">+ Ajouter un livre · إضافة كتاب</string>
-    <string name="invoice_subtotal">Sous-total · المجموع الفرعي</string>
-    <string name="invoice_remise_amount">Remise · التخفيض</string>
-    <string name="invoice_total">Total · المجموع</string>
-    <string name="invoice_paid">Payé · المدفوع</string>
-    <string name="invoice_rest">Reste · الباقي</string>
-    <string name="payments">Paiements · الأداءات</string>
-    <string name="add_payment">+ Ajouter un paiement · إضافة أداء</string>
-    <string name="payment_amount">Montant · المبلغ</string>
-    <string name="payment_method">Mode · الطريقة</string>
-    <string name="payment_note">Note · ملاحظة</string>
-    <string name="share_invoice">Partager la facture · مشاركة الفاتورة</string>
-    <string name="select_book">Choisir un livre · اختر كتابًا</string>
-    <string name="manual_entry">Saisie manuelle · إدخال يدوي</string>
-    <string name="quantity">Quantité · الكمية</string>
-    <string name="unit_price">Prix unitaire · الثمن للوحدة</string>
+    <!-- Virement / order -->
+    <string name="virement_title">Ordre de virement · إذن بالتحويل</string>
+    <string name="virement_account">Compte à débiter · الحساب المدين</string>
+    <string name="virement_no_account">Ajoutez un compte dans Paramètres · أضف حسابًا في الإعدادات</string>
+    <string name="virement_pdf">PDF</string>
+    <string name="virement_excel">Excel</string>
+    <string name="virement_share">Partager · مشاركة</string>
+    <string name="virement_count">%1$d salariés · %2$s</string>
+    <string name="virement_empty">Aucun salarié à virer · لا يوجد</string>
 
-    <!-- Status -->
-    <string name="status_paid">Payée · مؤداة</string>
-    <string name="status_partial">Partielle · جزئية</string>
-    <string name="status_unpaid">Impayée · غير مؤداة</string>
-
-    <!-- Payment methods -->
-    <string name="method_cash">Espèces · نقدا</string>
-    <string name="method_cheque">Chèque · شيك</string>
-    <string name="method_transfer">Virement · تحويل</string>
-    <string name="method_other">Autre · أخرى</string>
+    <!-- Settings -->
+    <string name="settings_title">Paramètres · الإعدادات</string>
+    <string name="set_societe">Société · الشركة</string>
+    <string name="set_manager">Gérant · المسير</string>
+    <string name="set_bank">Banque · البنك</string>
+    <string name="set_agency">Agence · الوكالة</string>
+    <string name="set_ref">Référence · المرجع</string>
+    <string name="set_ville">Ville · المدينة</string>
+    <string name="set_jours_base">Base jours (÷) · أساس الأيام</string>
+    <string name="set_accounts">Comptes de la société · حسابات الشركة</string>
+    <string name="set_account_label">Libellé · التسمية</string>
+    <string name="set_account_rib">N° de compte / RIB · رقم الحساب</string>
+    <string name="set_add_account">+ Ajouter un compte · إضافة حساب</string>
+    <string name="set_active_account">Compte actif · الحساب النشيط</string>
+    <string name="set_no_accounts">Aucun compte enregistré · لا يوجد حساب</string>
+    <string name="saved">Enregistré · تم الحفظ</string>
 
     <!-- Validation -->
     <string name="err_name_required">Le nom est obligatoire · الاسم إجباري</string>
-    <string name="err_no_client">Choisissez un client · اختر زبونًا</string>
-    <string name="err_no_items">Ajoutez au moins un article · أضف مادة واحدة على الأقل</string>
 </resources>

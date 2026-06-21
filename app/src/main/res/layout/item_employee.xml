@@ -27,7 +27,7 @@
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:background="@drawable/bg_circle"
-            android:backgroundTint="@color/tint_teal"
+            android:backgroundTint="@color/tint_indigo"
             android:padding="11dp"
             android:src="@drawable/ic_clients" />
 
@@ -46,7 +46,7 @@
                 android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:textStyle="bold"
-                tools:text="Librairie Al Maarifa" />
+                tools:text="Mohamed El Amrani" />
 
             <TextView
                 android:id="@+id/subtitle"
@@ -55,12 +55,20 @@
                 android:layout_marginTop="3dp"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp"
-                tools:text="Gros · Remise 10% · 0600000000" />
+                tools:text="Cuisinier · Hôpital · 4 500 DH" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_chevron" />
+        <TextView
+            android:id="@+id/badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_badge"
+            android:backgroundTint="@color/primary_light"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp"
+            android:textColor="@color/primary_dark"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="4 500 DH" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

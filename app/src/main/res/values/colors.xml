@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== Modern, elegant palette ===== -->
-    <color name="bg">#F5F6FB</color>
+    <!-- ===== RECO RESTAU palette (warm orange / gold) ===== -->
+    <color name="bg">#FBF6F1</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F0F1F8</color>
-    <color name="stroke">#E7E9F3</color>
+    <color name="surface_variant">#F6EFE7</color>
+    <color name="stroke">#EEE2D6</color>
 
-    <!-- Indigo / violet brand -->
-    <color name="primary">#5B5BD6</color>
-    <color name="primary_dark">#4B45C6</color>
-    <color name="primary_light">#EEEEFC</color>
-    <color name="gradient_start">#6D6BEF</color>
-    <color name="gradient_end">#4F46E5</color>
+    <!-- Orange brand (from the logo) -->
+    <color name="primary">#DD5B14</color>
+    <color name="primary_dark">#C24E0E</color>
+    <color name="primary_light">#FCEFE2</color>
+    <color name="gradient_start">#F39A33</color>
+    <color name="gradient_end">#DD5B14</color>
     <color name="on_primary">#FFFFFF</color>
 
     <!-- Text -->
-    <color name="text_primary">#1B1E2B</color>
-    <color name="text_secondary">#6B7180</color>
-    <color name="on_primary_dim">#DDDCFA</color>
+    <color name="text_primary">#2A1D13</color>
+    <color name="text_secondary">#8A7867</color>
+    <color name="on_primary_dim">#FBE6D2</color>
 
     <!-- Status -->
     <color name="paid">#16A34A</color>
@@ -27,12 +27,13 @@
     <color name="unpaid">#DC2626</color>
     <color name="unpaid_tint">#FBE9E9</color>
 
-    <!-- Accent tints for stat / menu icons -->
-    <color name="tint_indigo">#EAEAFB</color>
+    <!-- Accent tints for menu / list icons -->
+    <color name="tint_indigo">#FCE7D6</color>
     <color name="tint_green">#E7F6EC</color>
-    <color name="tint_amber">#FCF1E1</color>
-    <color name="tint_teal">#E2F6F3</color>
-    <color name="teal">#0EA5A5</color>
+    <color name="tint_amber">#FBEFD2</color>
+    <color name="tint_teal">#FBE3D2</color>
+    <color name="teal">#E08A2B</color>
+    <color name="gold">#F0C24B</color>
 
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>

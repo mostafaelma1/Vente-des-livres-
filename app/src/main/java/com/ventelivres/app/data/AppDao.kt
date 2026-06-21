@@ -8,67 +8,39 @@ import androidx.room.Upsert
 @Dao
 interface AppDao {
 
-    // ---- Clients ----
-    @Query("SELECT * FROM clients ORDER BY name COLLATE NOCASE")
-    suspend fun clients(): List<Client>
+    // ---- Employees ----
+    @Query("SELECT * FROM employees ORDER BY nom COLLATE NOCASE, prenom COLLATE NOCASE")
+    suspend fun employees(): List<Employee>
 
-    @Query("SELECT * FROM clients WHERE id = :id")
-    suspend fun client(id: Long): Client?
-
-    @Upsert
-    suspend fun upsertClient(client: Client): Long
-
-    @Delete
-    suspend fun deleteClient(client: Client)
-
-    // ---- Books ----
-    @Query("SELECT * FROM books ORDER BY title COLLATE NOCASE")
-    suspend fun books(): List<Book>
+    @Query("SELECT * FROM employees WHERE actif = 1 ORDER BY nom COLLATE NOCASE, prenom COLLATE NOCASE")
+    suspend fun activeEmployees(): List<Employee>
 
     @Upsert
-    suspend fun upsertBook(book: Book): Long
+    suspend fun upsertEmployee(employee: Employee): Long
 
     @Delete
-    suspend fun deleteBook(book: Book)
+    suspend fun deleteEmployee(employee: Employee)
 
-    // ---- Invoices ----
-    @Query("SELECT * FROM invoices WHERE id = :id")
-    suspend fun invoice(id: Long): Invoice?
+    // ---- Pointages (monthly attendance) ----
+    @Query("SELECT * FROM pointages WHERE year = :year AND month = :month")
+    suspend fun pointages(year: Int, month: Int): List<Pointage>
+
+    @Query("SELECT * FROM pointages WHERE employeeId = :employeeId AND year = :year AND month = :month LIMIT 1")
+    suspend fun pointage(employeeId: Long, year: Int, month: Int): Pointage?
 
     @Upsert
-    suspend fun upsertInvoice(invoice: Invoice): Long
+    suspend fun upsertPointage(pointage: Pointage): Long
 
-    @Delete
-    suspend fun deleteInvoice(invoice: Invoice)
+    // ---- Company accounts ----
+    @Query("SELECT * FROM company_accounts ORDER BY id")
+    suspend fun accounts(): List<CompanyAccount>
 
-    @Query(
-        """
-        SELECT i.*,
-          (SELECT COALESCE(SUM(unitPrice * quantity), 0) FROM invoice_items WHERE invoiceId = i.id) AS subtotal,
-          (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE invoiceId = i.id) AS paid
-        FROM invoices i
-        ORDER BY i.date DESC, i.id DESC
-        """
-    )
-    suspend fun invoicesWithTotals(): List<InvoiceWithTotals>
-
-    // ---- Invoice items ----
-    @Query("SELECT * FROM invoice_items WHERE invoiceId = :invoiceId ORDER BY id")
-    suspend fun items(invoiceId: Long): List<InvoiceItem>
+    @Query("SELECT * FROM company_accounts WHERE id = :id")
+    suspend fun account(id: Long): CompanyAccount?
 
     @Upsert
-    suspend fun upsertItem(item: InvoiceItem): Long
+    suspend fun upsertAccount(account: CompanyAccount): Long
 
     @Delete
-    suspend fun deleteItem(item: InvoiceItem)
-
-    // ---- Payments ----
-    @Query("SELECT * FROM payments WHERE invoiceId = :invoiceId ORDER BY date, id")
-    suspend fun payments(invoiceId: Long): List<Payment>
-
-    @Upsert
-    suspend fun upsertPayment(payment: Payment): Long
-
-    @Delete
-    suspend fun deletePayment(payment: Payment)
+    suspend fun deleteAccount(account: CompanyAccount)
 }

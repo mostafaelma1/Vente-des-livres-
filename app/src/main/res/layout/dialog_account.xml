@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -10,39 +9,25 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/payment_amount">
+        android:hint="@string/set_account_label">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/amount"
+            android:id="@+id/label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="@string/payment_method">
-
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/method"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="none" />
+            android:inputType="textCapWords" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:hint="@string/payment_note">
+        android:hint="@string/set_account_rib">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/note"
+            android:id="@+id/rib"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textCapSentences" />
+            android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

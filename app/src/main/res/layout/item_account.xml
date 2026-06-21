@@ -4,48 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_badge"
+    android:backgroundTint="@color/surface"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingVertical="8dp">
+    android:padding="6dp">
+
+    <RadioButton
+        android:id="@+id/radio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/primary"
+        android:focusable="false" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
             android:textColor="@color/text_primary"
             android:textSize="15sp"
-            tools:text="Les Misérables" />
+            android:textStyle="bold"
+            tools:text="Compte principal" />
 
         <TextView
-            android:id="@+id/detail"
+            android:id="@+id/rib"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
-            tools:text="2 × 60 DH" />
+            tools:text="225 010 030 705 289 651 011 902" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/lineTotal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/text_primary"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        tools:text="120 DH" />
-
-    <ImageButton
-        android:id="@+id/delete"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+    <ImageView
+        android:id="@+id/editIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/delete"
-        android:src="@drawable/ic_delete" />
+        android:padding="9dp"
+        android:src="@drawable/ic_settings" />
 </LinearLayout>

@@ -26,6 +26,28 @@ object Format {
 
     fun date(millis: Long): String = dateFmt.format(Date(millis))
 
+    private val MONTHS_FR = arrayOf(
+        "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+        "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+    )
+
+    /** French month name for a 1..12 value. */
+    fun monthName(month: Int): String = MONTHS_FR.getOrElse(month - 1) { "" }
+
+    /** e.g. "Juin 2026". */
+    fun period(year: Int, month: Int): String = "${monthName(month)} $year"
+
+    /** Plain amount with 2 decimals and no currency, e.g. "1 234.50". */
+    fun amount(value: Double): String {
+        val rounded = Math.round(value * 100.0) / 100.0
+        val raw = String.format(Locale.FRANCE, "%,.2f", rounded)
+        return raw.replace(NBSP, ' ').replace(NNBSP, ' ')
+    }
+
+    /** Trim a whole-number double to an integer string ("26.0" -> "26"). */
+    fun trimDays(v: Double): String =
+        if (v == Math.floor(v)) v.toLong().toString() else String.format(Locale.FRANCE, "%.1f", v)
+
     /** Parse a user-entered number, accepting both "," and "." as the decimal separator. */
     fun parseNumber(text: String?): Double {
         if (text.isNullOrBlank()) return 0.0

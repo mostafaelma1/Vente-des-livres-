@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [Client::class, Book::class, Invoice::class, InvoiceItem::class, Payment::class],
+    entities = [Employee::class, Pointage::class, CompanyAccount::class],
     version = 1,
     exportSchema = false
 )
@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "vente_livres.db"
+                    "reco_salaires.db"
                 ).build().also { instance = it }
             }
     }

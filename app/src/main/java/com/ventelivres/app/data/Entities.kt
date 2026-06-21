@@ -1,121 +1,79 @@
 package com.ventelivres.app.data
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-/** A customer: a bookstore (gros) or an individual (détail). */
-@Entity(tableName = "clients")
-data class Client(
+/** A salaried employee of the company. */
+@Entity(tableName = "employees")
+data class Employee(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
-    val phone: String = "",
-    /** "GROS" or "DETAIL". */
-    val type: String = TYPE_GROS,
-    /** Default discount applied to this client's invoices, in percent. */
-    val remisePercent: Double = 0.0,
-    val notes: String = ""
+    val nom: String,
+    val prenom: String = "",
+    /** Job / function, e.g. "Cuisinier", "Agent de service". */
+    val poste: String = "",
+    /** Work site, e.g. an hospital or a school canteen. */
+    val lieuTravail: String = "",
+    val telephone: String = "",
+    /** CIN — national identity card number. */
+    val carteNationale: String = "",
+    /** Bank account / RIB used for the salary transfer. */
+    val numeroCompte: String = "",
+    val salaireMensuel: Double = 0.0,
+    /** Wording printed in the bank order, e.g. "MISE DISPOSITION" or "VIREMENT". */
+    val typeVirement: String = TYPE_MISE_DISPOSITION,
+    val actif: Boolean = true
 ) {
+    /** "Prénom Nom" if both present, otherwise whichever is filled. */
+    val nomComplet: String
+        get() = listOf(prenom, nom).filter { it.isNotBlank() }.joinToString(" ").ifBlank { nom }
+
     companion object {
-        const val TYPE_GROS = "GROS"
-        const val TYPE_DETAIL = "DETAIL"
+        const val TYPE_MISE_DISPOSITION = "MISE DISPOSITION"
+        const val TYPE_VIREMENT = "VIREMENT"
     }
 }
 
-/** A book in the catalog, entered manually with its wholesale/retail price. */
-@Entity(tableName = "books")
-data class Book(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val title: String,
-    val author: String = "",
-    val priceGros: Double = 0.0,
-    val priceDetail: Double = 0.0
-)
-
-/** A sale/invoice header. Items and payments reference it. */
-@Entity(tableName = "invoices")
-data class Invoice(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val clientId: Long,
-    /** Snapshot of the client name at creation time (kept even if client edited). */
-    val clientName: String,
-    val date: Long = System.currentTimeMillis(),
-    val type: String = Client.TYPE_GROS,
-    val remisePercent: Double = 0.0,
-    val note: String = ""
-)
-
+/**
+ * Monthly attendance ("pointage") for one employee: the number of worked days
+ * in a given month. The prorated salary is derived from this value.
+ */
 @Entity(
-    tableName = "invoice_items",
+    tableName = "pointages",
+    indices = [Index(value = ["employeeId", "year", "month"], unique = true)],
     foreignKeys = [ForeignKey(
-        entity = Invoice::class,
+        entity = Employee::class,
         parentColumns = ["id"],
-        childColumns = ["invoiceId"],
+        childColumns = ["employeeId"],
         onDelete = ForeignKey.CASCADE
-    )],
-    indices = [Index("invoiceId")]
+    )]
 )
-data class InvoiceItem(
+data class Pointage(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val invoiceId: Long,
-    val bookId: Long? = null,
-    val title: String,
-    val unitPrice: Double,
-    val quantity: Int = 1
-) {
-    val lineTotal: Double get() = unitPrice * quantity
-}
-
-@Entity(
-    tableName = "payments",
-    foreignKeys = [ForeignKey(
-        entity = Invoice::class,
-        parentColumns = ["id"],
-        childColumns = ["invoiceId"],
-        onDelete = ForeignKey.CASCADE
-    )],
-    indices = [Index("invoiceId")]
-)
-data class Payment(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val invoiceId: Long,
-    val amount: Double,
-    val date: Long = System.currentTimeMillis(),
-    /** "CASH", "CHEQUE", "TRANSFER", "OTHER". */
-    val method: String = METHOD_CASH,
-    val note: String = ""
+    val employeeId: Long,
+    /** Calendar year, e.g. 2026. */
+    val year: Int,
+    /** Month 1..12. */
+    val month: Int,
+    /** Worked days in the month (supports half-days). */
+    val jours: Double = DEFAULT_JOURS
 ) {
     companion object {
-        const val METHOD_CASH = "CASH"
-        const val METHOD_CHEQUE = "CHEQUE"
-        const val METHOD_TRANSFER = "TRANSFER"
-        const val METHOD_OTHER = "OTHER"
+        const val DEFAULT_JOURS = 26.0
     }
 }
 
-/** Invoice header plus its computed totals, for list/summary screens. */
-data class InvoiceWithTotals(
-    @Embedded val invoice: Invoice,
-    val subtotal: Double,
-    val paid: Double
-) {
-    val remiseAmount: Double get() = subtotal * invoice.remisePercent / 100.0
-    val total: Double get() = subtotal - remiseAmount
-    val rest: Double get() = total - paid
-
-    val status: String
-        get() = when {
-            total <= 0.0 -> STATUS_UNPAID
-            paid <= 0.0 -> STATUS_UNPAID
-            rest > 0.009 -> STATUS_PARTIAL
-            else -> STATUS_PAID
-        }
-
-    companion object {
-        const val STATUS_PAID = "PAID"
-        const val STATUS_PARTIAL = "PARTIAL"
-        const val STATUS_UNPAID = "UNPAID"
-    }
-}
+/**
+ * A company bank account that can be used as the debited account on the
+ * transfer order. The user can store several and pick the active one — the
+ * "compte variable" requested.
+ */
+@Entity(tableName = "company_accounts")
+data class CompanyAccount(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    /** Free label, e.g. "Compte principal". */
+    val label: String,
+    /** Account number / RIB (24 digits at Crédit Agricole). */
+    val rib: String
+)

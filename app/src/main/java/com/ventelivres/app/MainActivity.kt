@@ -8,17 +8,20 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.ventelivres.app.data.Pointage
 import com.ventelivres.app.databinding.ActivityMainBinding
 import com.ventelivres.app.databinding.IncludeMenuCardBinding
 import com.ventelivres.app.util.Format
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val dao get() = (application as VenteApp).db.dao()
+    private val settings by lazy { (application as VenteApp).settings }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,19 +29,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupCard(
-            binding.btnInvoices, R.drawable.ic_invoice, R.color.tint_indigo,
-            R.string.menu_invoices, R.string.menu_invoices_desc
-        ) { startActivity(Intent(this, InvoicesActivity::class.java)) }
+            binding.btnEmployees, R.drawable.ic_clients, R.color.tint_indigo,
+            R.string.menu_employees, R.string.menu_employees_desc
+        ) { startActivity(Intent(this, EmployeesActivity::class.java)) }
 
         setupCard(
-            binding.btnClients, R.drawable.ic_clients, R.color.tint_teal,
-            R.string.menu_clients, R.string.menu_clients_desc
-        ) { startActivity(Intent(this, ClientsActivity::class.java)) }
+            binding.btnPayroll, R.drawable.ic_calendar, R.color.tint_amber,
+            R.string.menu_payroll, R.string.menu_payroll_desc
+        ) { startActivity(Intent(this, PayrollActivity::class.java)) }
 
         setupCard(
-            binding.btnBooks, R.drawable.ic_book, R.color.tint_amber,
-            R.string.menu_books, R.string.menu_books_desc
-        ) { startActivity(Intent(this, BooksActivity::class.java)) }
+            binding.btnVirement, R.drawable.ic_receipt, R.color.tint_teal,
+            R.string.menu_virement, R.string.menu_virement_desc
+        ) { startActivity(Intent(this, VirementActivity::class.java)) }
+
+        setupCard(
+            binding.btnSettings, R.drawable.ic_settings, R.color.tint_green,
+            R.string.menu_settings, R.string.menu_settings_desc
+        ) { startActivity(Intent(this, SettingsActivity::class.java)) }
     }
 
     private fun setupCard(
@@ -63,11 +71,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshSummary() = lifecycleScope.launch {
-        val invoices = withContext(Dispatchers.IO) { dao.invoicesWithTotals() }
-        val unpaid = invoices.sumOf { it.rest.coerceAtLeast(0.0) }
-        val revenue = invoices.sumOf { it.total }
-        binding.summaryUnpaid.text = Format.money(unpaid)
-        binding.summaryRevenue.text = Format.money(revenue)
-        binding.summaryCount.text = invoices.size.toString()
+        val cal = Calendar.getInstance()
+        val year = cal.get(Calendar.YEAR)
+        val month = cal.get(Calendar.MONTH) + 1
+        val base = settings.joursBase
+
+        val (count, total) = withContext(Dispatchers.IO) {
+            val employees = dao.activeEmployees()
+            val pointages = dao.pointages(year, month).associateBy { it.employeeId }
+            val sum = employees.sumOf { e ->
+                val jours = pointages[e.id]?.jours ?: Pointage.DEFAULT_JOURS
+                val daily = if (base > 0) e.salaireMensuel / base else 0.0
+                Math.round(daily * jours * 100.0) / 100.0
+            }
+            employees.size to sum
+        }
+
+        binding.summaryCount.text = count.toString()
+        binding.summaryTotal.text = Format.money(total)
+        binding.summaryPeriod.text = Format.period(year, month)
     }
 }
