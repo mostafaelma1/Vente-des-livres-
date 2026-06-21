@@ -44,7 +44,12 @@ class MainActivity : AppCompatActivity() {
         ) { startActivity(Intent(this, VirementActivity::class.java)) }
 
         setupCard(
-            binding.btnSettings, R.drawable.ic_settings, R.color.tint_green,
+            binding.btnHistory, R.drawable.ic_trending, R.color.tint_green,
+            R.string.menu_history, R.string.menu_history_desc
+        ) { startActivity(Intent(this, HistoryActivity::class.java)) }
+
+        setupCard(
+            binding.btnSettings, R.drawable.ic_settings, R.color.tint_indigo,
             R.string.menu_settings, R.string.menu_settings_desc
         ) { startActivity(Intent(this, SettingsActivity::class.java)) }
     }

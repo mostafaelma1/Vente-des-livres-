@@ -205,6 +205,14 @@
                 android:layout_height="12dp" />
 
             <include
+                android:id="@+id/btnHistory"
+                layout="@layout/include_menu_card" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+            <include
                 android:id="@+id/btnSettings"
                 layout="@layout/include_menu_card" />
         </LinearLayout>

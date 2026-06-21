@@ -25,6 +25,9 @@ interface AppDao {
     @Query("SELECT * FROM pointages WHERE year = :year AND month = :month")
     suspend fun pointages(year: Int, month: Int): List<Pointage>
 
+    @Query("SELECT * FROM pointages")
+    suspend fun allPointages(): List<Pointage>
+
     @Query("SELECT * FROM pointages WHERE employeeId = :employeeId AND year = :year AND month = :month LIMIT 1")
     suspend fun pointage(employeeId: Long, year: Int, month: Int): Pointage?
 

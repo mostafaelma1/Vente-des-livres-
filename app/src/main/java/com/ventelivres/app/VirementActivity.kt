@@ -9,6 +9,7 @@ import com.ventelivres.app.data.Pointage
 import com.ventelivres.app.databinding.ActivityVirementBinding
 import com.ventelivres.app.util.DocumentExporter
 import com.ventelivres.app.util.Format
+import com.ventelivres.app.util.MoneyWords
 import com.ventelivres.app.util.PayrollRow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,9 +34,15 @@ class VirementActivity : AppCompatActivity() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        val cal = Calendar.getInstance()
-        year = cal.get(Calendar.YEAR)
-        month = cal.get(Calendar.MONTH) + 1
+        val extraYear = intent.getIntExtra(EXTRA_YEAR, -1)
+        if (extraYear > 0) {
+            year = extraYear
+            month = intent.getIntExtra(EXTRA_MONTH, 1)
+        } else {
+            val cal = Calendar.getInstance()
+            year = cal.get(Calendar.YEAR)
+            month = cal.get(Calendar.MONTH) + 1
+        }
 
         binding.prevMonth.setOnClickListener { changeMonth(-1) }
         binding.nextMonth.setOnClickListener { changeMonth(1) }
@@ -71,8 +78,10 @@ class VirementActivity : AppCompatActivity() {
         }
 
         val rows = loadRows()
+        val total = rows.sumOf { it.salaireAPayer }
         binding.countLabel.text = rows.size.toString()
-        binding.totalLabel.text = Format.money(rows.sumOf { it.salaireAPayer })
+        binding.totalLabel.text = Format.money(total)
+        binding.amountWords.text = if (rows.isEmpty()) "—" else MoneyWords.money(total)
 
         val enabled = rows.isNotEmpty()
         binding.pdfBtn.isEnabled = enabled
@@ -131,5 +140,10 @@ class VirementActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(this@VirementActivity, "Erreur: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    companion object {
+        const val EXTRA_YEAR = "extra_year"
+        const val EXTRA_MONTH = "extra_month"
     }
 }

@@ -11,6 +11,8 @@
     <string name="menu_payroll_desc">Jours travaillés et calcul auto · أيام العمل والحساب</string>
     <string name="menu_virement">Ordre de virement · إذن بالتحويل</string>
     <string name="menu_virement_desc">Liste banque, PDF &amp; Excel · لائحة البنك</string>
+    <string name="menu_history">Historique · الأرشيف</string>
+    <string name="menu_history_desc">Les mois passés · الأشهر السابقة</string>
     <string name="menu_settings">Paramètres · الإعدادات</string>
     <string name="menu_settings_desc">Société, banque et comptes · الشركة والبنك</string>
     <string name="summary_employees">Salariés · الأجراء</string>
@@ -59,6 +61,12 @@
     <string name="virement_share">Partager · مشاركة</string>
     <string name="virement_count">%1$d salariés · %2$s</string>
     <string name="virement_empty">Aucun salarié à virer · لا يوجد</string>
+    <string name="virement_amount_words">Montant en lettres · المبلغ بالحروف</string>
+
+    <!-- History -->
+    <string name="history_title">Historique · الأرشيف</string>
+    <string name="history_empty">Aucun mois enregistré · لا يوجد أرشيف</string>
+    <string name="history_subtitle">%1$d salariés · %2$s</string>
 
     <!-- Settings -->
     <string name="settings_title">Paramètres · الإعدادات</string>
