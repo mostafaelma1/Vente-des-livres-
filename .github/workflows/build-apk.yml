@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "claude/book-sales-management-app-y4n0x9"
+      - "claude/salary-management-app-ynxixj"
   workflow_dispatch:
 
 permissions:
