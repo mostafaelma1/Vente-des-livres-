@@ -41,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="@string/menu_invoices"
+                android:text="@string/menu_employees"
                 android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="@string/menu_invoices_desc"
+                android:text="@string/menu_employees_desc"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
         </LinearLayout>
