@@ -1,0 +1,67 @@
+name: Build PrixRef AO APK
+
+on:
+  push:
+    branches:
+      - "claude/moroccan-tender-analyzer-0szsuc"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required SDK packages
+        run: |
+          yes | sdkmanager "platforms;android-34" "build-tools;34.0.0" >/dev/null
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Stage APK
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/PrixRef-AO-Maroc-debug.apk
+          ls -la dist
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PrixRef-AO-Maroc-debug-apk
+          path: dist/PrixRef-AO-Maroc-debug.apk
+          if-no-files-found: error
+
+      - name: Publish APK to a Release (direct download link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: prixref-v${{ github.run_number }}
+          name: PrixRef AO Maroc APK (build ${{ github.run_number }})
+          body: |
+            APK debug compilé depuis `${{ github.sha }}`.
+
+            Téléchargez **PrixRef-AO-Maroc-debug.apk** ci-dessous, puis installez-le
+            sur un appareil Android (activez « Installer des applications inconnues »).
+
+            Cette application n'est pas officielle et n'est pas affiliée à
+            marchespublics.gov.ma. Les résultats sont indicatifs.
+          files: dist/PrixRef-AO-Maroc-debug.apk
