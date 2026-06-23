@@ -76,8 +76,11 @@ dependencies {
     // Gson — sérialisation JSON des analyses complètes.
     implementation("com.google.code.gson:gson:2.11.0")
 
-    // Jsoup — téléchargement et analyse HTML de la page de consultation.
-    implementation("org.jsoup:jsoup:1.17.2")
+    // Retrofit + OkHttp — appel du backend d'analyse (scraping Playwright).
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Tests unitaires du moteur de calcul.
     testImplementation("junit:junit:4.13.2")

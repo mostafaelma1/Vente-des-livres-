@@ -38,7 +38,7 @@
 
                     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Collez un lien marchespublics.gov.ma (page SuiviConsultation)."
+                        android:text="Collez un lien marchespublics.gov.ma. L'analyse automatique nécessite Internet et le serveur (voir Paramètres)."
                         android:textColor="@color/text_secondary" android:textSize="12sp" />
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -64,24 +64,39 @@
                     android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <TextView style="@style/SectionTitle" android:text="Paramètres extraits" />
+                    <TextView style="@style/SectionTitle" android:text="Résultat de l'analyse" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" android:gravity="center_vertical"
+                        android:orientation="horizontal">
+                        <ProgressBar
+                            android:id="@+id/progress"
+                            android:layout_width="22dp" android:layout_height="22dp"
+                            android:layout_marginEnd="10dp" android:visibility="gone" />
+                        <TextView android:id="@+id/tvMessage"
+                            android:layout_width="0dp" android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_primary" android:textSize="13sp" />
+                    </LinearLayout>
 
                     <TextView android:id="@+id/tvRef" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:layout_marginTop="8dp"
-                        android:textColor="@color/text_primary" android:textSize="14sp" />
+                        android:layout_height="wrap_content" android:layout_marginTop="10dp"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
                     <TextView android:id="@+id/tvOrg" android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/text_primary" android:textSize="14sp" />
-
-                    <TextView android:id="@+id/tvMessage" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:layout_marginTop="12dp"
-                        android:background="@color/warning_tint" android:padding="12dp"
-                        android:textColor="@color/warning" android:textSize="13sp" />
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnContinue" style="@style/PrimaryButton"
                         android:layout_marginTop="14dp"
                         android:text="Continuer en mode manuel" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExport"
+                        style="@style/OutlineButton"
+                        android:layout_marginTop="10dp" android:visibility="gone"
+                        android:text="Exporter les données brutes (debug)" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

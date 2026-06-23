@@ -26,12 +26,28 @@ PDF** professionnel.
 - **Historique** local (Room/SQLite) : recherche, ouverture, suppression,
   régénération du PDF.
 - **Simulation avant dépôt** : position probable et conseils selon l'offre saisie.
-- **Analyse par URL** : téléchargement de la page de consultation
-  `marchespublics.gov.ma` (sur l'appareil, via Jsoup) et extraction best-effort
-  de la référence, l'objet, le maître d'ouvrage, l'estimation et du tableau des
-  offres (société / montant / statut). Le formulaire est pré-rempli pour
-  vérification, avec repli sur la saisie manuelle si la page n'est pas
-  exploitable. Nécessite la permission Internet.
+- **Analyse par URL (via backend)** : l'app envoie l'URL à un **backend Python
+  FastAPI + Playwright** (voir `backend/`) qui ouvre la vraie page
+  `marchespublics.gov.ma` dans un Chromium headless, attend le rendu JavaScript,
+  puis extrait référence, objet, acheteur, estimation et le tableau des offres.
+  Le formulaire est pré-rempli pour vérification. Configurez l'URL du serveur
+  dans **Paramètres**. Un bouton **« Exporter les données brutes »** permet
+  d'envoyer le JSON (rawText + tables) pour le debug.
+- **Mode manuel hors ligne** : fonctionne sans serveur ni connexion. Le backend
+  n'est nécessaire que pour l'analyse automatique par URL.
+
+## Architecture
+
+```
+Application Android (Kotlin)  ──HTTP──>  Backend FastAPI (backend/)
+   • mode manuel (hors ligne)              • Playwright Chromium headless
+   • calcul prix de référence              • ouvre marchespublics.gov.ma
+   • Paramètres : URL du serveur           • extrait infos + offres -> JSON
+```
+
+Le scraping ne se fait **pas** dans l'APK (site dynamique/protégé) : il est
+délégué au backend. Voir **`backend/README.md`** pour l'installation et le
+lancement du serveur.
 
 ## Pile technique
 
