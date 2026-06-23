@@ -17,9 +17,25 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        // Clé de signature stable et partagée par tous les builds (CI inclus),
+        // afin que les nouvelles versions s'installent par-dessus l'ancienne
+        // sans avoir à désinstaller l'application.
+        create("stable") {
+            storeFile = file("prixref-release.jks")
+            storePassword = "prixref2026"
+            keyAlias = "prixref"
+            keyPassword = "prixref2026"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("stable")
+        }
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("stable")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

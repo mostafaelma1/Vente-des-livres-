@@ -35,20 +35,20 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Build signed release APK
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Stage APK
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/PrixRef-AO-Maroc-debug.apk
+          cp app/build/outputs/apk/release/app-release.apk dist/PrixRef-AO-Maroc.apk
           ls -la dist
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PrixRef-AO-Maroc-debug-apk
-          path: dist/PrixRef-AO-Maroc-debug.apk
+          name: PrixRef-AO-Maroc-apk
+          path: dist/PrixRef-AO-Maroc.apk
           if-no-files-found: error
 
       - name: Publish APK to a Release (direct download link)
@@ -57,11 +57,15 @@ jobs:
           tag_name: prixref-v${{ github.run_number }}
           name: PrixRef AO Maroc APK (build ${{ github.run_number }})
           body: |
-            APK debug compilé depuis `${{ github.sha }}`.
+            APK release signé, compilé depuis `${{ github.sha }}`.
 
-            Téléchargez **PrixRef-AO-Maroc-debug.apk** ci-dessous, puis installez-le
+            Téléchargez **PrixRef-AO-Maroc.apk** ci-dessous, puis installez-le
             sur un appareil Android (activez « Installer des applications inconnues »).
+
+            Toutes les versions sont signées avec la même clé : une nouvelle
+            version s'installe par-dessus l'ancienne sans désinstallation, et
+            n'affecte aucune autre application installée.
 
             Cette application n'est pas officielle et n'est pas affiliée à
             marchespublics.gov.ma. Les résultats sont indicatifs.
-          files: dist/PrixRef-AO-Maroc-debug.apk
+          files: dist/PrixRef-AO-Maroc.apk
