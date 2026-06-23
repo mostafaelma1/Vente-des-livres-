@@ -1,38 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== Modern, elegant palette ===== -->
-    <color name="bg">#F5F6FB</color>
+    <!-- ===== Palette administrative et professionnelle ===== -->
+    <color name="bg">#F4F6F9</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#F0F1F8</color>
-    <color name="stroke">#E7E9F3</color>
+    <color name="surface_variant">#EEF1F6</color>
+    <color name="stroke">#DDE3EC</color>
 
-    <!-- Indigo / violet brand -->
-    <color name="primary">#5B5BD6</color>
-    <color name="primary_dark">#4B45C6</color>
-    <color name="primary_light">#EEEEFC</color>
-    <color name="gradient_start">#6D6BEF</color>
-    <color name="gradient_end">#4F46E5</color>
+    <!-- Bleu foncé (marque) -->
+    <color name="primary">#16335C</color>
+    <color name="primary_dark">#0F2542</color>
+    <color name="primary_light">#E6ECF5</color>
+    <color name="gradient_start">#1E4D85</color>
+    <color name="gradient_end">#16335C</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <!-- Text -->
-    <color name="text_primary">#1B1E2B</color>
-    <color name="text_secondary">#6B7180</color>
-    <color name="on_primary_dim">#DDDCFA</color>
+    <!-- Texte -->
+    <color name="text_primary">#1B2330</color>
+    <color name="text_secondary">#5C6675</color>
+    <color name="on_primary_dim">#C7D3E5</color>
 
-    <!-- Status -->
+    <!-- Résultats / statuts -->
+    <color name="positive">#16A34A</color>
+    <color name="positive_tint">#E4F6EA</color>
+    <color name="warning">#D9741B</color>
+    <color name="warning_tint">#FBEFE0</color>
+    <color name="danger">#DC2626</color>
+    <color name="danger_tint">#FBE9E9</color>
+
+    <!-- Compatibilité avec les drawables existants -->
     <color name="paid">#16A34A</color>
-    <color name="paid_tint">#E7F6EC</color>
-    <color name="partial">#D97706</color>
-    <color name="partial_tint">#FCF1E1</color>
+    <color name="paid_tint">#E4F6EA</color>
+    <color name="partial">#D9741B</color>
+    <color name="partial_tint">#FBEFE0</color>
     <color name="unpaid">#DC2626</color>
     <color name="unpaid_tint">#FBE9E9</color>
-
-    <!-- Accent tints for stat / menu icons -->
-    <color name="tint_indigo">#EAEAFB</color>
-    <color name="tint_green">#E7F6EC</color>
-    <color name="tint_amber">#FCF1E1</color>
-    <color name="tint_teal">#E2F6F3</color>
-    <color name="teal">#0EA5A5</color>
+    <color name="tint_indigo">#E6ECF5</color>
+    <color name="tint_green">#E4F6EA</color>
+    <color name="tint_amber">#FBEFE0</color>
+    <color name="tint_teal">#E1F2F0</color>
+    <color name="teal">#0E8E8E</color>
 
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>

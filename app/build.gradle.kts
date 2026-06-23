@@ -5,12 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.ventelivres.app"
+    namespace = "com.prixref.ao"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ventelivres.app"
-        minSdk = 24
+        applicationId = "com.prixref.ao"
+        // Android 8.0 (Oreo) et plus.
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -47,12 +48,18 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
-    // Lifecycle + coroutines for running database work off the main thread.
+    // Lifecycle + coroutines pour exécuter les accès base hors du thread UI.
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // Room — local SQLite persistence for clients, books, invoices, payments.
+    // Room — persistance locale SQLite de l'historique des analyses.
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
+    // Gson — sérialisation JSON des analyses complètes.
+    implementation("com.google.code.gson:gson:2.11.0")
+
+    // Tests unitaires du moteur de calcul.
+    testImplementation("junit:junit:4.13.2")
 }

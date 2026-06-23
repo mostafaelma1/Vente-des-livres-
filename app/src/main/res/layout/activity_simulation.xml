@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="Simulation avant dépôt"
+        app:titleTextColor="@color/on_primary"
+        app:navigationIconTint="@color/on_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.card.MaterialCardView style="@style/CardSection">
+                <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView style="@style/SectionTitle" android:text="Vos hypothèses" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp" android:hint="@string/f_estimation">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etEstimation" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" android:hint="Votre offre (DH)">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etMyOffer" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:inputType="numberDecimal" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/CardSection" android:layout_marginTop="14dp">
+                <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView style="@style/SectionTitle"
+                        android:text="Offres estimées des concurrents" />
+
+                    <LinearLayout
+                        android:id="@+id/competitorsContainer"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddCompetitor"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" android:text="@string/add_competitor"
+                        app:icon="@drawable/ic_add" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSimulate" style="@style/PrimaryButton"
+                android:layout_marginTop="18dp" android:text="Simuler ma position" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardResult" style="@style/CardSection"
+                android:layout_marginTop="16dp" android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView style="@style/SectionTitle" android:text="Résultat de la simulation" />
+
+                    <TextView android:id="@+id/tvRef" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_marginTop="10dp"
+                        android:textColor="@color/text_primary" android:textSize="15sp" />
+                    <TextView android:id="@+id/tvPosition" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:textColor="@color/text_primary"
+                        android:textSize="15sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/tvGap" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
+
+                    <TextView android:id="@+id/tvAdvice" android:layout_width="match_parent"
+                        android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_rounded"
+                        android:padding="14dp" android:textSize="15sp" android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

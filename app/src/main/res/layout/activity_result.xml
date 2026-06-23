@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:title="Résultat de l'analyse"
+        app:titleTextColor="@color/on_primary"
+        app:navigationIconTint="@color/on_primary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Synthèse -->
+            <com.google.android.material.card.MaterialCardView style="@style/CardSection">
+                <LinearLayout
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView android:id="@+id/tvHeaderRef" style="@style/SectionTitle"
+                        android:text="Référence AO" />
+                    <TextView android:id="@+id/tvHeaderObjet"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp" android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
+                    <TextView android:id="@+id/tvHeaderMaitre"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary" android:textSize="13sp" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp"
+                        android:layout_marginVertical="12dp" android:background="@color/stroke" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <LinearLayout android:layout_width="0dp" android:layout_weight="1"
+                            android:layout_height="wrap_content" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Estimation" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                            <TextView android:id="@+id/tvEstimation" android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:textColor="@color/text_primary"
+                                android:textSize="15sp" android:textStyle="bold" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_weight="1"
+                            android:layout_height="wrap_content" android:orientation="vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                                android:text="Moyenne retenues" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                            <TextView android:id="@+id/tvAverage" android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:textColor="@color/text_primary"
+                                android:textSize="15sp" android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp" android:background="@color/primary_light"
+                        android:padding="14dp" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="PRIX DE RÉFÉRENCE" android:textColor="@color/primary_dark"
+                            android:textSize="12sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvReference" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:textColor="@color/primary_dark"
+                            android:textSize="22sp" android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" android:background="@color/positive_tint"
+                        android:padding="14dp" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="GAGNANT PROBABLE" android:textColor="@color/positive"
+                            android:textSize="12sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvWinner" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:textColor="@color/positive"
+                            android:textSize="18sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/tvCounts" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:layout_marginTop="2dp"
+                            android:textColor="@color/text_secondary" android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView style="@style/SectionTitle" android:layout_marginTop="18dp"
+                android:text="Classement des offres" />
+
+            <LinearLayout
+                android:id="@+id/rankingContainer"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPdf" style="@style/PrimaryButton"
+                android:layout_marginTop="20dp" app:icon="@drawable/ic_share"
+                app:iconTint="@color/on_primary" android:text="@string/generate_pdf" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExcel" style="@style/OutlineButton"
+                android:layout_marginTop="12dp" android:text="@string/export_excel" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave" style="@style/OutlineButton"
+                android:layout_marginTop="12dp" android:text="@string/save_history" />
+
+            <TextView
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" android:text="@string/disclaimer"
+                android:textColor="@color/text_secondary" android:textSize="11sp"
+                android:textStyle="italic" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

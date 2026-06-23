@@ -1,75 +1,104 @@
-# Vente Livres · بيع الكتب 📚
+# PrixRef AO Maroc
 
-Application Android **offline** pour gérer la **vente de livres** (en gros et au
-détail) : clients/librairies, catalogue de livres saisi manuellement, factures
-avec **remise**, **paiements partiels** et suivi du **reste à payer**.
+Application Android d'aide à l'analyse financière des appels d'offres publics au
+Maroc. Elle calcule le **prix de référence**, compare les offres des concurrents,
+les classe selon leur proximité avec le prix de référence et génère un **rapport
+PDF** professionnel.
 
-> تطبيق أندرويد بدون أنترنت لتسيير بيع الكتب: الزبناء، الكتب، الفواتير مع
-> التخفيض، الأداء الجزئي، وتتبّع الباقي.
+> Cet outil fournit une estimation analytique interne. Il ne remplace pas les
+> décisions officielles des commissions d'appel d'offres ni les documents
+> réglementaires. L'application n'est pas affiliée à marchespublics.gov.ma.
 
----
+## Fonctionnalités
 
-## ✨ Fonctionnalités · الميزات
+- **Mode manuel (hors ligne)** — saisie des informations de l'AO, de l'estimation
+  et des offres des concurrents (statut retenue / écartée).
+- **Calcul du prix de référence**
+  - Moyenne des offres retenues = somme des offres retenues / nombre des offres retenues
+  - Prix de référence = (estimation maître d'ouvrage + moyenne des offres retenues) / 2
+  - Écart (DH) = | offre − prix de référence | ; Écart (%) = écart / prix de référence × 100
+  - Classement par écart croissant ; gagnant probable = offre la plus proche
+- **Observations automatiques** : Très proche (≤ 1 %), Proche (≤ 3 %), Moyen (≤ 7 %), Éloigné (> 7 %)
+- **Analyse de risque** : offre anormalement basse / excessive / bonne position.
+  Seuil d'alerte ±25 % (Travaux), ±20 % (Fournitures et Services).
+- **Rapport PDF** professionnel, partageable (WhatsApp, Gmail, …).
+- **Export Excel** (CSV compatible Excel, séparateur `;`, encodage UTF-8 avec BOM).
+- **Historique** local (Room/SQLite) : recherche, ouverture, suppression,
+  régénération du PDF.
+- **Simulation avant dépôt** : position probable et conseils selon l'offre saisie.
+- **Analyse par URL (bêta)** : extraction de `refConsultation` et `orgAcronyme`
+  d'un lien `marchespublics.gov.ma`, puis bascule sur le mode manuel.
 
-- **Clients / الزبناء** — nom, téléphone, type **Gros** ou **Détail**, et une
-  **remise par défaut (%)** appliquée automatiquement à leurs factures.
-- **Livres / الكتب** — saisis manuellement avec un **prix de gros** et un **prix
-  de détail**. Aucun import : vous entrez les titres et les prix vous-même.
-- **Factures / الفواتير** — choisir un client, ajouter des livres (depuis le
-  catalogue ou en saisie libre), appliquer la remise, voir le **sous-total**, la
-  **remise**, le **total**.
-- **Paiements partiels / الأداء الجزئي** — enregistrer plusieurs paiements
-  (espèces, chèque, virement…). Le **Reste** (الباقي) est recalculé en direct.
-- **Modifier une facture / تعديل الفاتورة** — rouvrir une facture pour ajouter
-  un article, enregistrer un nouveau paiement ou corriger la remise. Le statut
-  passe automatiquement **Impayée → Partielle → Payée**.
-- **Partager la facture / مشاركة الفاتورة** — générer un texte de facture clair
-  et l'envoyer par WhatsApp, SMS, e-mail, etc.
-- **Tableau de bord / لوحة القيادة** — total du **reste à encaisser**, chiffre
-  d'affaires et nombre de factures.
+## Pile technique
 
-Tout est stocké **localement** sur l'appareil (SQLite / Room). Aucune connexion
-internet, aucun compte.
+- Kotlin, Android (minSdk 26 / Android 8+, targetSdk 34)
+- Architecture View + ViewBinding, Material Design 3
+- Room (SQLite) pour l'historique, Gson pour la sérialisation JSON
+- `android.graphics.pdf.PdfDocument` pour le PDF (aucune dépendance lourde)
+- Coroutines pour les accès base hors du thread UI
 
----
+## Structure du projet
 
-## 🏗️ Stack technique
+```
+app/src/main/java/com/prixref/ao/
+├── MainActivity.kt              # Accueil
+├── ManualAnalysisActivity.kt    # Saisie manuelle
+├── ResultActivity.kt            # Résultats + PDF/Excel/enregistrement
+├── HistoryActivity.kt           # Historique
+├── UrlAnalysisActivity.kt       # Extraction depuis URL (bêta)
+├── SimulationActivity.kt        # Simulation avant dépôt
+├── AboutActivity.kt             # À propos
+├── calc/
+│   ├── ReferenceCalculator.kt   # Moteur de calcul (pur Kotlin, testé)
+│   └── UrlParser.kt             # parseMarchesPublicsUrl(url)
+├── model/Models.kt              # Modèles de données
+├── data/                        # Room (Entity, Dao, Database) + JsonStore
+├── pdf/PdfReportGenerator.kt    # Génération du rapport PDF
+├── export/CsvExporter.kt        # Export Excel (CSV)
+├── ui/HistoryAdapter.kt         # Adaptateur RecyclerView
+└── util/                        # Format (montants/dates) + Sharing (FileProvider)
 
-| Concern      | Choix                                       |
-| ------------ | ------------------------------------------- |
-| Langage      | Kotlin                                      |
-| UI           | Android Views + Material 3 + ViewBinding    |
-| Persistance  | Room (SQLite)                               |
-| Async        | Kotlin Coroutines                           |
-| Min / Target | Android 7.0 (API 24) / Android 14 (API 34)  |
+app/src/test/java/com/prixref/ao/
+└── ReferenceCalculatorTest.kt   # Tests unitaires du moteur de calcul
+```
 
----
+## Compilation
 
-## 🚀 Démarrer
+Prérequis : Android Studio (Iguana ou plus récent) ou le SDK Android en ligne de
+commande, JDK 17.
 
-1. Ouvrir le projet dans **Android Studio**. Depuis la ligne de commande, copier
-   `local.properties.sample` vers `local.properties` et renseigner `sdk.dir`.
-2. Construire :
+1. Copier `local.properties.sample` vers `local.properties` et y indiquer le
+   chemin du SDK (`sdk.dir=...`). Android Studio le fait automatiquement.
+2. Construire le debug APK :
+
    ```bash
    ./gradlew assembleDebug
    ```
 
-Un **APK** est aussi construit automatiquement par GitHub Actions à chaque push
-sur la branche de développement — voir l'onglet **Releases** pour le téléchargement direct.
+   L'APK est généré dans `app/build/outputs/apk/debug/app-debug.apk`.
 
----
+3. APK de release (non signé) :
 
-## 📂 Structure du projet
+   ```bash
+   ./gradlew assembleRelease
+   ```
 
+4. Lancer les tests unitaires :
+
+   ```bash
+   ./gradlew testDebugUnitTest
+   ```
+
+## Installation sur un appareil
+
+```bash
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
-app/src/main/java/com/ventelivres/app/
-├── VenteApp.kt              # Application : accès à la base de données
-├── MainActivity.kt          # Tableau de bord + navigation
-├── ClientsActivity.kt       # Liste / ajout / édition des clients
-├── BooksActivity.kt         # Liste / ajout / édition des livres
-├── InvoicesActivity.kt      # Liste des factures + statut + reste
-├── InvoiceEditActivity.kt   # Créer / modifier une facture, articles, paiements
-├── data/                    # Entités Room, DAO, base de données
-├── ui/                      # Adapters RecyclerView
-└── util/Format.kt           # Formatage montant / date
-```
+
+## Priorité de la version actuelle (v1)
+
+Conformément au cahier des charges, la première version fonctionne **entièrement
+hors ligne** : mode manuel, calcul du prix de référence, classement, historique
+et export PDF/Excel. L'extraction automatique depuis marchespublics.gov.ma reste
+une fonctionnalité **bêta** (extraction des paramètres d'URL uniquement) afin de
+ne jamais bloquer l'application si le portail n'est pas lisible automatiquement.

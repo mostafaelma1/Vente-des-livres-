@@ -2,10 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Everything is stored locally (Room/SQLite). No internet permission. -->
+    <!-- Internet : uniquement pour la tentative d'extraction depuis une URL.
+         L'application fonctionne entièrement hors ligne en mode manuel. -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".VenteApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,7 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/Theme.VenteLivres"
+        android:theme="@style/Theme.PrixRef"
         tools:targetApi="34">
 
         <activity
@@ -26,23 +27,44 @@
         </activity>
 
         <activity
-            android:name=".ClientsActivity"
+            android:name=".ManualAnalysisActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".BooksActivity"
+            android:name=".UrlAnalysisActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".InvoicesActivity"
+            android:name=".ResultActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".InvoiceEditActivity"
+            android:name=".HistoryActivity"
             android:exported="false"
-            android:parentActivityName=".InvoicesActivity" />
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".SimulationActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Partage des PDF / CSV générés via WhatsApp, Gmail, etc. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

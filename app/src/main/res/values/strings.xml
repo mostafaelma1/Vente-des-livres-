@@ -1,91 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Vente Livres · بيع الكتب</string>
+    <string name="app_name">PrixRef AO Maroc</string>
+    <string name="slogan">Analyse intelligente des appels d\'offres publics</string>
 
-    <!-- Dashboard -->
-    <string name="dashboard_subtitle">Gestion des ventes · تسيير المبيعات</string>
-    <string name="dashboard_hello">Bienvenue · مرحبًا 👋</string>
-    <string name="menu_invoices">Factures · الفواتير</string>
-    <string name="menu_clients">Clients · الزبناء</string>
-    <string name="menu_books">Livres · الكتب</string>
-    <string name="menu_invoices_desc">Créer et suivre les ventes · إنشاء وتتبّع المبيعات</string>
-    <string name="menu_clients_desc">Clients, types et remises · الزبناء والتخفيضات</string>
-    <string name="menu_books_desc">Catalogue et prix · الكتالوج والأثمنة</string>
-    <string name="summary_title">Résumé · ملخّص</string>
-    <string name="summary_unpaid">Reste à encaisser · الباقي</string>
-    <string name="summary_revenue">Chiffre d\'affaires · المبيعات</string>
-    <string name="summary_invoices">Factures · الفواتير</string>
+    <!-- Accueil -->
+    <string name="home_new_analysis">Nouvelle analyse (URL)</string>
+    <string name="home_manual">Mode manuel</string>
+    <string name="home_history">Historique</string>
+    <string name="home_simulation">Simulation avant dépôt</string>
+    <string name="home_about">À propos</string>
 
-    <!-- Common -->
-    <string name="save">Enregistrer · حفظ</string>
-    <string name="cancel">Annuler · إلغاء</string>
-    <string name="delete">Supprimer · حذف</string>
-    <string name="add">Ajouter · إضافة</string>
-    <string name="edit">Modifier · تعديل</string>
-    <string name="currency">DH</string>
-    <string name="confirm_delete">Supprimer ? · هل تريد الحذف؟</string>
+    <!-- Commun -->
+    <string name="calculate">Calculer le prix de référence</string>
+    <string name="generate_pdf">Générer le rapport PDF</string>
+    <string name="export_excel">Export Excel (CSV)</string>
+    <string name="save_history">Enregistrer dans l\'historique</string>
+    <string name="add_competitor">+ Ajouter un concurrent</string>
+    <string name="disclaimer">Cet outil fournit une estimation analytique interne. Il ne remplace pas les décisions officielles des commissions d\'appel d\'offres.</string>
 
-    <!-- Clients -->
-    <string name="clients_title">Clients · الزبناء</string>
-    <string name="client_name">Nom · الاسم</string>
-    <string name="client_phone">Téléphone · الهاتف</string>
-    <string name="client_remise">Remise %% · التخفيض %%</string>
-    <string name="client_type">Type · النوع</string>
-    <string name="type_gros">Gros · بالجملة</string>
-    <string name="type_detail">Détail · بالتقسيط</string>
-    <string name="client_notes">Notes · ملاحظات</string>
-    <string name="new_client">Nouveau client · زبون جديد</string>
-    <string name="no_clients">Aucun client · لا يوجد زبناء</string>
-
-    <!-- Books -->
-    <string name="books_title">Livres · الكتب</string>
-    <string name="book_title">Titre · العنوان</string>
-    <string name="book_author">Auteur · المؤلف</string>
-    <string name="book_price_gros">Prix gros · ثمن الجملة</string>
-    <string name="book_price_detail">Prix détail · ثمن التقسيط</string>
-    <string name="new_book">Nouveau livre · كتاب جديد</string>
-    <string name="no_books">Aucun livre · لا يوجد كتب</string>
-
-    <!-- Invoices -->
-    <string name="invoices_title">Factures · الفواتير</string>
-    <string name="new_invoice">Nouvelle facture · فاتورة جديدة</string>
-    <string name="no_invoices">Aucune facture · لا توجد فواتير</string>
-    <string name="invoice_client">Client · الزبون</string>
-    <string name="invoice_date">Date · التاريخ</string>
-    <string name="invoice_type">Type de vente · نوع البيع</string>
-    <string name="invoice_remise">Remise %% · التخفيض %%</string>
-    <string name="invoice_note">Note · ملاحظة</string>
-    <string name="invoice_items">Articles · المواد</string>
-    <string name="add_item">+ Ajouter un livre · إضافة كتاب</string>
-    <string name="invoice_subtotal">Sous-total · المجموع الفرعي</string>
-    <string name="invoice_remise_amount">Remise · التخفيض</string>
-    <string name="invoice_total">Total · المجموع</string>
-    <string name="invoice_paid">Payé · المدفوع</string>
-    <string name="invoice_rest">Reste · الباقي</string>
-    <string name="payments">Paiements · الأداءات</string>
-    <string name="add_payment">+ Ajouter un paiement · إضافة أداء</string>
-    <string name="payment_amount">Montant · المبلغ</string>
-    <string name="payment_method">Mode · الطريقة</string>
-    <string name="payment_note">Note · ملاحظة</string>
-    <string name="share_invoice">Partager la facture · مشاركة الفاتورة</string>
-    <string name="select_book">Choisir un livre · اختر كتابًا</string>
-    <string name="manual_entry">Saisie manuelle · إدخال يدوي</string>
-    <string name="quantity">Quantité · الكمية</string>
-    <string name="unit_price">Prix unitaire · الثمن للوحدة</string>
-
-    <!-- Status -->
-    <string name="status_paid">Payée · مؤداة</string>
-    <string name="status_partial">Partielle · جزئية</string>
-    <string name="status_unpaid">Impayée · غير مؤداة</string>
-
-    <!-- Payment methods -->
-    <string name="method_cash">Espèces · نقدا</string>
-    <string name="method_cheque">Chèque · شيك</string>
-    <string name="method_transfer">Virement · تحويل</string>
-    <string name="method_other">Autre · أخرى</string>
-
-    <!-- Validation -->
-    <string name="err_name_required">Le nom est obligatoire · الاسم إجباري</string>
-    <string name="err_no_client">Choisissez un client · اختر زبونًا</string>
-    <string name="err_no_items">Ajoutez au moins un article · أضف مادة واحدة على الأقل</string>
+    <!-- Champs -->
+    <string name="f_reference">Référence AO</string>
+    <string name="f_objet">Objet</string>
+    <string name="f_maitre">Maître d\'ouvrage</string>
+    <string name="f_type">Type de marché</string>
+    <string name="f_lieu">Lieu d\'exécution</string>
+    <string name="f_estimation">Estimation maître d\'ouvrage (DH)</string>
+    <string name="f_lot_num">Numéro du lot</string>
+    <string name="f_lot_desig">Désignation du lot</string>
+    <string name="f_company">Nom de la société</string>
+    <string name="f_amount">Montant de l\'offre (DH)</string>
+    <string name="f_retained">Offre retenue</string>
 </resources>
