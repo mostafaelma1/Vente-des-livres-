@@ -16,6 +16,7 @@
     <string name="export_excel">Export Excel (CSV)</string>
     <string name="save_history">Enregistrer dans l\'historique</string>
     <string name="add_competitor">+ Ajouter un concurrent</string>
+    <string name="delete">Supprimer</string>
     <string name="disclaimer">Cet outil fournit une estimation analytique interne. Il ne remplace pas les décisions officielles des commissions d\'appel d\'offres.</string>
 
     <!-- Champs -->
