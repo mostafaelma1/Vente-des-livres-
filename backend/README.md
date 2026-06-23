@@ -26,6 +26,41 @@ uvicorn main:app --host 0.0.0.0 --port 8000
   (PC et téléphone sur le même Wi-Fi).
 - Production : déployez derrière HTTPS, ex. `https://monserveur.com`.
 
+## Déploiement en ligne (recommandé)
+
+Pour que l'analyse automatique fonctionne **sans laisser un PC allumé**, hébergez
+ce backend. Un `Dockerfile` (basé sur l'image officielle Playwright, navigateurs
+préinstallés) et un blueprint `render.yaml` sont fournis.
+
+### Option A — Render (gratuit, le plus simple)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mostafaelma1/Vente-des-livres-)
+
+1. Créez un compte gratuit sur https://render.com (connexion avec GitHub).
+2. **New + → Blueprint**, choisissez ce dépôt, **branche
+   `claude/moroccan-tender-analyzer-0szsuc`** → Render lit `render.yaml`.
+3. Validez : Render construit l'image Docker et déploie. Vous obtenez une URL du
+   type `https://prixref-backend.onrender.com`.
+4. Dans l'app Android → **Paramètres** → collez cette URL.
+
+> Plan gratuit : l'instance se met en veille après ~15 min d'inactivité (le
+> premier appel peut prendre 30–60 s). La RAM est limitée (512 Mo) ; si Chromium
+> manque de mémoire, passez à un plan supérieur ou utilisez Fly.io.
+
+### Option B — Fly.io / Railway / VPS
+
+L'image Docker fonctionne sur n'importe quelle plateforme acceptant Docker :
+
+```bash
+docker build -t prixref-backend ./backend
+docker run -p 8000:8000 prixref-backend
+```
+
+### Option C — Hugging Face Spaces (gratuit, sans carte)
+
+Créez un Space **Docker**, ajoutez le contenu de `backend/`, et exposez le port
+attendu par HF (`PORT=7860`). L'URL publique sera `https://<user>-<space>.hf.space`.
+
 ## Endpoint
 
 `POST /api/analyse-url`

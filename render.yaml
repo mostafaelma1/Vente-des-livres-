@@ -1,0 +1,12 @@
+# Blueprint Render — déploie le backend PrixRef AO (FastAPI + Playwright).
+# Sur render.com : New + > Blueprint > sélectionner ce dépôt et la branche
+# claude/moroccan-tender-analyzer-0szsuc.
+services:
+  - type: web
+    name: prixref-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    autoDeployTrigger: commit
