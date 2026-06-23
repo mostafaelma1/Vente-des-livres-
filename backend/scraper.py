@@ -254,13 +254,34 @@ async def scrape(url: str) -> dict:
 
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True, args=["--no-sandbox"])
+            # Arguments orientés faible mémoire (hébergement gratuit ~512 Mo).
+            browser = await p.chromium.launch(
+                headless=True,
+                args=[
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-extensions",
+                    "--no-zygote",
+                ],
+            )
             context = await browser.new_context(
                 user_agent=USER_AGENT,
                 locale="fr-FR",
-                viewport={"width": 1366, "height": 900},
+                viewport={"width": 1280, "height": 800},
             )
             page = await context.new_page()
+
+            # Bloque les ressources lourdes (images, polices, médias) :
+            # économise mémoire et bande passante, le HTML suffit pour l'analyse.
+            async def _block(route):
+                if route.request.resource_type in ("image", "media", "font"):
+                    await route.abort()
+                else:
+                    await route.continue_()
+
+            await page.route("**/*", _block)
+
             await page.goto(url, wait_until="networkidle", timeout=60000)
             # Laisse le temps au JavaScript de finir le rendu.
             await page.wait_for_timeout(3000)
