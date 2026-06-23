@@ -76,6 +76,9 @@ dependencies {
     // Gson — sérialisation JSON des analyses complètes.
     implementation("com.google.code.gson:gson:2.11.0")
 
+    // Jsoup — téléchargement et analyse HTML de la page de consultation.
+    implementation("org.jsoup:jsoup:1.17.2")
+
     // Tests unitaires du moteur de calcul.
     testImplementation("junit:junit:4.13.2")
 }

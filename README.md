@@ -26,8 +26,12 @@ PDF** professionnel.
 - **Historique** local (Room/SQLite) : recherche, ouverture, suppression,
   régénération du PDF.
 - **Simulation avant dépôt** : position probable et conseils selon l'offre saisie.
-- **Analyse par URL (bêta)** : extraction de `refConsultation` et `orgAcronyme`
-  d'un lien `marchespublics.gov.ma`, puis bascule sur le mode manuel.
+- **Analyse par URL** : téléchargement de la page de consultation
+  `marchespublics.gov.ma` (sur l'appareil, via Jsoup) et extraction best-effort
+  de la référence, l'objet, le maître d'ouvrage, l'estimation et du tableau des
+  offres (société / montant / statut). Le formulaire est pré-rempli pour
+  vérification, avec repli sur la saisie manuelle si la page n'est pas
+  exploitable. Nécessite la permission Internet.
 
 ## Pile technique
 

@@ -20,6 +20,9 @@ class ManualAnalysisActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_REFERENCE = "extra_reference"
+        // AnalysisInput sérialisé en JSON, pour pré-remplir le formulaire
+        // (extraction automatique depuis une URL).
+        const val EXTRA_PREFILL = "extra_prefill"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +43,44 @@ class ManualAnalysisActivity : AppCompatActivity() {
         binding.btnAddCompetitor.setOnClickListener { addRow() }
         binding.btnCalculate.setOnClickListener { calculate() }
 
-        // Deux lignes vides au démarrage.
-        addRow()
-        addRow()
+        val prefillJson = intent.getStringExtra(EXTRA_PREFILL)
+        if (prefillJson != null) {
+            applyPrefill(prefillJson)
+        } else {
+            // Deux lignes vides au démarrage.
+            addRow()
+            addRow()
+        }
     }
+
+    private fun applyPrefill(json: String) {
+        val input = try {
+            com.google.gson.Gson().fromJson(json, AnalysisInput::class.java)
+        } catch (e: Exception) {
+            addRow(); addRow(); return
+        }
+        binding.etReference.setText(input.reference)
+        binding.etObjet.setText(input.objet)
+        binding.etMaitre.setText(input.maitreOuvrage)
+        binding.etLieu.setText(input.lieu)
+        binding.acType.setText(input.typeMarche.label, false)
+        if (input.estimation > 0.0) {
+            binding.etEstimation.setText(formatPlain(input.estimation))
+        }
+        if (input.lotNumero.isNotBlank()) binding.etLotNum.setText(input.lotNumero)
+        binding.etLotDesig.setText(input.lotDesignation)
+
+        if (input.competitors.isEmpty()) {
+            addRow(); addRow()
+        } else {
+            for (c in input.competitors) {
+                addRow(c.name, formatPlain(c.amount), c.retained)
+            }
+        }
+    }
+
+    private fun formatPlain(value: Double): String =
+        if (value % 1.0 == 0.0) value.toLong().toString() else value.toString()
 
     private fun addRow(name: String = "", amount: String = "", retained: Boolean = true) {
         val row = ItemCompetitorBinding.inflate(layoutInflater, binding.competitorsContainer, false)
