@@ -52,6 +52,13 @@ class UrlAnalysisActivity : AppCompatActivity() {
             useWideViewPort = true
             builtInZoomControls = true
             displayZoomControls = false
+            // Mode « Site PC » (bureau) : marchespublics.gov.ma n'affiche le
+            // tableau des résultats qu'en version bureau. On force donc un
+            // user-agent de bureau pour que la page (et les tableaux) se charge
+            // comme sur ordinateur.
+            userAgentString =
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
