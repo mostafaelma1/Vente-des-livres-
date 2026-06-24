@@ -9,8 +9,11 @@ import java.util.concurrent.TimeUnit
 /** Construit le client Retrofit à partir de l'URL backend configurée. */
 object ApiClient {
 
-    fun create(context: Context): BackendApi {
-        var base = Settings.getBackendUrl(context).trim()
+    fun create(context: Context): BackendApi =
+        create(Settings.getBackendUrl(context))
+
+    fun create(baseUrl: String): BackendApi {
+        var base = baseUrl.trim()
         if (!base.endsWith("/")) base += "/"
 
         // Le scraping Playwright peut prendre du temps : timeouts généreux.

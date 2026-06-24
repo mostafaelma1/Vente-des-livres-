@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder
 import com.prixref.ao.api.AnalyseRequest
 import com.prixref.ao.api.AnalyseResponse
 import com.prixref.ao.api.ApiClient
+import com.prixref.ao.api.Settings
 import com.prixref.ao.calc.parseMarchesPublicsUrl
 import com.prixref.ao.databinding.ActivityUrlBinding
 import com.prixref.ao.model.AnalysisInput
@@ -54,6 +55,15 @@ class UrlAnalysisActivity : AppCompatActivity() {
         binding.btnExport.visibility = View.GONE
         prefillJson = null
         lastResponse = null
+
+        // Analyse automatique désactivée tant qu'aucun serveur n'est configuré.
+        if (!Settings.isConfigured(this)) {
+            binding.tvMessage.text =
+                "Analyse automatique désactivée : aucune URL de serveur valide n'est " +
+                    "configurée. Renseignez-la dans Paramètres, ou continuez en mode manuel."
+            binding.btnContinue.text = "Continuer en mode manuel"
+            return
+        }
 
         setBusy(true)
         binding.tvMessage.text = "Analyse en cours sur le serveur… (cela peut prendre quelques secondes)"

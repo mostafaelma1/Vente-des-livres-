@@ -6,6 +6,10 @@ data class AnalyseRequest(
     val url: String,
 )
 
+data class HealthResponse(
+    val status: String = "",
+)
+
 data class ConsultationDto(
     val reference: String = "",
     val objet: String = "",
