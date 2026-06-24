@@ -12,93 +12,118 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Nouvelle analyse par URL"
+        app:title="Analyse locale par URL"
         app:titleTextColor="@color/on_primary"
         app:navigationIconTint="@color/on_primary" />
 
-    <ScrollView
+    <!-- Saisie de l'URL -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Analyse locale disponible. Aucun serveur nécessaire. Collez le lien, chargez la page, puis extrayez les données."
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="URL marchespublics.gov.ma">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri"
+                android:maxLines="3" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLoad"
+            style="@style/PrimaryButton"
+            android:layout_marginTop="8dp"
+            android:text="Charger la page" />
+
+        <TextView
+            android:id="@+id/tvRefOrg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Navigateur intégré (WebView) -->
+    <WebView
+        android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:visibility="gone" />
+
+    <!-- Panneau d'action -->
+    <LinearLayout
+        android:id="@+id/actionPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <com.google.android.material.card.MaterialCardView style="@style/CardSection">
-                <LinearLayout
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView style="@style/SectionTitle"
-                        android:text="Lien de suivi de consultation" />
-
-                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Collez un lien marchespublics.gov.ma. L'analyse automatique nécessite Internet et le serveur (voir Paramètres)."
-                        android:textColor="@color/text_secondary" android:textSize="12sp" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp" android:hint="URL">
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etUrl" android:layout_width="match_parent"
-                            android:layout_height="wrap_content" android:inputType="textUri"
-                            android:minLines="2" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnParse" style="@style/PrimaryButton"
-                        android:layout_marginTop="14dp" android:text="Analyser l'URL" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardResult" style="@style/CardSection"
-                android:layout_marginTop="14dp" android:visibility="gone">
-                <LinearLayout
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView style="@style/SectionTitle" android:text="Résultat de l'analyse" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent" android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp" android:gravity="center_vertical"
-                        android:orientation="horizontal">
-                        <ProgressBar
-                            android:id="@+id/progress"
-                            android:layout_width="22dp" android:layout_height="22dp"
-                            android:layout_marginEnd="10dp" android:visibility="gone" />
-                        <TextView android:id="@+id/tvMessage"
-                            android:layout_width="0dp" android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/text_primary" android:textSize="13sp" />
-                    </LinearLayout>
-
-                    <TextView android:id="@+id/tvRef" android:layout_width="match_parent"
-                        android:layout_height="wrap_content" android:layout_marginTop="10dp"
-                        android:textColor="@color/text_secondary" android:textSize="13sp" />
-                    <TextView android:id="@+id/tvOrg" android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary" android:textSize="13sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnContinue" style="@style/PrimaryButton"
-                        android:layout_marginTop="14dp"
-                        android:text="Continuer en mode manuel" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExport"
-                        style="@style/OutlineButton"
-                        android:layout_marginTop="10dp" android:visibility="gone"
-                        android:text="Exporter les données brutes (debug)" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp" />
         </LinearLayout>
-    </ScrollView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExtract"
+            style="@style/PrimaryButton"
+            android:layout_marginTop="8dp"
+            android:enabled="false"
+            android:text="Extraire les données de la page" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnContinue"
+            style="@style/PrimaryButton"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            android:text="Vérifier et calculer" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnColumns"
+            style="@style/OutlineButton"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            android:text="Choisir les colonnes manuellement" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnExport"
+            style="@style/OutlineButton"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            android:text="Exporter les données brutes (debug)" />
+    </LinearLayout>
 </LinearLayout>
