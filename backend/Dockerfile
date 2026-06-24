@@ -8,8 +8,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# La plateforme d'hébergement fournit la variable PORT (Render, etc.).
-ENV PORT=8000
-EXPOSE 8000
+# Port d'écoute :
+# - Hugging Face Spaces attend 7860 (valeur par défaut ci-dessous) ;
+# - Render/Fly/… fournissent la variable PORT, qui est alors utilisée.
+ENV PORT=7860
+EXPOSE 7860
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]

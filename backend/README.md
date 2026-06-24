@@ -1,3 +1,13 @@
+---
+title: PrixRef AO Backend
+emoji: 📊
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Backend PrixRef AO — FastAPI + Playwright
 
 Service d'extraction des consultations de `marchespublics.gov.ma`. Le site
@@ -32,34 +42,40 @@ Pour que l'analyse automatique fonctionne **sans laisser un PC allumé**, héber
 ce backend. Un `Dockerfile` (basé sur l'image officielle Playwright, navigateurs
 préinstallés) et un blueprint `render.yaml` sont fournis.
 
-### Option A — Render (gratuit, le plus simple)
+### Option A — Hugging Face Spaces (gratuit, sans carte, recommandé)
+
+Hugging Face offre un hébergement Docker gratuit avec assez de RAM pour
+Playwright (pas de carte bancaire). Le dossier `backend/` est déjà prêt
+(`README.md` contient l'en-tête HF `sdk: docker` / `app_port: 7860`).
+
+1. Créez un compte sur https://huggingface.co (gratuit).
+2. **New → Space** → choisissez **SDK = Docker** (Blank), nom ex. `prixref-backend`.
+3. Dans le Space, onglet **Files → Add file → Upload files** : téléversez **tous
+   les fichiers du dossier `backend/`** :
+   `Dockerfile`, `README.md`, `requirements.txt`, `main.py`, `scraper.py`,
+   `schemas.py`, `analysis.py`.
+4. Le Space se construit automatiquement (5–10 min la 1ʳᵉ fois). Quand il est
+   **Running**, l'URL publique est `https://<utilisateur>-prixref-backend.hf.space`.
+5. Testez : ouvrez `https://<...>.hf.space/health` (doit afficher
+   `{"status":"ok"}`), puis mettez cette URL dans l'app Android → **Paramètres**.
+
+### Option B — Render (gratuit)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mostafaelma1/Vente-des-livres-)
 
-1. Créez un compte gratuit sur https://render.com (connexion avec GitHub).
-2. **New + → Blueprint**, choisissez ce dépôt, **branche
-   `claude/moroccan-tender-analyzer-0szsuc`** → Render lit `render.yaml`.
-3. Validez : Render construit l'image Docker et déploie. Vous obtenez une URL du
-   type `https://prixref-backend.onrender.com`.
-4. Dans l'app Android → **Paramètres** → collez cette URL.
+1. https://render.com → **Sign in with GitHub**.
+2. **New + → Blueprint** → ce dépôt, branche
+   `claude/moroccan-tender-analyzer-0szsuc` → Render lit `render.yaml`.
+3. URL obtenue : `https://prixref-backend.onrender.com`.
 
-> Plan gratuit : l'instance se met en veille après ~15 min d'inactivité (le
-> premier appel peut prendre 30–60 s). La RAM est limitée (512 Mo) ; si Chromium
-> manque de mémoire, passez à un plan supérieur ou utilisez Fly.io.
+> Plan gratuit Render : veille après ~15 min (1er appel 30–60 s), RAM 512 Mo.
 
-### Option B — Fly.io / Railway / VPS
-
-L'image Docker fonctionne sur n'importe quelle plateforme acceptant Docker :
+### Option C — Fly.io / Railway / VPS (Docker)
 
 ```bash
 docker build -t prixref-backend ./backend
-docker run -p 8000:8000 prixref-backend
+docker run -e PORT=8000 -p 8000:8000 prixref-backend
 ```
-
-### Option C — Hugging Face Spaces (gratuit, sans carte)
-
-Créez un Space **Docker**, ajoutez le contenu de `backend/`, et exposez le port
-attendu par HF (`PORT=7860`). L'URL publique sera `https://<user>-<space>.hf.space`.
 
 ## Endpoint
 
