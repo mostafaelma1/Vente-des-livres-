@@ -26,7 +26,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Analyse locale disponible. Aucun serveur nécessaire. Collez le lien, chargez la page, puis extrayez les données."
+            android:text="Analyse locale disponible. Aucun serveur nécessaire. Collez le lien et chargez la page : l'analyse se lance automatiquement."
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 

@@ -14,7 +14,10 @@ import kotlin.math.abs
  * - Moyenne des offres retenues = somme des offres retenues / nombre des offres retenues.
  * - Prix de référence = (estimation du maître d'ouvrage + moyenne des offres retenues) / 2.
  * - Écart (DH) = | offre - prix de référence | ; Écart (%) = écart / prix de référence * 100.
- * - Classement par écart croissant : l'offre la plus proche du prix de référence est première.
+ * - Classement : les offres **inférieures ou égales** au prix de référence sont
+ *   classées en premier (la plus proche du prix de référence par le dessous
+ *   d'abord), puis les offres **supérieures** (la plus proche par le dessus).
+ *   Exemple (prix de référence = 500) : 450, 503, 510 → 450, 503, 510.
  */
 object ReferenceCalculator {
 
@@ -36,7 +39,14 @@ object ReferenceCalculator {
         val referencePrice = (input.estimation + average) / 2.0
 
         val ranked = retained
-            .sortedWith(compareBy({ abs(it.amount - referencePrice) }, { it.amount }))
+            .sortedWith(
+                compareBy(
+                    // 0 = offre <= prix de référence (prioritaire), 1 = offre au-dessus.
+                    { if (it.amount <= referencePrice) 0 else 1 },
+                    // puis la plus proche du prix de référence (écart croissant).
+                    { abs(it.amount - referencePrice) },
+                )
+            )
             .mapIndexed { index, competitor ->
                 val gap = abs(competitor.amount - referencePrice)
                 val gapPercent = if (referencePrice != 0.0) gap / referencePrice * 100.0 else 0.0

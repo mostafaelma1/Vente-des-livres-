@@ -43,6 +43,26 @@ class ReferenceCalculatorTest {
     }
 
     @Test
+    fun `classement les offres en dessous du prix de reference passent en premier`() {
+        // estimation 500, offres 450 / 510 / 540 -> moyenne 500, prix de référence 500.
+        val result = ReferenceCalculator.analyze(
+            input(
+                500.0,
+                listOf(
+                    Competitor("C1", 510.0, true), // au-dessus, écart 10
+                    Competitor("C2", 450.0, true), // en dessous, écart 50
+                    Competitor("C3", 540.0, true), // au-dessus, écart 40
+                ),
+            )
+        )
+        assertEquals(500.0, result.referencePrice, 0.001)
+        // L'offre en dessous (450) passe avant les offres au-dessus, même si
+        // son écart est plus grand. Puis les offres au-dessus par écart croissant.
+        assertEquals(listOf("C2", "C1", "C3"), result.ranking.map { it.name })
+        assertEquals("C2", result.probableWinner)
+    }
+
+    @Test
     fun `offres ecartees exclues de la moyenne`() {
         val result = ReferenceCalculator.analyze(
             input(
