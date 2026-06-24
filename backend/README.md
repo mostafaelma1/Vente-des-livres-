@@ -123,9 +123,22 @@ Le scraper (`scraper.py`) ne dépend d'aucun `id` HTML fixe :
 - `rawText` et `tables` sont toujours renvoyés pour faciliter le **debug** et la
   correction du mapping des colonnes.
 
+## Multi-utilisateurs
+
+Le backend est conçu pour servir plusieurs utilisateurs :
+- **Limite de concurrence** : au plus 2 navigateurs Chromium simultanés
+  (`_MAX_CONCURRENCY`) pour ne pas saturer la mémoire ; les autres requêtes
+  attendent leur tour.
+- **Cache** : les consultations récentes (clé `refConsultation|orgAcronyme`) sont
+  mises en cache 10 min, donc plusieurs utilisateurs qui ouvrent la même
+  consultation ne déclenchent qu'un seul scraping.
+
+> Pour une forte charge, augmentez la RAM/CPU de l'hébergement et `_MAX_CONCURRENCY`.
+
 ## Calcul du prix de référence
 
-Le calcul est effectué côté application Android à partir des offres `retenue` :
+Le calcul est effectué **côté serveur** (champ `analyse` de la réponse) **et**
+reste disponible côté application. À partir des offres `retenue` :
 
 ```
 moyenneOffres = somme(offres retenues) / nombre(offres retenues)

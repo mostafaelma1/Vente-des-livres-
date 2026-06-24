@@ -39,6 +39,28 @@ class RawTable(BaseModel):
     rows: list[list[str]] = Field(default_factory=list)
 
 
+class OffreClassee(BaseModel):
+    rang: int = 0
+    societe: str = ""
+    montant: float = 0.0
+    statut: str = "retenue"
+    ecartDh: float = 0.0
+    ecartPercent: float = 0.0
+    observation: str = ""
+
+
+class Analyse(BaseModel):
+    calculable: bool = False
+    estimation: float = 0.0
+    moyenneOffres: float = 0.0
+    prixReference: float = 0.0
+    nbRetenues: int = 0
+    nbEcartees: int = 0
+    gagnantProbable: str | None = None
+    classement: list[OffreClassee] = Field(default_factory=list)
+    message: str = ""
+
+
 class AnalyseUrlResponse(BaseModel):
     """Réponse unifiée (succès ou échec)."""
 
@@ -50,5 +72,6 @@ class AnalyseUrlResponse(BaseModel):
     sourceUrl: str = ""
     consultation: Consultation = Field(default_factory=Consultation)
     lots: list[Lot] = Field(default_factory=list)
+    analyse: Analyse | None = None
     tables: list[RawTable] = Field(default_factory=list)
     rawText: str = ""

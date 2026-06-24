@@ -10,10 +10,19 @@ Robuste par conception :
 
 from __future__ import annotations
 
+import asyncio
 import re
+import time
 from urllib.parse import parse_qs, urlparse
 
 from bs4 import BeautifulSoup
+
+# --- Multi-utilisateurs : limite le nombre de navigateurs simultanés (mémoire)
+#     et met en cache les consultations récentes pour réduire la charge. ---
+_MAX_CONCURRENCY = 2
+_SEM = asyncio.Semaphore(_MAX_CONCURRENCY)
+_CACHE: dict[str, tuple[float, dict]] = {}
+_CACHE_TTL_SECONDS = 600  # 10 minutes
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -239,6 +248,12 @@ async def scrape(url: str) -> dict:
             "orgAcronyme": org,
         }
 
+    # Cache : évite de re-scraper la même consultation pour plusieurs utilisateurs.
+    cache_key = f"{ref}|{org}|{url}"
+    cached = _CACHE.get(cache_key)
+    if cached and (time.time() - cached[0]) < _CACHE_TTL_SECONDS and cached[1].get("success"):
+        return cached[1]
+
     try:
         # Import paresseux : l'application peut démarrer sans navigateur installé.
         from playwright.async_api import async_playwright
@@ -253,7 +268,9 @@ async def scrape(url: str) -> dict:
         }
 
     try:
-        async with async_playwright() as p:
+        # Limite le nombre de navigateurs simultanés (mémoire) ; les autres
+        # requêtes attendent leur tour.
+        async with _SEM, async_playwright() as p:
             # Arguments orientés faible mémoire (hébergement gratuit ~512 Mo).
             browser = await p.chromium.launch(
                 headless=True,
@@ -297,4 +314,7 @@ async def scrape(url: str) -> dict:
             "orgAcronyme": org,
         }
 
-    return _parse_html(html, url, ref, org)
+    result = _parse_html(html, url, ref, org)
+    if result.get("success"):
+        _CACHE[cache_key] = (time.time(), result)
+    return result

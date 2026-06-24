@@ -11,6 +11,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from analysis import compute_analyse
 from schemas import AnalyseUrlRequest, AnalyseUrlResponse
 from scraper import parse_url, scrape
 
@@ -49,6 +50,11 @@ async def analyse_url(body: AnalyseUrlRequest) -> AnalyseUrlResponse:
             orgAcronyme=org,
             sourceUrl=body.url,
         )
+    # Analyse côté serveur (prix de référence + classement) si possible.
+    if data.get("success"):
+        estimation = (data.get("consultation") or {}).get("estimation", 0.0)
+        data["analyse"] = compute_analyse(estimation, data.get("lots", []))
+
     # ``data`` est déjà conforme au schéma ; AnalyseUrlResponse comble les défauts.
     return AnalyseUrlResponse(**data)
 
