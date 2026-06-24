@@ -192,14 +192,24 @@ class UrlAnalysisActivity : AppCompatActivity() {
         lastInput = result.input
 
         binding.btnExport.visibility = View.VISIBLE
-        if (result.offersDetected) {
-            proceed(result)
-            return
+        when {
+            // Offres avec montants : calcul direct (ou manuel si estimation manque).
+            result.offersDetected -> proceed(result)
+            // Infos partielles (sociétés sans montant, et/ou estimation) :
+            // on ouvre automatiquement le mode manuel pré-rempli.
+            result.input.estimation > 0.0 || result.input.competitors.isNotEmpty() -> {
+                binding.tvMessage.text =
+                    "Informations récupérées automatiquement. Complétez les montants/estimation si besoin."
+                openManual()
+            }
+            // Rien d'exploitable : on propose le choix des colonnes ou le manuel.
+            else -> {
+                binding.tvMessage.text = result.summary
+                binding.btnContinue.visibility = View.VISIBLE
+                binding.btnContinue.text = "Continuer en mode manuel"
+                binding.btnColumns.visibility = if (page.tables.isNotEmpty()) View.VISIBLE else View.GONE
+            }
         }
-        binding.tvMessage.text = result.summary
-        binding.btnContinue.visibility = View.VISIBLE
-        binding.btnContinue.text = "Continuer en mode manuel"
-        binding.btnColumns.visibility = if (page.tables.isNotEmpty()) View.VISIBLE else View.GONE
     }
 
     /**

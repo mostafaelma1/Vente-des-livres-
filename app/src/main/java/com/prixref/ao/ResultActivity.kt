@@ -81,6 +81,8 @@ class ResultActivity : AppCompatActivity() {
         row.tvAmount.text = Format.money(offer.amount)
         row.tvGap.text = Format.money(offer.gap)
         row.tvGapPercent.text = Format.percent(offer.gapPercent)
+        row.tvGapEstimation.text =
+            "Écart vs estimation : ${Format.money(offer.gapEstimation)} (${Format.percent(offer.gapEstimationPercent)})"
         row.tvObservation.text = offer.observation
 
         val obsColor = when (offer.observation) {

@@ -92,10 +92,19 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvRisk"
+            android:id="@+id/tvGapEstimation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:text="Écart vs estimation : —"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvRisk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:text="Bonne position financière"
             android:textColor="@color/positive"
             android:textSize="12sp"

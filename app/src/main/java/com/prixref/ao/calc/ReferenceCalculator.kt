@@ -50,6 +50,8 @@ object ReferenceCalculator {
             .mapIndexed { index, competitor ->
                 val gap = abs(competitor.amount - referencePrice)
                 val gapPercent = if (referencePrice != 0.0) gap / referencePrice * 100.0 else 0.0
+                val gapEst = abs(competitor.amount - input.estimation)
+                val gapEstPercent = if (input.estimation != 0.0) gapEst / input.estimation * 100.0 else 0.0
                 RankedOffer(
                     rank = index + 1,
                     name = competitor.name,
@@ -59,6 +61,8 @@ object ReferenceCalculator {
                     observation = observation(gapPercent),
                     risk = riskLabel(competitor, input),
                     isProbableWinner = index == 0,
+                    gapEstimation = gapEst,
+                    gapEstimationPercent = gapEstPercent,
                 )
             }
 

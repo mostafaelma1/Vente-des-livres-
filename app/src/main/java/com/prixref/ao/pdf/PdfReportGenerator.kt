@@ -143,7 +143,12 @@ object PdfReportGenerator {
                 }
             }
             canvas.drawText("• ${ellipsize(offer.name, 28)} : ${offer.risk}", MARGIN, y, riskPaint)
-            y += 13
+            y += 12
+            canvas.drawText(
+                "   Écart / estimation : ${Format.money(offer.gapEstimation)} (${Format.percent(offer.gapEstimationPercent)})",
+                MARGIN, y, small,
+            )
+            y += 14
         }
 
         // ---- Disclaimer ----

@@ -40,9 +40,31 @@ object LocalAnalyzer {
 
     private val LABELS_REFERENCE = listOf("référence", "reference", "n° de consultation", "numéro de consultation", "n° consultation")
     private val LABELS_OBJET = listOf("objet")
-    private val LABELS_ACHETEUR = listOf("maître d'ouvrage", "maitre d'ouvrage", "acheteur public", "acheteur", "administration", "service contractant")
-    private val LABELS_LIEU = listOf("lieu d'exécution", "lieu d'execution", "lieu de réalisation", "lieu de prestation", "lieu")
-    private val LABELS_ESTIMATION = listOf("estimation", "montant estimé", "estimation du maître", "budget prévisionnel", "coût estimatif")
+    private val LABELS_ACHETEUR = listOf("acheteur public", "maître d'ouvrage", "maitre d'ouvrage", "acheteur", "administration", "service contractant")
+    private val LABELS_LIEU = listOf("lieu d'exécution", "lieu d'execution", "lieu de réalisation", "lieu de prestation")
+    private val LABELS_ESTIMATION = listOf(
+        "estimation (dhs ttc)", "estimation (dh ttc)", "estimation", "montant estimé",
+        "estimation du maître", "budget prévisionnel", "coût estimatif",
+    )
+    private val LABELS_CATEGORIE = listOf("catégorie principale", "categorie principale", "domaine d'activité", "domaine d'activite", "catégorie", "categorie")
+
+    /**
+     * Tous les libellés connus de la fiche de consultation marchespublics.gov.ma.
+     * Servent de bornes : la valeur d'un champ s'arrête au libellé suivant (la page
+     * affiche « Libellé  valeur » souvent sans deux-points).
+     */
+    private val ALL_LABELS = listOf(
+        "référence", "reference", "objet", "acheteur public", "maître d'ouvrage",
+        "type d'annonce", "procédure", "procedure", "catégorie principale",
+        "categorie principale", "réservé à", "reserve a", "lieu d'exécution",
+        "lieu d'execution", "estimation (dhs ttc)", "estimation", "domaine d'activité",
+        "domaine d'activite", "adresse de retrait", "adresse de dépôt", "adresse de depot",
+        "lieu d'ouverture des plis", "lieu d'ouverture", "prix d'acquisition des plans",
+        "prix d'acquisition", "caution provisoire", "cautionnement", "agréments", "agrements",
+        "qualifications", "qualification", "préqualification", "prequalification",
+        "réunion", "reunion", "visite des lieux", "visite", "variante",
+        "contact administratif", "contact", "dématérialisation", "dematerialisation",
+    )
 
     private val AMOUNT_RE = Regex("""\d[\d\s  .,]*\d|\d""")
     private val GROUPED_RE = Regex("""\d{1,3}(\.\d{3})+""")
@@ -56,6 +78,7 @@ object LocalAnalyzer {
         val acheteur = labelValue(page, LABELS_ACHETEUR)
         val lieu = labelValue(page, LABELS_LIEU)
         val estimation = parseAmount(labelValue(page, LABELS_ESTIMATION)) ?: 0.0
+        val typeMarche = mapType(labelValue(page, LABELS_CATEGORIE))
 
         // Choix du tableau d'offres : celui qui produit le plus d'offres valides.
         var best: List<Competitor> = emptyList()
@@ -78,24 +101,43 @@ object LocalAnalyzer {
             }
         }
 
+        val offersDetected = best.isNotEmpty()
+
+        // Repli : si aucune offre avec montant (ex. stade « ouverture des plis »),
+        // on récupère quand même les NOMS des sociétés (montant à saisir).
+        var namesOnly = false
+        var competitors: List<Competitor> = best
+        if (best.isEmpty()) {
+            val names = extractNamesOnly(page)
+            if (names.names.isNotEmpty()) {
+                competitors = names.names
+                namesOnly = true
+                bestTableIdx = names.tableIndex
+                bestNameCol = names.nameCol
+                bestAmountCol = names.amountColGuess
+                bestStatusCol = names.statusCol
+            }
+        }
+
         val input = AnalysisInput(
             reference = reference,
             objet = objet,
             maitreOuvrage = acheteur,
-            typeMarche = TypeMarche.FOURNITURES,
+            typeMarche = typeMarche,
             lieu = lieu,
             estimation = estimation,
             lotNumero = "1",
             lotDesignation = objet,
-            competitors = best,
+            competitors = competitors,
         )
 
-        val offersDetected = best.isNotEmpty()
         val summary = when {
             offersDetected && estimation > 0.0 ->
-                "${best.size} offre(s) et l'estimation détectées. Vérifiez puis calculez."
+                "${competitors.size} offre(s) et l'estimation détectées. Vérifiez puis calculez."
             offersDetected ->
-                "${best.size} offre(s) détectée(s). Renseignez l'estimation, vérifiez puis calculez."
+                "${competitors.size} offre(s) détectée(s). Renseignez l'estimation, vérifiez puis calculez."
+            namesOnly ->
+                "${competitors.size} société(s) détectée(s) (sans montant). Saisissez les montants pour calculer."
             page.tables.isNotEmpty() ->
                 "Aucune offre reconnue automatiquement. Choisissez les colonnes, ou complétez en mode manuel."
             else ->
@@ -150,6 +192,56 @@ object LocalAnalyzer {
         return offers
     }
 
+    /** Résultat de la récupération « noms seuls » (sociétés sans montant). */
+    private class NamesResult(
+        val names: List<Competitor>,
+        val tableIndex: Int,
+        val nameCol: Int,
+        val amountColGuess: Int,
+        val statusCol: Int,
+    )
+
+    /**
+     * Récupère les noms des sociétés depuis un tableau qui en contient (en-tête
+     * « entreprise / soumissionnaire / société … »), même sans colonne montant.
+     * Les montants restent à 0 (à saisir par l'utilisateur).
+     */
+    private fun extractNamesOnly(page: PageData): NamesResult {
+        page.tables.forEachIndexed { idx, table ->
+            val headers = table.headers.map { it.lowercase() }
+            val nameCol = headers.indexOfFirst { h -> K_NAME.any { h.contains(it) } }
+            if (nameCol < 0) return@forEachIndexed
+            val statusCol = headers.indexOfFirst { h -> K_STATUS.any { h.contains(it) } }
+            val amountCol = headers.indexOfFirst { h -> K_AMOUNT.any { h.contains(it) } }
+            val names = mutableListOf<Competitor>()
+            for (row in table.rows) {
+                val name = row.getOrNull(nameCol)?.trim().orEmpty()
+                if (name.length < 2) continue
+                val statusText = if (statusCol in row.indices) row[statusCol] else row.joinToString(" ")
+                names.add(Competitor(clean(name), 0.0, !isExcluded(statusText)))
+            }
+            if (names.isNotEmpty()) {
+                return NamesResult(
+                    names = names, tableIndex = idx, nameCol = nameCol,
+                    amountColGuess = if (amountCol >= 0) amountCol else (table.columnCount - 1).coerceAtLeast(0),
+                    statusCol = statusCol,
+                )
+            }
+        }
+        return NamesResult(emptyList(), -1, 0, 1, -1)
+    }
+
+    /** Déduit le type de marché depuis la catégorie / domaine d'activité. */
+    private fun mapType(categorie: String): TypeMarche {
+        val c = categorie.lowercase()
+        return when {
+            c.contains("travaux") -> TypeMarche.TRAVAUX
+            c.contains("service") -> TypeMarche.SERVICES
+            c.contains("fourniture") -> TypeMarche.FOURNITURES
+            else -> TypeMarche.FOURNITURES
+        }
+    }
+
     fun isExcluded(text: String?): Boolean {
         val t = (text ?: "").lowercase()
         return K_STATUS_OUT.any { t.contains(it) }
@@ -160,27 +252,68 @@ object LocalAnalyzer {
         return digits >= 4 && parseAmount(text) != null
     }
 
-    /** Cherche une valeur associée à un libellé : d'abord dans les tableaux (clé/valeur), puis dans le texte. */
+    /**
+     * Cherche la valeur d'un champ. Trois stratégies, dans l'ordre :
+     *  1. Tableaux clé/valeur (« Libellé » | « valeur »).
+     *  2. Texte « Libellé : valeur » (avec deux-points).
+     *  3. Texte « Libellé  valeur » sans séparateur : la valeur va du libellé
+     *     jusqu'au libellé connu suivant (cas de marchespublics.gov.ma).
+     */
     private fun labelValue(page: PageData, labels: List<String>): String {
+        // 1. Tableaux clé/valeur.
         for (table in page.tables) {
             for (row in table.rows) {
                 if (row.size >= 2) {
                     val key = clean(row[0]).lowercase()
-                    if (labels.any { key.startsWith(it) || key.contains(it) }) {
+                    if (labels.any { key == it || key.startsWith("$it ") || key.startsWith("$it:") || key.startsWith(it) }) {
                         val value = clean(row.last())
                         if (value.isNotBlank() && value.lowercase() != key) return value
                     }
                 }
             }
-            // En-tête / première ligne au format "Libellé : valeur".
         }
         val text = page.rawText
+        // 2. « Libellé : valeur ».
         for (lbl in labels) {
             val re = Regex("(?i)\\b${Regex.escape(lbl)}\\b\\s*[:\\-]\\s*(.{2,200})")
             val m = re.find(text)
-            if (m != null) return clean(m.groupValues[1])
+            if (m != null) {
+                val v = cutAtNextLabel(clean(m.groupValues[1]))
+                if (v.isNotBlank()) return v
+            }
+        }
+        // 3. « Libellé  valeur » sans séparateur.
+        return valueAfterLabel(text, labels)
+    }
+
+    /** Extrait la valeur située juste après un libellé, jusqu'au libellé connu suivant. */
+    private fun valueAfterLabel(text: String, labels: List<String>): String {
+        val lower = text.lowercase()
+        for (lbl in labels) {
+            val idx = lower.indexOf(lbl.lowercase())
+            if (idx < 0) continue
+            val start = idx + lbl.length
+            if (start >= text.length) continue
+            var end = text.length
+            for (stop in ALL_LABELS) {
+                val p = lower.indexOf(stop, start + 1)
+                if (p in (start + 1) until end) end = p
+            }
+            val value = clean(text.substring(start, end)).trim(':', '-', '.', ' ', ' ')
+            if (value.length >= 2) return value.take(300)
         }
         return ""
+    }
+
+    /** Coupe une valeur (extraite avec deux-points) au prochain libellé connu, si collé. */
+    private fun cutAtNextLabel(value: String): String {
+        val lower = value.lowercase()
+        var end = value.length
+        for (stop in ALL_LABELS) {
+            val p = lower.indexOf(stop, 1)
+            if (p in 1 until end) end = p
+        }
+        return clean(value.substring(0, end)).trim(':', '-', '.', ' ', ' ')
     }
 
     fun parseAmount(text: String?): Double? {

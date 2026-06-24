@@ -74,7 +74,7 @@ class ManualAnalysisActivity : AppCompatActivity() {
             addRow(); addRow()
         } else {
             for (c in input.competitors) {
-                addRow(c.name, formatPlain(c.amount), c.retained)
+                addRow(c.name, if (c.amount > 0.0) formatPlain(c.amount) else "", c.retained)
             }
         }
     }

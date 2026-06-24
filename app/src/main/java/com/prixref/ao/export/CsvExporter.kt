@@ -33,11 +33,14 @@ object CsvExporter {
         line("")
 
         line("Classement des offres")
-        line("Rang", "Société", "Offre (DH)", "Écart (DH)", "Écart (%)", "Observation", "Risque")
+        line(
+            "Rang", "Société", "Offre (DH)", "Écart / prix réf. (DH)", "Écart / prix réf. (%)",
+            "Écart / estimation (DH)", "Écart / estimation (%)", "Observation", "Risque"
+        )
         for (o in result.ranking) {
             line(
-                o.rank.toString(), o.name, num(o.amount), num(o.gap),
-                num(o.gapPercent), o.observation, o.risk
+                o.rank.toString(), o.name, num(o.amount), num(o.gap), num(o.gapPercent),
+                num(o.gapEstimation), num(o.gapEstimationPercent), o.observation, o.risk
             )
         }
 

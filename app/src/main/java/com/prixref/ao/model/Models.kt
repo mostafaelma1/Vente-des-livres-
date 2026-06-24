@@ -44,6 +44,9 @@ data class RankedOffer(
     val observation: String,
     val risk: String,
     val isProbableWinner: Boolean,
+    // Écart de l'offre par rapport à l'estimation du maître d'ouvrage.
+    val gapEstimation: Double = 0.0,
+    val gapEstimationPercent: Double = 0.0,
 ) : Serializable
 
 /** Résultat complet d'une analyse. */
