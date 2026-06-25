@@ -64,21 +64,34 @@ class CompanyStatsActivity : AppCompatActivity() {
                 "${company.count} marché(s) • Moyenne vs estimation : ${Format.signedPercent(company.averagePercent)}"
             card.root.setOnLongClickListener { confirmDelete(company); true }
 
-            for (p in company.participations) {
-                val tv = TextView(this)
-                val title = p.reference.ifBlank { p.objet.ifBlank { "Marché" } }.take(48)
-                val statut = if (p.retained) "" else "  · écartée"
-                val pct = if (p.estimation > 0.0) " (${Format.signedPercent(p.percentVsEstimation)})" else ""
-                tv.text = "• ${Format.date(p.date)} — $title : ${Format.money(p.amount)}$pct$statut"
-                tv.textSize = 12.5f
-                tv.setTextColor(
-                    ContextCompat.getColor(
-                        this,
-                        if (p.retained) R.color.text_primary else R.color.text_secondary,
-                    )
-                )
-                tv.setPadding(0, 6, 0, 6)
-                card.linesContainer.addView(tv)
+            // Détail par catégorie / domaine d'activité, avec % moyen PAR domaine.
+            for (dom in company.byDomaine) {
+                val header = TextView(this).apply {
+                    text = "▸ ${dom.categorie} · ${dom.domaine}  —  ${dom.count} marché(s) · moy. ${Format.signedPercent(dom.averagePercent)}"
+                    textSize = 13.5f
+                    setTypeface(typeface, android.graphics.Typeface.BOLD)
+                    setTextColor(ContextCompat.getColor(this@CompanyStatsActivity, R.color.brand_orange_dark))
+                    setPadding(0, 10, 0, 2)
+                }
+                card.linesContainer.addView(header)
+
+                for (p in dom.participations) {
+                    val title = p.reference.ifBlank { p.objet.ifBlank { "Marché" } }.take(46)
+                    val statut = if (p.retained) "" else "  · écartée"
+                    val pct = if (p.estimation > 0.0) " (${Format.signedPercent(p.percentVsEstimation)})" else ""
+                    val tv = TextView(this).apply {
+                        text = "    • ${Format.date(p.date)} — $title : ${Format.money(p.amount)}$pct$statut"
+                        textSize = 12.5f
+                        setTextColor(
+                            ContextCompat.getColor(
+                                this@CompanyStatsActivity,
+                                if (p.retained) R.color.text_primary else R.color.text_secondary,
+                            )
+                        )
+                        setPadding(0, 4, 0, 4)
+                    }
+                    card.linesContainer.addView(tv)
+                }
             }
             binding.statsContainer.addView(card.root)
         }

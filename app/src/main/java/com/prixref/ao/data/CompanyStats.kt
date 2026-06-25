@@ -26,6 +26,17 @@ object CompanyStats {
         val percentVsEstimation: Double,
         val rank: Int,
         val retained: Boolean,
+        val categorie: String,
+        val domaine: String,
+    )
+
+    /** Statistiques d'une société pour un domaine d'activité donné. */
+    data class DomaineStat(
+        val categorie: String,
+        val domaine: String,
+        val count: Int,
+        val averagePercent: Double,
+        val participations: List<Participation>,
     )
 
     /** Statistiques agrégées d'une société. */
@@ -34,6 +45,8 @@ object CompanyStats {
         val participations: List<Participation>,
         val averagePercent: Double,
         val count: Int,
+        /** Détail par domaine d'activité (pourcentage calculé par domaine). */
+        val byDomaine: List<DomaineStat>,
     )
 
     /** Normalise un nom de société pour le regroupement (majuscules, espaces, ponctuation). */
@@ -50,13 +63,15 @@ object CompanyStats {
             val objet = s.result.input.objet
             // Date de remise des plis (issue du site) ; à défaut, date d'enregistrement.
             val date = parseDate(s.result.input.dateLimite) ?: s.date
+            val categorie = s.result.input.categorieLabel.ifBlank { s.result.input.typeMarche.label }
+            val domaine = s.result.input.domaine.ifBlank { "(domaine non précisé)" }
 
             fun add(name: String, amount: Double, rank: Int, retained: Boolean) {
                 val norm = normalize(name)
                 if (norm.length < 2) return
                 val pct = if (est > 0.0) (amount - est) / est * 100.0 else 0.0
                 map.getOrPut(norm) { mutableListOf() }
-                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained))
+                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, categorie, domaine))
                 display.putIfAbsent(norm, name.trim())
             }
 
@@ -67,11 +82,25 @@ object CompanyStats {
         return map.map { (norm, parts) ->
             val withPct = parts.filter { it.estimation > 0.0 }
             val avg = if (withPct.isNotEmpty()) withPct.sumOf { it.percentVsEstimation } / withPct.size else 0.0
+
+            // Détail par domaine d'activité : pourcentage moyen calculé PAR domaine.
+            val byDomaine = parts.groupBy { it.categorie to it.domaine }.map { (key, list) ->
+                val wp = list.filter { it.estimation > 0.0 }
+                DomaineStat(
+                    categorie = key.first,
+                    domaine = key.second,
+                    count = list.size,
+                    averagePercent = if (wp.isNotEmpty()) wp.sumOf { it.percentVsEstimation } / wp.size else 0.0,
+                    participations = list.sortedBy { it.date },
+                )
+            }.sortedWith(compareByDescending<DomaineStat> { it.count }.thenBy { it.domaine })
+
             Company(
                 name = display[norm] ?: norm,
-                participations = parts.sortedBy { it.date }, // du plus ancien au plus récent
+                participations = parts.sortedBy { it.date },
                 averagePercent = avg,
                 count = parts.size,
+                byDomaine = byDomaine,
             )
         }.sortedWith(compareByDescending<Company> { it.count }.thenBy { it.name })
     }
