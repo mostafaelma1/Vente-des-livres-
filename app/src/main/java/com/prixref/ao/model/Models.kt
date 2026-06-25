@@ -34,6 +34,10 @@ data class AnalysisInput(
     val competitors: List<Competitor>,
     /** Date et heure limite de remise des plis (texte issu du site, ex. « 12/05/2026 10:00 »). */
     val dateLimite: String = "",
+    /** Catégorie principale : « Travaux » / « Services » / « Fournitures ». */
+    val categorieLabel: String = "",
+    /** Domaine d'activité (issu de la fiche, ex. « Nettoyage, gardiennage, entretien et maintenance »). */
+    val domaine: String = "",
 ) : Serializable
 
 /** Une offre classée, enrichie par le moteur de calcul. */

@@ -56,7 +56,8 @@ object LocalAnalyzer {
         "estimation (dhs ttc)", "estimation (dh ttc)", "estimation", "montant estimé",
         "estimation du maître", "budget prévisionnel", "coût estimatif",
     )
-    private val LABELS_CATEGORIE = listOf("catégorie principale", "categorie principale", "domaine d'activité", "domaine d'activite", "catégorie", "categorie")
+    private val LABELS_CATEGORIE = listOf("catégorie principale", "categorie principale", "catégorie", "categorie")
+    private val LABELS_DOMAINE = listOf("domaine d'activité", "domaine d'activite")
     private val LABELS_DATE_LIMITE = listOf(
         "date et heure limite de remise des plis", "date limite de remise des plis",
         "date limite des plis", "limite de remise des plis", "date limite",
@@ -94,7 +95,10 @@ object LocalAnalyzer {
         val acheteur = labelValue(page, LABELS_ACHETEUR)
         val lieu = labelValue(page, LABELS_LIEU)
         val estimation = parseAmount(labelValue(page, LABELS_ESTIMATION)) ?: 0.0
-        val typeMarche = mapType(labelValue(page, LABELS_CATEGORIE))
+        val categorieText = labelValue(page, LABELS_CATEGORIE)
+        val domaineText = labelValue(page, LABELS_DOMAINE)
+        val typeMarche = mapType(categorieText.ifBlank { domaineText })
+        val domaine = parseDomaine(domaineText)
         val dateLimite = labelValue(page, LABELS_DATE_LIMITE)
 
         // Choix du tableau d'offres : celui qui produit le plus d'offres valides.
@@ -147,6 +151,8 @@ object LocalAnalyzer {
             lotDesignation = objet,
             competitors = competitors,
             dateLimite = dateLimite,
+            categorieLabel = typeMarche.label,
+            domaine = domaine,
         )
 
         val summary = when {
@@ -242,6 +248,21 @@ object LocalAnalyzer {
             }
         }
         return NamesResult(emptyList(), -1, 0, 1, -1)
+    }
+
+    /**
+     * Extrait le domaine d'activité d'une valeur du type
+     * « 7 Fournitures / Équipements et produits médicaux… / sous-domaine ».
+     * Retourne le 2ᵉ segment (le domaine principal) sinon le texte nettoyé.
+     */
+    private fun parseDomaine(text: String): String {
+        if (text.isBlank()) return ""
+        val segs = text.split("/").map { it.trim() }.filter { it.length >= 2 }
+        return when {
+            segs.size >= 2 -> segs[1]
+            segs.size == 1 -> segs[0].replace(Regex("^\\d+\\s+"), "").trim()
+            else -> ""
+        }.take(160)
     }
 
     /** Déduit le type de marché depuis la catégorie / domaine d'activité. */

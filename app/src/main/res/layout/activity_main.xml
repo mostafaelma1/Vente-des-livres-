@@ -169,6 +169,42 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Historique des analyses -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnHistory"
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_brown">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_calendar" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_history" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Retrouver et rouvrir toutes vos analyses" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Statistiques avancées (par catégorie / domaine) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAdvanced"
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_orange">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_advanced" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Par catégorie (Travaux / Services / Fournitures) et domaine" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -370,6 +370,8 @@ class UrlAnalysisActivity : AppCompatActivity() {
             lotDesignation = base?.lotDesignation.orEmpty(),
             competitors = competitors,
             dateLimite = base?.dateLimite.orEmpty(),
+            categorieLabel = base?.categorieLabel.orEmpty(),
+            domaine = base?.domaine.orEmpty(),
         )
         openManual()
     }

@@ -78,6 +78,9 @@ object PdfReportGenerator {
         y = drawInfo(canvas, label, value, y, "Objet", input.objet.ifBlank { "—" })
         y = drawInfo(canvas, label, value, y, "Maître d'ouvrage", input.maitreOuvrage.ifBlank { "—" })
         y = drawInfo(canvas, label, value, y, "Type de marché", input.typeMarche.label)
+        if (input.domaine.isNotBlank()) {
+            y = drawInfo(canvas, label, value, y, "Domaine d'activité", input.domaine)
+        }
         y = drawInfo(canvas, label, value, y, "Lieu d'exécution", input.lieu.ifBlank { "—" })
         y = drawInfo(canvas, label, value, y, "Lot", "${input.lotNumero} — ${input.lotDesignation.ifBlank { "—" }}")
         y += 6

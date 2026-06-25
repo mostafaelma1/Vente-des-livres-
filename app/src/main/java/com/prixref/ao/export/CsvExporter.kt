@@ -24,6 +24,8 @@ object CsvExporter {
         line("Objet", input.objet)
         line("Maître d'ouvrage", input.maitreOuvrage)
         line("Type de marché", input.typeMarche.label)
+        line("Catégorie", input.categorieLabel)
+        line("Domaine d'activité", input.domaine)
         line("Lieu d'exécution", input.lieu)
         line("Lot", "${input.lotNumero} - ${input.lotDesignation}")
         line("Estimation (DH)", num(input.estimation))

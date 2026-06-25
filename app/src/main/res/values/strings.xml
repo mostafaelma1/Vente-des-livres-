@@ -4,9 +4,10 @@
     <string name="slogan">Calcul Prix Référence</string>
 
     <!-- Accueil -->
-    <string name="home_new_analysis">Nouvelle analyse (URL)</string>
+    <string name="home_new_analysis">Nouvelle analyse</string>
     <string name="home_manual">Mode manuel</string>
-    <string name="home_history">Historique</string>
+    <string name="home_history">Historique des analyses</string>
+    <string name="home_advanced">Statistiques avancées</string>
     <string name="home_companies">Historique par société</string>
     <string name="home_premium_title">Passer à Premium</string>
     <string name="home_premium_sub">Analyses illimitées · Rapports PDF · Statistiques avancées</string>
