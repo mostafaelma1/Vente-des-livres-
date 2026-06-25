@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -50,10 +51,12 @@ class UrlAnalysisActivity : AppCompatActivity() {
     private var autoAttempts = 0
     private var autoDone = false
     private var pulse: ObjectAnimator? = null
+    private var countDown: CountDownTimer? = null
 
     private companion object {
         const val MAX_AUTO_ATTEMPTS = 8
         const val AUTO_DELAY_MS = 2500L
+        const val ESTIMATED_MS = 24000L
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -112,6 +115,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
         binding.progressBar.visibility = View.VISIBLE
         binding.tvMessage.text = "Analyse en cours…"
         startPulse()
+        startCountdown()
 
         binding.webView.loadUrl(url)
     }
@@ -197,6 +201,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
     /** Affiche les options de secours sur l'écran d'animation (sans montrer la WebView). */
     private fun showFallback(message: String, hasTables: Boolean) {
         stopPulse()
+        stopCountdown()
         binding.progressBar.visibility = View.GONE
         binding.tvMessage.text = message
         binding.btnContinue.visibility = View.VISIBLE
@@ -227,6 +232,8 @@ class UrlAnalysisActivity : AppCompatActivity() {
     /** Ouvre l'écran cible et ferme celui-ci : l'utilisateur ne voit que le résultat. */
     private fun goTo(intent: Intent) {
         handler.removeCallbacksAndMessages(null)
+        stopCountdown()
+        binding.progressBar.setProgressCompat(100, true)
         stopPulse()
         startActivity(intent)
         finish()
@@ -235,6 +242,32 @@ class UrlAnalysisActivity : AppCompatActivity() {
     // ------------------------------------------------------------------ //
     // Animation
     // ------------------------------------------------------------------ //
+    private fun startCountdown() {
+        binding.progressBar.isIndeterminate = false
+        binding.progressBar.max = 100
+        binding.progressBar.progress = 0
+        countDown?.cancel()
+        countDown = object : CountDownTimer(ESTIMATED_MS, 300) {
+            override fun onTick(msLeft: Long) {
+                val elapsed = ESTIMATED_MS - msLeft
+                val pct = (elapsed * 95 / ESTIMATED_MS).toInt().coerceIn(0, 95)
+                binding.progressBar.setProgressCompat(pct, true)
+                val sec = (msLeft / 1000) + 1
+                binding.tvMessage.text = "Analyse en cours… ${sec}s"
+            }
+
+            override fun onFinish() {
+                binding.progressBar.setProgressCompat(96, true)
+                binding.tvMessage.text = "Finalisation de l'analyse…"
+            }
+        }.start()
+    }
+
+    private fun stopCountdown() {
+        countDown?.cancel()
+        countDown = null
+    }
+
     private fun startPulse() {
         pulse?.cancel()
         pulse = ObjectAnimator.ofPropertyValuesHolder(
@@ -375,6 +408,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
         stopPulse()
+        stopCountdown()
         super.onDestroy()
     }
 }

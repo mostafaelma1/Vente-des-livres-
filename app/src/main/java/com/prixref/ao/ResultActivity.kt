@@ -48,10 +48,11 @@ class ResultActivity : AppCompatActivity() {
         binding.btnPdf.setOnClickListener { generatePdf() }
         binding.btnExcel.setOnClickListener { exportCsv() }
 
-        if (intent.getBooleanExtra(EXTRA_FROM_HISTORY, false)) {
-            binding.btnSave.visibility = android.view.View.GONE
-        } else {
-            binding.btnSave.setOnClickListener { saveToHistory() }
+        // L'enregistrement dans l'historique est désormais AUTOMATIQUE (sans
+        // doublon). Le bouton manuel n'est donc plus nécessaire.
+        binding.btnSave.visibility = android.view.View.GONE
+        if (!intent.getBooleanExtra(EXTRA_FROM_HISTORY, false)) {
+            autoSaveToHistory()
         }
     }
 
@@ -120,7 +121,8 @@ class ResultActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveToHistory() {
+    /** Enregistre automatiquement l'analyse dans l'historique, sans créer de doublon. */
+    private fun autoSaveToHistory() {
         val entity = AnalysisEntity(
             date = System.currentTimeMillis(),
             reference = result.input.reference,
@@ -132,11 +134,14 @@ class ResultActivity : AppCompatActivity() {
             json = JsonStore.toJson(result),
         )
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                AppDatabase.get(this@ResultActivity).analysisDao().insert(entity)
+            val dao = AppDatabase.get(this@ResultActivity).analysisDao()
+            val isDuplicate = withContext(Dispatchers.IO) {
+                dao.countMatching(entity.reference, entity.estimation, entity.referencePrice) > 0
             }
-            toast("Analyse enregistrée dans l'historique.")
-            binding.btnSave.isEnabled = false
+            if (!isDuplicate) {
+                withContext(Dispatchers.IO) { dao.insert(entity) }
+                toast("Analyse enregistrée automatiquement dans l'historique.")
+            }
         }
     }
 

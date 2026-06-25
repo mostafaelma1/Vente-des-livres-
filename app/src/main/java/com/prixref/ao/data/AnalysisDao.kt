@@ -25,4 +25,11 @@ interface AnalysisDao {
 
     @Query("SELECT * FROM analyses WHERE id = :id")
     suspend fun getById(id: Long): AnalysisEntity?
+
+    /** Compte les analyses identiques (même réf., estimation et prix de référence) — anti-doublon. */
+    @Query(
+        "SELECT COUNT(*) FROM analyses WHERE reference = :reference " +
+            "AND estimation = :estimation AND referencePrice = :referencePrice"
+    )
+    suspend fun countMatching(reference: String, estimation: Double, referencePrice: Double): Int
 }

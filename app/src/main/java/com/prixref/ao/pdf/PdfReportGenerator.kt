@@ -1,10 +1,13 @@
 package com.prixref.ao.pdf
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.pdf.PdfDocument
+import com.prixref.ao.R
 import com.prixref.ao.model.AnalysisResult
 import com.prixref.ao.util.Format
 import java.io.File
@@ -24,6 +27,8 @@ object PdfReportGenerator {
             "décisions officielles des commissions d'appel d'offres ni les " +
             "documents réglementaires."
 
+    private val brandOrange = Color.rgb(0xE5, 0x83, 0x2E)
+    private val brandSlate = Color.rgb(0x33, 0x37, 0x3D)
     private val navy = Color.rgb(0x16, 0x2A, 0x4A)
     private val grayLight = Color.rgb(0xF0, 0xF1, 0xF8)
     private val green = Color.rgb(0x16, 0xA3, 0x4A)
@@ -44,15 +49,25 @@ object PdfReportGenerator {
         var canvas = page.canvas
         var y = MARGIN
 
-        // ---- En-tête ----
-        canvas.drawText("PrixRef AO Maroc", MARGIN, y + 6, title)
-        y += 22
-        canvas.drawText("Rapport d'analyse du prix de référence", MARGIN, y, h2)
-        y += 14
-        canvas.drawText("Généré le " + Format.dateTime(System.currentTimeMillis()), MARGIN, y, small)
-        y += 14
-        fill.color = navy
-        canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + 2, fill)
+        // ---- En-tête de marque (logo + identité B Marche) ----
+        val brandPaint = Paint().apply { color = brandSlate; textSize = 22f; isFakeBoldText = true; isAntiAlias = true }
+        val taglinePaint = Paint().apply { color = brandOrange; textSize = 11f; isFakeBoldText = true; isAntiAlias = true }
+        val logo = runCatching { BitmapFactory.decodeResource(context.resources, R.drawable.logo_bmarche) }.getOrNull()
+        val logoSize = 58f
+        if (logo != null) {
+            canvas.drawBitmap(logo, null, RectF(MARGIN, y, MARGIN + logoSize, y + logoSize), null)
+        }
+        val tx = MARGIN + logoSize + 12
+        canvas.drawText("B Marche", tx, y + 26, brandPaint)
+        canvas.drawText("CALCUL PRIX RÉFÉRENCE", tx, y + 44, taglinePaint)
+        y += logoSize + 4
+        canvas.drawText(
+            "Rapport d'analyse du prix de référence — généré le " +
+                Format.dateTime(System.currentTimeMillis()), MARGIN, y, small,
+        )
+        y += 12
+        fill.color = brandOrange
+        canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + 2.5f, fill)
         y += 18
 
         val input = result.input
@@ -156,6 +171,15 @@ object PdfReportGenerator {
         fill.color = grayLight
         canvas.drawRect(MARGIN, y - 12, PAGE_WIDTH - MARGIN, y + 22, fill)
         drawWrapped(canvas, small, DISCLAIMER, MARGIN + 6, y, PAGE_WIDTH - 2 * MARGIN - 12)
+
+        // Pied de page « publicitaire » B Marche.
+        val brandFoot = Paint().apply {
+            color = brandOrange; textSize = 9f; isFakeBoldText = true; isAntiAlias = true
+        }
+        canvas.drawText(
+            "Édité avec B Marche · Calcul Prix Référence · analyse des appels d'offres publics au Maroc",
+            MARGIN, PAGE_HEIGHT - 14f, brandFoot,
+        )
 
         doc.finishPage(page)
 
