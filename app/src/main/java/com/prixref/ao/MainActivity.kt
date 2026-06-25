@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnUrl.setOnClickListener { open(UrlAnalysisActivity::class.java) }
         binding.btnSimulation.setOnClickListener { open(SimulationActivity::class.java) }
         binding.btnHistory.setOnClickListener { open(HistoryActivity::class.java) }
+        binding.btnCompanies.setOnClickListener { open(CompanyStatsActivity::class.java) }
         binding.btnSettings.setOnClickListener { open(SettingsActivity::class.java) }
         binding.btnAbout.setOnClickListener { open(AboutActivity::class.java) }
     }

@@ -77,6 +77,14 @@
                 android:text="@string/home_history" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCompanies"
+                style="@style/OutlineButton"
+                android:layout_marginTop="14dp"
+                app:icon="@drawable/ic_clients"
+                app:iconGravity="textStart"
+                android:text="@string/home_companies" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSettings"
                 style="@style/OutlineButton"
                 android:layout_marginTop="14dp"

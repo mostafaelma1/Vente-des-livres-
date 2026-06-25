@@ -7,6 +7,7 @@
     <string name="home_new_analysis">Nouvelle analyse (URL)</string>
     <string name="home_manual">Mode manuel</string>
     <string name="home_history">Historique</string>
+    <string name="home_companies">Statistiques par société</string>
     <string name="home_simulation">Simulation avant dépôt</string>
     <string name="home_settings">Paramètres (serveur — optionnel)</string>
     <string name="home_about">À propos</string>

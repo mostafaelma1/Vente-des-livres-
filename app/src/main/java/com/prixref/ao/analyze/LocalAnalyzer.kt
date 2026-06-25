@@ -38,6 +38,16 @@ object LocalAnalyzer {
         "non retenu", "éliminé", "elimine", "irrecevable", "hors délai",
     )
 
+    /** Mots de statut/qualité qui ne sont JAMAIS un nom de société. */
+    private val NON_NAME_WORDS = setOf(
+        "admissible", "admis", "inadmissible", "non admis", "retenu", "retenue",
+        "non retenu", "non retenue", "écartée", "ecartee", "écarté", "ecarte",
+        "conforme", "non conforme", "rejeté", "rejete", "rejetée", "qualifié",
+        "qualifie", "accepté", "accepte", "acceptée", "acceptee", "refusé", "refuse",
+        "recevable", "irrecevable", "valide", "invalide", "éliminé", "elimine",
+        "oui", "non", "-", "—",
+    )
+
     private val LABELS_REFERENCE = listOf("référence", "reference", "n° de consultation", "numéro de consultation", "n° consultation")
     private val LABELS_OBJET = listOf("objet")
     private val LABELS_ACHETEUR = listOf("acheteur public", "maître d'ouvrage", "maitre d'ouvrage", "acheteur", "administration", "service contractant")
@@ -177,17 +187,12 @@ object LocalAnalyzer {
             }
             if (amount == null || amount <= 0.0) continue
 
-            // Société : colonne dédiée si connue, sinon la plus longue cellule non numérique.
-            var name = if (nameCol in row.indices) row[nameCol].trim() else ""
-            if (name.isBlank()) {
-                name = row.filter { !looksLikeAmount(it) && it.trim().length >= 2 }
-                    .maxByOrNull { it.length }?.trim().orEmpty()
-            }
+            val name = pickName(row, nameCol)
             if (name.isBlank()) continue
 
             val statusText = if (statusCol in row.indices) row[statusCol] else row.joinToString(" ")
             val retained = !isExcluded(statusText)
-            offers.add(Competitor(name = clean(name), amount = amount, retained = retained))
+            offers.add(Competitor(name = name, amount = amount, retained = retained))
         }
         return offers
     }
@@ -215,10 +220,10 @@ object LocalAnalyzer {
             val amountCol = headers.indexOfFirst { h -> K_AMOUNT.any { h.contains(it) } }
             val names = mutableListOf<Competitor>()
             for (row in table.rows) {
-                val name = row.getOrNull(nameCol)?.trim().orEmpty()
+                val name = pickName(row, nameCol)
                 if (name.length < 2) continue
                 val statusText = if (statusCol in row.indices) row[statusCol] else row.joinToString(" ")
-                names.add(Competitor(clean(name), 0.0, !isExcluded(statusText)))
+                names.add(Competitor(name, 0.0, !isExcluded(statusText)))
             }
             if (names.isNotEmpty()) {
                 return NamesResult(
@@ -250,6 +255,24 @@ object LocalAnalyzer {
     private fun looksLikeAmount(text: String): Boolean {
         val digits = text.count { it.isDigit() }
         return digits >= 4 && parseAmount(text) != null
+    }
+
+    /** Vrai si la cellule est un mot de statut/qualité (« Admissible », « Conforme »…). */
+    private fun isStatusWord(text: String): Boolean {
+        val t = clean(text).lowercase()
+        return t.isNotEmpty() && NON_NAME_WORDS.contains(t)
+    }
+
+    /**
+     * Choisit le nom de la société dans une ligne : la colonne dédiée si elle
+     * contient un vrai nom, sinon la plus longue cellule qui n'est ni un montant
+     * ni un mot de statut (évite de prendre « Admissible » à la place du nom).
+     */
+    private fun pickName(row: List<String>, nameCol: Int): String {
+        val byCol = if (nameCol in row.indices) row[nameCol].trim() else ""
+        if (byCol.length >= 2 && !looksLikeAmount(byCol) && !isStatusWord(byCol)) return clean(byCol)
+        return row.filter { it.trim().length >= 2 && !looksLikeAmount(it) && !isStatusWord(it) }
+            .maxByOrNull { it.trim().length }?.let { clean(it) }.orEmpty()
     }
 
     /**
