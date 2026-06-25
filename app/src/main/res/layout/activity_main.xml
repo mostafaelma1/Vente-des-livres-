@@ -169,6 +169,24 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Statistiques par société -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnSociety"
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_orange_dark">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_society" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Chaque société et son % par domaine d'activité" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Historique des analyses -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnHistory"
