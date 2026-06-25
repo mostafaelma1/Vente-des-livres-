@@ -49,6 +49,85 @@ object CompanyStats {
         val byDomaine: List<DomaineStat>,
     )
 
+    // ------------------------------------------------------------------ //
+    // Vue « Catégorie -> Domaine -> Sociétés »
+    // ------------------------------------------------------------------ //
+    private val CATEGORIES = listOf("Travaux", "Services", "Fournitures")
+
+    data class CompanyInDomaine(
+        val name: String,
+        val count: Int,
+        val averagePercent: Double,
+        val participations: List<Participation>,
+    )
+
+    data class DomaineGroup(
+        val categorie: String,
+        val domaine: String,
+        val count: Int,
+        val companies: List<CompanyInDomaine>,
+    )
+
+    data class CategoryGroup(
+        val name: String,
+        val count: Int,
+        val domaines: List<DomaineGroup>,
+    )
+
+    /**
+     * Construit l'arborescence Catégorie -> Domaine d'activité -> Sociétés.
+     * Le pourcentage de chaque société est calculé dans le domaine concerné.
+     * Applique le masquage (hidden) et la recherche (query) sur les sociétés.
+     */
+    fun buildByDomaine(sources: List<Source>, hidden: Set<String>, query: String): List<CategoryGroup> {
+        val q = query.trim().uppercase()
+        // cat -> domaine -> normName -> participations
+        val tree = LinkedHashMap<String, LinkedHashMap<String, LinkedHashMap<String, MutableList<Participation>>>>()
+        val display = HashMap<String, String>()
+
+        for (s in sources) {
+            val est = s.result.input.estimation
+            val ref = s.result.input.reference
+            val objet = s.result.input.objet
+            val date = parseDate(s.result.input.dateLimite) ?: s.date
+            val categorie = s.result.input.categorieLabel.ifBlank { s.result.input.typeMarche.label }
+            val domaine = s.result.input.domaine.ifBlank { "(domaine non précisé)" }
+
+            fun add(name: String, amount: Double, rank: Int, retained: Boolean) {
+                val norm = normalize(name)
+                if (norm.length < 2) return
+                if (hidden.contains(norm)) return
+                if (q.isNotEmpty() && !norm.contains(q)) return
+                val pct = if (est > 0.0) (amount - est) / est * 100.0 else 0.0
+                tree.getOrPut(categorie) { LinkedHashMap() }
+                    .getOrPut(domaine) { LinkedHashMap() }
+                    .getOrPut(norm) { mutableListOf() }
+                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, categorie, domaine))
+                display.putIfAbsent(norm, name.trim())
+            }
+
+            for (o in s.result.ranking) add(o.name, o.amount, o.rank, true)
+            for (c in s.result.excluded) add(c.name, c.amount, 0, false)
+        }
+
+        return tree.map { (cat, domMap) ->
+            val domaines = domMap.map { (dom, compMap) ->
+                val companies = compMap.map { (norm, parts) ->
+                    val wp = parts.filter { it.estimation > 0.0 }
+                    CompanyInDomaine(
+                        name = display[norm] ?: norm,
+                        count = parts.size,
+                        averagePercent = if (wp.isNotEmpty()) wp.sumOf { it.percentVsEstimation } / wp.size else 0.0,
+                        participations = parts.sortedBy { it.date },
+                    )
+                }.sortedBy { it.name }
+                DomaineGroup(cat, dom, companies.sumOf { it.count }, companies)
+            }.sortedWith(compareByDescending<DomaineGroup> { it.count }.thenBy { it.domaine })
+            CategoryGroup(cat, domaines.sumOf { it.count }, domaines)
+        }.filter { it.count > 0 }
+            .sortedWith(compareBy({ CATEGORIES.indexOf(it.name).let { i -> if (i < 0) Int.MAX_VALUE else i } }, { it.name }))
+    }
+
     /** Normalise un nom de société pour le regroupement (majuscules, espaces, ponctuation). */
     fun normalize(name: String): String =
         name.uppercase().replace(Regex("\\s+"), " ").trim().trim('.', ',', '-', '–', '—', ' ')

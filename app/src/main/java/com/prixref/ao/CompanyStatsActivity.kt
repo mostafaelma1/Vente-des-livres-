@@ -1,5 +1,6 @@
 package com.prixref.ao
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -20,14 +21,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Statistiques par société, agrégées depuis l'historique : pour chaque société
- * (regroupée par nom), la liste des marchés et son écart vs l'estimation (%),
- * plus une moyenne. Permet de suivre le comportement de chaque concurrent.
+ * Historique par société, organisé : Catégorie principale -> Domaine d'activité
+ * -> liste des sociétés (chacune avec son % moyen vs estimation dans ce domaine).
  */
 class CompanyStatsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCompanyStatsBinding
-    private var companies: List<CompanyStats.Company> = emptyList()
+    private var sources: List<CompanyStats.Source> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,73 +41,73 @@ class CompanyStatsActivity : AppCompatActivity() {
     private fun load() {
         lifecycleScope.launch {
             val dao = AppDatabase.get(this@CompanyStatsActivity).analysisDao()
-            companies = withContext(Dispatchers.IO) {
-                val sources = dao.getAll().mapNotNull { entity ->
-                    runCatching { CompanyStats.Source(entity.date, JsonStore.fromJson(entity.json)) }.getOrNull()
+            sources = withContext(Dispatchers.IO) {
+                dao.getAll().mapNotNull { e ->
+                    runCatching { CompanyStats.Source(e.date, JsonStore.fromJson(e.json)) }.getOrNull()
                 }
-                CompanyStats.build(sources)
             }
             render(binding.etSearch.text?.toString().orEmpty())
         }
     }
 
     private fun render(query: String) {
-        val visible = CompanyStats.removeHidden(companies, HiddenCompanies.get(this))
-        val list = CompanyStats.filter(visible, query)
+        val categories = CompanyStats.buildByDomaine(sources, HiddenCompanies.get(this), query)
         binding.statsContainer.removeAllViews()
-        binding.tvEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+        binding.tvEmpty.visibility = if (categories.isEmpty()) View.VISIBLE else View.GONE
 
-        for (company in list) {
+        for (cat in categories) {
             val card = ItemCompanyBinding.inflate(layoutInflater, binding.statsContainer, false)
-            card.tvName.text = company.name
-            card.tvSummary.text =
-                "${company.count} marché(s) • Moyenne vs estimation : ${Format.signedPercent(company.averagePercent)}"
-            card.root.setOnLongClickListener { confirmDelete(company); true }
+            card.tvName.text = cat.name
+            card.tvName.setTextColor(ContextCompat.getColor(this, categoryColor(cat.name)))
+            card.tvSummary.text = "${cat.count} marché(s) · ${cat.domaines.size} domaine(s) d'activité"
 
-            // Détail par catégorie / domaine d'activité, avec % moyen PAR domaine.
-            for (dom in company.byDomaine) {
-                val header = TextView(this).apply {
-                    text = "▸ ${dom.categorie} · ${dom.domaine}  —  ${dom.count} marché(s) · moy. ${Format.signedPercent(dom.averagePercent)}"
-                    textSize = 13.5f
-                    setTypeface(typeface, android.graphics.Typeface.BOLD)
-                    setTextColor(ContextCompat.getColor(this@CompanyStatsActivity, R.color.brand_orange_dark))
-                    setPadding(0, 10, 0, 2)
-                }
-                card.linesContainer.addView(header)
-
-                for (p in dom.participations) {
-                    val title = p.reference.ifBlank { p.objet.ifBlank { "Marché" } }.take(46)
-                    val statut = if (p.retained) "" else "  · écartée"
-                    val pct = if (p.estimation > 0.0) " (${Format.signedPercent(p.percentVsEstimation)})" else ""
-                    val tv = TextView(this).apply {
-                        text = "    • ${Format.date(p.date)} — $title : ${Format.money(p.amount)}$pct$statut"
-                        textSize = 12.5f
-                        setTextColor(
-                            ContextCompat.getColor(
-                                this@CompanyStatsActivity,
-                                if (p.retained) R.color.text_primary else R.color.text_secondary,
-                            )
-                        )
-                        setPadding(0, 4, 0, 4)
-                    }
-                    card.linesContainer.addView(tv)
+            for (dom in cat.domaines) {
+                card.linesContainer.addView(
+                    text("▸ ${dom.domaine}  (${dom.count})", 13.5f, R.color.brand_orange_dark, 10, bold = true)
+                )
+                for (co in dom.companies) {
+                    val pct = if (co.participations.any { it.estimation > 0.0 })
+                        " · moy. ${Format.signedPercent(co.averagePercent)}" else ""
+                    val line = text(
+                        "    • ${co.name} — ${co.count} marché(s)$pct",
+                        12.5f, R.color.text_primary, 4,
+                    )
+                    line.setOnLongClickListener { confirmDelete(co.name); true }
+                    card.linesContainer.addView(line)
                 }
             }
             binding.statsContainer.addView(card.root)
         }
     }
 
-    private fun confirmDelete(company: CompanyStats.Company) {
+    private fun text(value: String, size: Float, colorRes: Int, topPad: Int, bold: Boolean = false): TextView =
+        TextView(this).apply {
+            text = value
+            textSize = size
+            setTextColor(ContextCompat.getColor(this@CompanyStatsActivity, colorRes))
+            setPadding(0, dp(topPad), 0, dp(2))
+            if (bold) setTypeface(typeface, Typeface.BOLD)
+        }
+
+    private fun confirmDelete(companyName: String) {
         MaterialAlertDialogBuilder(this)
             .setTitle("Supprimer cette société ?")
-            .setMessage("« ${company.name} » sera retirée de l'historique par société. " +
+            .setMessage("« $companyName » sera retirée de l'historique par société. " +
                 "Les analyses enregistrées ne sont pas modifiées.")
             .setNegativeButton("Annuler", null)
             .setPositiveButton("Supprimer") { _, _ ->
-                HiddenCompanies.hide(this, CompanyStats.normalize(company.name))
+                HiddenCompanies.hide(this, CompanyStats.normalize(companyName))
                 render(binding.etSearch.text?.toString().orEmpty())
             }
             .show()
     }
-}
 
+    private fun categoryColor(name: String): Int = when (name.lowercase()) {
+        "travaux" -> R.color.brand_brown
+        "services" -> R.color.brand_slate
+        "fournitures" -> R.color.brand_orange
+        else -> R.color.text_primary
+    }
+
+    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+}
