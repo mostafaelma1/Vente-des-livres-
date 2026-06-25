@@ -305,67 +305,64 @@ object LocalAnalyzer {
     }
 
     /**
-     * Cherche la valeur d'un champ. Trois stratégies, dans l'ordre :
-     *  1. Tableaux clé/valeur (« Libellé » | « valeur »).
-     *  2. Texte « Libellé : valeur » (avec deux-points).
-     *  3. Texte « Libellé  valeur » sans séparateur : la valeur va du libellé
-     *     jusqu'au libellé connu suivant (cas de marchespublics.gov.ma).
+     * Repli d'un caractère : minuscule, sans accent, apostrophes/espaces unifiés.
+     * Préserve la longueur (1 caractère -> 1 caractère) pour que les index
+     * calculés sur le texte replié restent valides sur le texte original.
+     */
+    private fun foldChar(c: Char): Char = when (c.lowercaseChar()) {
+        'à', 'â', 'ä', 'á', 'ã', 'å' -> 'a'
+        'é', 'è', 'ê', 'ë' -> 'e'
+        'î', 'ï', 'í', 'ì' -> 'i'
+        'ô', 'ö', 'ò', 'ó', 'õ' -> 'o'
+        'û', 'ü', 'ù', 'ú' -> 'u'
+        'ç' -> 'c'
+        'ñ' -> 'n'
+        '’', '‘', '`', '´', 'ʼ' -> '\''
+        ' ', ' ' -> ' '
+        else -> c.lowercaseChar()
+    }
+
+    private fun fold(s: String): String = buildString(s.length) { for (c in s) append(foldChar(c)) }
+
+    /**
+     * Cherche la valeur d'un champ, insensible aux accents et apostrophes :
+     *  1. Tableaux clé/valeur ; 2. Texte « Libellé [:] valeur » jusqu'au
+     *  libellé connu suivant (souvent sans deux-points sur marchespublics.gov.ma).
      */
     private fun labelValue(page: PageData, labels: List<String>): String {
-        // 1. Tableaux clé/valeur.
+        val foldedLabels = labels.map { fold(it) }
         for (table in page.tables) {
             for (row in table.rows) {
                 if (row.size >= 2) {
-                    val key = clean(row[0]).lowercase()
-                    if (labels.any { key == it || key.startsWith("$it ") || key.startsWith("$it:") || key.startsWith(it) }) {
+                    val key = fold(clean(row[0]))
+                    if (foldedLabels.any { key == it || key.startsWith(it) || key.contains(it) }) {
                         val value = clean(row.last())
-                        if (value.isNotBlank() && value.lowercase() != key) return value
+                        if (value.isNotBlank() && fold(value) != key) return value
                     }
                 }
             }
         }
-        val text = page.rawText
-        // 2. « Libellé : valeur ».
-        for (lbl in labels) {
-            val re = Regex("(?i)\\b${Regex.escape(lbl)}\\b\\s*[:\\-]\\s*(.{2,200})")
-            val m = re.find(text)
-            if (m != null) {
-                val v = cutAtNextLabel(clean(m.groupValues[1]))
-                if (v.isNotBlank()) return v
-            }
-        }
-        // 3. « Libellé  valeur » sans séparateur.
-        return valueAfterLabel(text, labels)
+        return valueAfterLabel(page.rawText, foldedLabels)
     }
 
-    /** Extrait la valeur située juste après un libellé, jusqu'au libellé connu suivant. */
-    private fun valueAfterLabel(text: String, labels: List<String>): String {
-        val lower = text.lowercase()
-        for (lbl in labels) {
-            val idx = lower.indexOf(lbl.lowercase())
+    /** Valeur juste après un libellé, jusqu'au libellé connu suivant (recherche sur texte replié). */
+    private fun valueAfterLabel(text: String, foldedLabels: List<String>): String {
+        val folded = fold(text) // même longueur que text
+        val foldedStops = ALL_LABELS.map { fold(it) }
+        for (fl in foldedLabels) {
+            val idx = folded.indexOf(fl)
             if (idx < 0) continue
-            val start = idx + lbl.length
+            val start = idx + fl.length
             if (start >= text.length) continue
             var end = text.length
-            for (stop in ALL_LABELS) {
-                val p = lower.indexOf(stop, start + 1)
+            for (stop in foldedStops) {
+                val p = folded.indexOf(stop, start + 1)
                 if (p in (start + 1) until end) end = p
             }
-            val value = clean(text.substring(start, end)).trim(':', '-', '.', ' ', ' ')
+            val value = clean(text.substring(start, end)).trim(':', '-', '.', ' ')
             if (value.length >= 2) return value.take(300)
         }
         return ""
-    }
-
-    /** Coupe une valeur (extraite avec deux-points) au prochain libellé connu, si collé. */
-    private fun cutAtNextLabel(value: String): String {
-        val lower = value.lowercase()
-        var end = value.length
-        for (stop in ALL_LABELS) {
-            val p = lower.indexOf(stop, 1)
-            if (p in 1 until end) end = p
-        }
-        return clean(value.substring(0, end)).trim(':', '-', '.', ' ', ' ')
     }
 
     fun parseAmount(text: String?): Double? {
