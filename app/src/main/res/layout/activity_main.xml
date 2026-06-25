@@ -240,4 +240,14 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <!-- Logo fixe en haut (superposé, ne défile pas) -->
+    <ImageView
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="18dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo_bmarche_t" />
 </FrameLayout>

@@ -65,12 +65,6 @@ class SocietyStatsActivity : AppCompatActivity() {
             card.root.setOnLongClickListener { confirmDelete(company.name); true }
 
             for (dom in company.byDomaine) {
-                card.linesContainer.addView(
-                    text(
-                        "▸ ${dom.categorie} · ${dom.domaine}  —  ${dom.count} marché(s) · moy. ${Format.signedPercent(dom.averagePercent)}",
-                        13.5f, R.color.brand_orange_dark, 12, bold = true,
-                    )
-                )
                 for (p in dom.participations) {
                     val statut = if (p.retained) "" else "  · écartée"
                     val pct = if (p.estimation > 0.0) Format.signedPercent(p.percentVsEstimation) else "—"

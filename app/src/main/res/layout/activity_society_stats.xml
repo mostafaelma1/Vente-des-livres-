@@ -71,6 +71,16 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <!-- Logo fixe en haut (superposé) -->
+    <ImageView
+        android:layout_width="112dp"
+        android:layout_height="112dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="14dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo_bmarche_t" />
+
     <ImageButton
         android:id="@+id/btnBack"
         android:layout_width="44dp"
