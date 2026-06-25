@@ -6,12 +6,12 @@
     <color name="surface_variant">#EEF1F6</color>
     <color name="stroke">#DDE3EC</color>
 
-    <!-- Bleu foncé (marque) -->
-    <color name="primary">#16335C</color>
-    <color name="primary_dark">#0F2542</color>
-    <color name="primary_light">#E6ECF5</color>
-    <color name="gradient_start">#1E4D85</color>
-    <color name="gradient_end">#16335C</color>
+    <!-- Couleur principale (marque « B Marche » : ardoise foncée) -->
+    <color name="primary">#33373D</color>
+    <color name="primary_dark">#26292E</color>
+    <color name="primary_light">#FBEEDF</color>
+    <color name="gradient_start">#3E444C</color>
+    <color name="gradient_end">#26292E</color>
     <color name="on_primary">#FFFFFF</color>
 
     <!-- Texte -->
@@ -42,4 +42,12 @@
 
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
+
+    <!-- ===== Marque « B Marche » (d'après le logo) ===== -->
+    <color name="brand_orange">#E5832E</color>
+    <color name="brand_orange_dark">#C96E1F</color>
+    <color name="brand_brown">#6E4A37</color>
+    <color name="brand_slate">#33373D</color>
+    <color name="brand_orange_tint">#FBEEDF</color>
+    <color name="brand_green">#0B7A3B</color>
 </resources>

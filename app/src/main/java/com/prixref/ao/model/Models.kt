@@ -32,6 +32,8 @@ data class AnalysisInput(
     val lotNumero: String,
     val lotDesignation: String,
     val competitors: List<Competitor>,
+    /** Date et heure limite de remise des plis (texte issu du site, ex. « 12/05/2026 10:00 »). */
+    val dateLimite: String = "",
 ) : Serializable
 
 /** Une offre classée, enrichie par le moteur de calcul. */

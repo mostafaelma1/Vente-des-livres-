@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.prixref.ao.data.AppDatabase
 import com.prixref.ao.data.CompanyStats
+import com.prixref.ao.data.HiddenCompanies
 import com.prixref.ao.data.JsonStore
 import com.prixref.ao.databinding.ActivityCompanyStatsBinding
 import com.prixref.ao.databinding.ItemCompanyBinding
@@ -50,7 +52,8 @@ class CompanyStatsActivity : AppCompatActivity() {
     }
 
     private fun render(query: String) {
-        val list = CompanyStats.filter(companies, query)
+        val visible = CompanyStats.removeHidden(companies, HiddenCompanies.get(this))
+        val list = CompanyStats.filter(visible, query)
         binding.statsContainer.removeAllViews()
         binding.tvEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
 
@@ -59,6 +62,7 @@ class CompanyStatsActivity : AppCompatActivity() {
             card.tvName.text = company.name
             card.tvSummary.text =
                 "${company.count} marché(s) • Moyenne vs estimation : ${Format.signedPercent(company.averagePercent)}"
+            card.root.setOnLongClickListener { confirmDelete(company); true }
 
             for (p in company.participations) {
                 val tv = TextView(this)
@@ -79,4 +83,18 @@ class CompanyStatsActivity : AppCompatActivity() {
             binding.statsContainer.addView(card.root)
         }
     }
+
+    private fun confirmDelete(company: CompanyStats.Company) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Supprimer cette société ?")
+            .setMessage("« ${company.name} » sera retirée de l'historique par société. " +
+                "Les analyses enregistrées ne sont pas modifiées.")
+            .setNegativeButton("Annuler", null)
+            .setPositiveButton("Supprimer") { _, _ ->
+                HiddenCompanies.hide(this, CompanyStats.normalize(company.name))
+                render(binding.etSearch.text?.toString().orEmpty())
+            }
+            .show()
+    }
 }
+

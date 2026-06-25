@@ -57,6 +57,10 @@ object LocalAnalyzer {
         "estimation du maître", "budget prévisionnel", "coût estimatif",
     )
     private val LABELS_CATEGORIE = listOf("catégorie principale", "categorie principale", "domaine d'activité", "domaine d'activite", "catégorie", "categorie")
+    private val LABELS_DATE_LIMITE = listOf(
+        "date et heure limite de remise des plis", "date limite de remise des plis",
+        "date limite des plis", "limite de remise des plis", "date limite",
+    )
 
     /**
      * Tous les libellés connus de la fiche de consultation marchespublics.gov.ma.
@@ -64,6 +68,8 @@ object LocalAnalyzer {
      * affiche « Libellé  valeur » souvent sans deux-points).
      */
     private val ALL_LABELS = listOf(
+        "date et heure limite de remise des plis", "date limite de remise des plis",
+        "remise des plis", "date limite",
         "référence", "reference", "objet", "acheteur public", "maître d'ouvrage",
         "type d'annonce", "procédure", "procedure", "catégorie principale",
         "categorie principale", "réservé à", "reserve a", "lieu d'exécution",
@@ -89,6 +95,7 @@ object LocalAnalyzer {
         val lieu = labelValue(page, LABELS_LIEU)
         val estimation = parseAmount(labelValue(page, LABELS_ESTIMATION)) ?: 0.0
         val typeMarche = mapType(labelValue(page, LABELS_CATEGORIE))
+        val dateLimite = labelValue(page, LABELS_DATE_LIMITE)
 
         // Choix du tableau d'offres : celui qui produit le plus d'offres valides.
         var best: List<Competitor> = emptyList()
@@ -139,6 +146,7 @@ object LocalAnalyzer {
             lotNumero = "1",
             lotDesignation = objet,
             competitors = competitors,
+            dateLimite = dateLimite,
         )
 
         val summary = when {

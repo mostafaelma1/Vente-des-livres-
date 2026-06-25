@@ -11,99 +11,105 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- En-tête -->
+        <!-- En-tête avec logo -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_header_gradient"
+            android:background="@color/surface"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="56dp"
-            android:paddingBottom="36dp">
+            android:gravity="center_horizontal"
+            android:paddingTop="40dp"
+            android:paddingBottom="24dp"
+            android:elevation="2dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/app_name"
-                android:textColor="@color/on_primary"
-                android:textSize="26sp"
-                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/logo_bmarche" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <View
+                android:layout_width="56dp"
+                android:layout_height="3dp"
                 android:layout_marginTop="6dp"
-                android:text="@string/slogan"
-                android:textColor="@color/on_primary_dim"
-                android:textSize="14sp" />
+                android:background="@color/brand_orange" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="18dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnManual"
-                style="@style/PrimaryButton"
-                app:icon="@drawable/ic_invoice"
-                app:iconGravity="textStart"
-                app:iconTint="@color/on_primary"
-                android:text="@string/home_manual" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginStart="4dp"
+                android:text="Que voulez-vous faire ?"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
-            <com.google.android.material.button.MaterialButton
+            <!-- Nouvelle analyse -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnUrl"
-                style="@style/OutlineButton"
-                android:layout_marginTop="14dp"
-                app:icon="@drawable/ic_link"
-                app:iconGravity="textStart"
-                android:text="@string/home_new_analysis" />
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_orange">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_link" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_new_analysis" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Coller un lien marchespublics.gov.ma — analyse automatique" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
+            <!-- Simulation avant dépôt -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnSimulation"
-                style="@style/OutlineButton"
-                android:layout_marginTop="14dp"
-                app:icon="@drawable/ic_trending"
-                app:iconGravity="textStart"
-                android:text="@string/home_simulation" />
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_brown">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_simulation" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Tester votre offre et estimer votre position" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnHistory"
-                style="@style/OutlineButton"
-                android:layout_marginTop="14dp"
-                app:icon="@drawable/ic_calendar"
-                app:iconGravity="textStart"
-                android:text="@string/home_history" />
-
-            <com.google.android.material.button.MaterialButton
+            <!-- Historique par société -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnCompanies"
-                style="@style/OutlineButton"
-                android:layout_marginTop="14dp"
-                app:icon="@drawable/ic_clients"
-                app:iconGravity="textStart"
-                android:text="@string/home_companies" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSettings"
-                style="@style/OutlineButton"
-                android:layout_marginTop="14dp"
-                app:icon="@drawable/ic_link"
-                app:iconGravity="textStart"
-                android:text="@string/home_settings" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAbout"
-                style="@style/OutlineButton"
-                android:layout_marginTop="14dp"
-                app:icon="@drawable/ic_info"
-                app:iconGravity="textStart"
-                android:text="@string/home_about" />
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_slate">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_companies" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Suivre chaque société et son écart vs estimation" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="22dp"
                 android:text="@string/disclaimer"
                 android:textColor="@color/text_secondary"
                 android:textSize="11sp"

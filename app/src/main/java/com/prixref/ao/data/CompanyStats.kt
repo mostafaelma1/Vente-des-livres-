@@ -1,6 +1,7 @@
 package com.prixref.ao.data
 
 import com.prixref.ao.model.AnalysisResult
+import java.util.Calendar
 
 /**
  * Agrège les données par **société** à travers toutes les analyses enregistrées.
@@ -47,13 +48,15 @@ object CompanyStats {
             val est = s.result.input.estimation
             val ref = s.result.input.reference
             val objet = s.result.input.objet
+            // Date de remise des plis (issue du site) ; à défaut, date d'enregistrement.
+            val date = parseDate(s.result.input.dateLimite) ?: s.date
 
             fun add(name: String, amount: Double, rank: Int, retained: Boolean) {
                 val norm = normalize(name)
                 if (norm.length < 2) return
                 val pct = if (est > 0.0) (amount - est) / est * 100.0 else 0.0
                 map.getOrPut(norm) { mutableListOf() }
-                    .add(Participation(s.date, ref, objet, amount, est, pct, rank, retained))
+                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained))
                 display.putIfAbsent(norm, name.trim())
             }
 
@@ -66,7 +69,7 @@ object CompanyStats {
             val avg = if (withPct.isNotEmpty()) withPct.sumOf { it.percentVsEstimation } / withPct.size else 0.0
             Company(
                 name = display[norm] ?: norm,
-                participations = parts.sortedByDescending { it.date },
+                participations = parts.sortedBy { it.date }, // du plus ancien au plus récent
                 averagePercent = avg,
                 count = parts.size,
             )
@@ -78,5 +81,34 @@ object CompanyStats {
         val q = query.trim().uppercase()
         if (q.isEmpty()) return companies
         return companies.filter { normalize(it.name).contains(q) }
+    }
+
+    /** Retire les sociétés masquées par l'utilisateur (par nom normalisé). */
+    fun removeHidden(companies: List<Company>, hidden: Set<String>): List<Company> {
+        if (hidden.isEmpty()) return companies
+        return companies.filter { !hidden.contains(normalize(it.name)) }
+    }
+
+    private val DATE_RE = Regex("""(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{4})(?:\D+(\d{1,2})[:hH](\d{2}))?""")
+
+    /** Parse une date « jj/mm/aaaa [hh:mm] » en epoch (ms), ou null si introuvable. */
+    fun parseDate(text: String?): Long? {
+        val t = text?.trim().orEmpty()
+        if (t.isEmpty()) return null
+        val m = DATE_RE.find(t) ?: return null
+        return try {
+            val day = m.groupValues[1].toInt()
+            val month = m.groupValues[2].toInt()
+            val year = m.groupValues[3].toInt()
+            val hour = m.groupValues[4].toIntOrNull() ?: 0
+            val min = m.groupValues[5].toIntOrNull() ?: 0
+            if (month !in 1..12 || day !in 1..31) return null
+            Calendar.getInstance().apply {
+                clear()
+                set(year, month - 1, day, hour, min, 0)
+            }.timeInMillis
+        } catch (e: Exception) {
+            null
+        }
     }
 }

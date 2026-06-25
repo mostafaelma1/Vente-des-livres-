@@ -136,6 +136,14 @@ class UrlAnalysisActivity : AppCompatActivity() {
     private fun autoExtractTick() {
         if (autoDone || isFinishing) return
         autoAttempts++
+        // 1) déplier les sections « + » de la page, 2) lire après un court délai.
+        binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
+            handler.postDelayed({ readAndHandle() }, 1000)
+        }
+    }
+
+    private fun readAndHandle() {
+        if (autoDone || isFinishing) return
         binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
             if (autoDone || isFinishing) return@evaluateJavascript
             val page = parsePage(value)
@@ -175,14 +183,18 @@ class UrlAnalysisActivity : AppCompatActivity() {
         handler.removeCallbacksAndMessages(null)
         setBusy(true)
         binding.tvMessage.text = "Extraction locale en cours…"
-        binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
-            setBusy(false)
-            val page = parsePage(value)
-            if (page == null || (page.tables.isEmpty() && page.rawText.isBlank())) {
-                failLocal()
-            } else {
-                handlePage(page)
-            }
+        binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
+            handler.postDelayed({
+                binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
+                    setBusy(false)
+                    val page = parsePage(value)
+                    if (page == null || (page.tables.isEmpty() && page.rawText.isBlank())) {
+                        failLocal()
+                    } else {
+                        handlePage(page)
+                    }
+                }
+            }, 1000)
         }
     }
 
@@ -336,6 +348,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
             lotNumero = lotNumero,
             lotDesignation = base?.lotDesignation.orEmpty(),
             competitors = competitors,
+            dateLimite = base?.dateLimite.orEmpty(),
         )
         binding.tvMessage.text =
             "${competitors.size} offre(s) construite(s) depuis vos colonnes. Vérifiez puis calculez."

@@ -31,6 +31,48 @@ data class PageData(
  */
 object WebExtraction {
 
+    /**
+     * Déplie les sections repliables de la page (boutons « + », « Afficher les
+     * détails »…) afin que toutes les informations de la consultation
+     * deviennent visibles avant l'extraction. Chaque élément n'est cliqué
+     * qu'une seule fois (marqueur __pxClicked) pour éviter de re-replier.
+     */
+    val EXPAND_SCRIPT: String = """
+        (function () {
+          function ownText(e) {
+            var t = '';
+            for (var i = 0; i < e.childNodes.length; i++) {
+              if (e.childNodes[i].nodeType === 3) t += e.childNodes[i].nodeValue;
+            }
+            return t.trim();
+          }
+          try {
+            var hint = /plus|expand|toggle|détail|detail|deplier|déplier|afficher|voir|more|collaps/i;
+            var els = document.querySelectorAll('a,span,div,button,img,i,td,th,li,p');
+            var clicked = 0;
+            for (var k = 0; k < els.length && clicked < 80; k++) {
+              var e = els[k];
+              if (e.__pxClicked) continue;
+              if (e.tagName === 'A') {
+                var href = e.getAttribute('href') || '';
+                var hl = href.toLowerCase();
+                if (href && hl.indexOf('#') !== 0 && hl.indexOf('javascript') !== 0) continue;
+              }
+              var cls = ('' + (e.className && e.className.baseVal !== undefined ? e.className.baseVal : (e.className || ''))).toLowerCase();
+              var id = (e.id || '').toLowerCase();
+              var oc = (e.getAttribute && (e.getAttribute('onclick') || '')) || '';
+              var title = (e.getAttribute && (e.getAttribute('title') || '')) || '';
+              var t = ownText(e);
+              if (t === '+' || t === '[+]' || hint.test(cls) || hint.test(id) || hint.test(oc) || hint.test(title)) {
+                e.__pxClicked = 1;
+                try { e.click(); clicked++; } catch (_) {}
+              }
+            }
+            return clicked;
+          } catch (e) { return -1; }
+        })();
+    """.trimIndent()
+
     val SCRIPT: String = """
         (function () {
           function clean(s) { return (s || '').replace(/\s+/g, ' ').trim(); }
