@@ -23,8 +23,8 @@
             android:elevation="2dp">
 
             <ImageView
-                android:layout_width="220dp"
-                android:layout_height="220dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/app_name"
                 android:src="@drawable/logo_bmarche" />
@@ -105,15 +105,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginStart="4dp"
-                android:text="Que voulez-vous faire ?"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+            <TextView style="@style/HomeSection" android:text="ANALYSER" />
 
             <!-- Nouvelle analyse -->
             <com.google.android.material.card.MaterialCardView
@@ -127,7 +119,7 @@
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_new_analysis" />
                         <TextView style="@style/HomeCardSub"
-                            android:text="Coller un lien marchespublics.gov.ma — analyse automatique" />
+                            android:text="Analyse automatique d'un lien" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -145,25 +137,27 @@
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_simulation" />
                         <TextView style="@style/HomeCardSub"
-                            android:text="Tester votre offre et estimer votre position" />
+                            android:text="Estimer votre position avant de déposer" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Historique par société -->
+            <TextView style="@style/HomeSection" android:text="STATISTIQUES" />
+
+            <!-- Statistiques par catégorie -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnCompanies"
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
                         android:backgroundTint="@color/brand_slate">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_companies" />
                         <TextView style="@style/HomeCardSub"
-                            android:text="Catégorie → domaine d'activité → sociétés et leurs %" />
+                            android:text="Catégorie → domaine → sociétés" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -181,7 +175,25 @@
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_society" />
                         <TextView style="@style/HomeCardSub"
-                            android:text="Chaque société et son % par domaine d'activité" />
+                            android:text="% de chaque société par domaine" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Statistiques avancées -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAdvanced"
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:backgroundTint="@color/brand_orange">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_advanced" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Vue d'ensemble par catégorie et domaine" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -199,25 +211,7 @@
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_history" />
                         <TextView style="@style/HomeCardSub"
-                            android:text="Retrouver et rouvrir toutes vos analyses" />
-                    </LinearLayout>
-                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Statistiques avancées (par catégorie / domaine) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnAdvanced"
-                style="@style/HomeCard">
-                <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_orange">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
-                    </FrameLayout>
-                    <LinearLayout style="@style/HomeCardText">
-                        <TextView style="@style/HomeCardTitle" android:text="@string/home_advanced" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Par catégorie (Travaux / Services / Fournitures) et domaine" />
+                            android:text="Toutes vos analyses enregistrées" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
