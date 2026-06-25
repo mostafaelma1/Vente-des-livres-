@@ -28,6 +28,7 @@ object CompanyStats {
         val retained: Boolean,
         val categorie: String,
         val domaine: String,
+        val lieu: String,
     )
 
     /** Statistiques d'une société pour un domaine d'activité donné. */
@@ -181,6 +182,7 @@ object CompanyStats {
             val ref = s.result.input.reference
             val objet = s.result.input.objet
             val date = parseDate(s.result.input.dateLimite) ?: s.date
+            val lieu = s.result.input.lieu
             val dom = s.result.input.domaine.ifBlank { NON_PRECISE }
 
             fun add(name: String, amount: Double, rank: Int, retained: Boolean) {
@@ -189,7 +191,7 @@ object CompanyStats {
                 if (q.isNotEmpty() && !norm.contains(q)) return
                 val pct = if (est > 0.0) (amount - est) / est * 100.0 else 0.0
                 map.getOrPut(norm) { mutableListOf() }
-                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, category, dom))
+                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, category, dom, lieu))
                 display.putIfAbsent(norm, name.trim())
             }
             for (o in s.result.ranking) add(o.name, o.amount, o.rank, true)
@@ -243,6 +245,7 @@ object CompanyStats {
             val ref = s.result.input.reference
             val objet = s.result.input.objet
             val date = parseDate(s.result.input.dateLimite) ?: s.date
+            val lieu = s.result.input.lieu
             val categorie = s.result.input.categorieLabel.ifBlank { s.result.input.typeMarche.label }
             val domaine = s.result.input.domaine.ifBlank { "(domaine non précisé)" }
 
@@ -255,7 +258,7 @@ object CompanyStats {
                 tree.getOrPut(categorie) { LinkedHashMap() }
                     .getOrPut(domaine) { LinkedHashMap() }
                     .getOrPut(norm) { mutableListOf() }
-                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, categorie, domaine))
+                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, categorie, domaine, lieu))
                 display.putIfAbsent(norm, name.trim())
             }
 
@@ -295,6 +298,7 @@ object CompanyStats {
             val objet = s.result.input.objet
             // Date de remise des plis (issue du site) ; à défaut, date d'enregistrement.
             val date = parseDate(s.result.input.dateLimite) ?: s.date
+            val lieu = s.result.input.lieu
             val categorie = s.result.input.categorieLabel.ifBlank { s.result.input.typeMarche.label }
             val domaine = s.result.input.domaine.ifBlank { "(domaine non précisé)" }
 
@@ -303,7 +307,7 @@ object CompanyStats {
                 if (norm.length < 2) return
                 val pct = if (est > 0.0) (amount - est) / est * 100.0 else 0.0
                 map.getOrPut(norm) { mutableListOf() }
-                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, categorie, domaine))
+                    .add(Participation(date, ref, objet, amount, est, pct, rank, retained, categorie, domaine, lieu))
                 display.putIfAbsent(norm, name.trim())
             }
 

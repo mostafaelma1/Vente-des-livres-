@@ -13,7 +13,7 @@ import com.prixref.ao.data.AppDatabase
 import com.prixref.ao.data.CompanyStats
 import com.prixref.ao.data.HiddenCompanies
 import com.prixref.ao.data.JsonStore
-import com.prixref.ao.databinding.ActivityCompanyStatsBinding
+import com.prixref.ao.databinding.ActivitySocietyStatsBinding
 import com.prixref.ao.databinding.ItemCompanyBinding
 import com.prixref.ao.util.Format
 import kotlinx.coroutines.Dispatchers
@@ -26,15 +26,14 @@ import kotlinx.coroutines.withContext
  */
 class SocietyStatsActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityCompanyStatsBinding
+    private lateinit var binding: ActivitySocietyStatsBinding
     private var companies: List<CompanyStats.Company> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCompanyStatsBinding.inflate(layoutInflater)
+        binding = ActivitySocietyStatsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.toolbar.title = "Statistiques par société"
-        binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.btnBack.setOnClickListener { finish() }
         binding.etSearch.doAfterTextChanged { render(it?.toString().orEmpty()) }
         load()
     }
@@ -69,17 +68,29 @@ class SocietyStatsActivity : AppCompatActivity() {
                 card.linesContainer.addView(
                     text(
                         "▸ ${dom.categorie} · ${dom.domaine}  —  ${dom.count} marché(s) · moy. ${Format.signedPercent(dom.averagePercent)}",
-                        13.5f, R.color.brand_orange_dark, 10, bold = true,
+                        13.5f, R.color.brand_orange_dark, 12, bold = true,
                     )
                 )
                 for (p in dom.participations) {
-                    val title = p.reference.ifBlank { p.objet.ifBlank { "Marché" } }.take(44)
                     val statut = if (p.retained) "" else "  · écartée"
-                    val pct = if (p.estimation > 0.0) " (${Format.signedPercent(p.percentVsEstimation)})" else ""
+                    val pct = if (p.estimation > 0.0) Format.signedPercent(p.percentVsEstimation) else "—"
+                    // Ligne 1 : n° d'appel d'offres + date limite + statut
                     card.linesContainer.addView(
                         text(
-                            "    • ${Format.date(p.date)} — $title : ${Format.money(p.amount)}$pct$statut",
-                            12.5f, if (p.retained) R.color.text_primary else R.color.text_secondary, 4,
+                            "• N° ${p.reference.ifBlank { "—" }}  ·  ${Format.date(p.date)}$statut",
+                            12.5f, if (p.retained) R.color.text_primary else R.color.text_secondary, 8, bold = true,
+                        )
+                    )
+                    // Ligne 2 : ville + catégorie
+                    val ville = p.lieu.ifBlank { "—" }
+                    card.linesContainer.addView(
+                        text("    Ville : $ville  ·  Catégorie : ${p.categorie}", 12f, R.color.text_secondary, 1)
+                    )
+                    // Ligne 3 : estimation + offre + écart %
+                    card.linesContainer.addView(
+                        text(
+                            "    Estimation : ${Format.money(p.estimation)}  ·  Offre : ${Format.money(p.amount)}  ·  Écart : $pct",
+                            12f, R.color.text_secondary, 1,
                         )
                     )
                 }
