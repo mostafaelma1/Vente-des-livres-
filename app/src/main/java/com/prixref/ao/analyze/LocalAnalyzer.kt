@@ -57,7 +57,9 @@ object LocalAnalyzer {
         "estimation du maître", "budget prévisionnel", "coût estimatif",
     )
     private val LABELS_CATEGORIE = listOf("catégorie principale", "categorie principale", "catégorie", "categorie")
-    private val LABELS_DOMAINE = listOf("domaine d'activité", "domaine d'activite")
+    private val LABELS_DOMAINE = listOf(
+        "domaines d'activité", "domaines d'activite", "domaine d'activité", "domaine d'activite",
+    )
     private val LABELS_DATE_LIMITE = listOf(
         "date et heure limite de remise des plis", "date limite de remise des plis",
         "date limite des plis", "limite de remise des plis", "date limite",
@@ -74,8 +76,9 @@ object LocalAnalyzer {
         "référence", "reference", "objet", "acheteur public", "maître d'ouvrage",
         "type d'annonce", "procédure", "procedure", "catégorie principale",
         "categorie principale", "réservé à", "reserve a", "lieu d'exécution",
-        "lieu d'execution", "estimation (dhs ttc)", "estimation", "domaine d'activité",
-        "domaine d'activite", "adresse de retrait", "adresse de dépôt", "adresse de depot",
+        "lieu d'execution", "estimation (dhs ttc)", "estimation", "domaines d'activité",
+        "domaines d'activite", "domaine d'activité", "domaine d'activite",
+        "adresse de retrait", "adresse de dépôt", "adresse de depot",
         "lieu d'ouverture des plis", "lieu d'ouverture", "prix d'acquisition des plans",
         "prix d'acquisition", "caution provisoire", "cautionnement", "agréments", "agrements",
         "qualifications", "qualification", "préqualification", "prequalification",
