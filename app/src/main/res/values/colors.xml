@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== Palette administrative et professionnelle ===== -->
-    <color name="bg">#F4F6F9</color>
+    <!-- ===== Palette « B Marche » (blanc cassé + orange + brun) ===== -->
+    <color name="bg">#FDF9F3</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#EEF1F6</color>
-    <color name="stroke">#DDE3EC</color>
+    <color name="surface_variant">#FFF7EC</color>
+    <color name="stroke">#EFE8DF</color>
 
     <!-- Couleur principale (marque « B Marche » : ardoise foncée) -->
     <color name="primary">#33373D</color>
@@ -15,8 +15,8 @@
     <color name="on_primary">#FFFFFF</color>
 
     <!-- Texte -->
-    <color name="text_primary">#1B2330</color>
-    <color name="text_secondary">#5C6675</color>
+    <color name="text_primary">#1F2329</color>
+    <color name="text_secondary">#5F6368</color>
     <color name="on_primary_dim">#C7D3E5</color>
 
     <!-- Résultats / statuts -->
@@ -43,11 +43,12 @@
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
 
-    <!-- ===== Marque « B Marche » (d'après le logo) ===== -->
-    <color name="brand_orange">#E5832E</color>
-    <color name="brand_orange_dark">#C96E1F</color>
-    <color name="brand_brown">#6E4A37</color>
-    <color name="brand_slate">#33373D</color>
-    <color name="brand_orange_tint">#FBEEDF</color>
+    <!-- ===== Marque « B Marche » (d'après le brief design) ===== -->
+    <color name="brand_orange">#E86F00</color>
+    <color name="brand_orange_dark">#C75F03</color>
+    <color name="brand_brown">#8B4F1D</color>
+    <color name="brand_slate">#24272E</color>
+    <color name="brand_orange_tint">#FFF7EC</color>
+    <color name="brand_amber">#F5A623</color>
     <color name="brand_green">#0B7A3B</color>
 </resources>

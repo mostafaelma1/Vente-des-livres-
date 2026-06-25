@@ -49,8 +49,8 @@
                 android:layout_marginBottom="18dp"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="3dp">
+                app:cardCornerRadius="26dp"
+                app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -108,12 +108,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp"
                 android:layout_marginStart="6dp"
                 android:text="Que voulez-vous faire ?"
                 android:textColor="@color/text_primary"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="4dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_title_underline" />
 
             <!-- Nouvelle analyse -->
             <com.google.android.material.card.MaterialCardView
@@ -121,7 +128,7 @@
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_orange">
+                        android:background="@drawable/circle_orange">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_link" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
@@ -139,7 +146,7 @@
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_brown">
+                        android:background="@drawable/circle_brown">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
@@ -157,8 +164,8 @@
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_slate">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
+                        android:background="@drawable/circle_dark">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_companies" />
@@ -175,7 +182,7 @@
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_orange_dark">
+                        android:background="@drawable/circle_deep">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
@@ -193,7 +200,7 @@
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_orange">
+                        android:background="@drawable/circle_amber">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
@@ -211,7 +218,7 @@
                 style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
                     <FrameLayout style="@style/HomeIconWrap"
-                        android:backgroundTint="@color/brand_brown">
+                        android:background="@drawable/circle_brown">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_calendar" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
@@ -223,14 +230,28 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="22dp"
-                android:text="@string/disclaimer"
-                android:textColor="@color/text_secondary"
-                android:textSize="11sp"
-                android:textStyle="italic" />
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="2dp"
+                    android:src="@drawable/ic_info"
+                    android:tint="@color/text_secondary" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="@string/disclaimer"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
