@@ -163,7 +163,7 @@
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_companies" />
                         <TextView style="@style/HomeCardSub"
-                            android:text="Suivre chaque société et son écart vs estimation" />
+                            android:text="Catégorie → domaine d'activité → sociétés et leurs %" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
