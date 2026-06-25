@@ -8,6 +8,8 @@
     <string name="home_manual">Mode manuel</string>
     <string name="home_history">Historique</string>
     <string name="home_companies">Historique par société</string>
+    <string name="home_premium_title">Passer à Premium</string>
+    <string name="home_premium_sub">Analyses illimitées · Rapports PDF · Statistiques avancées</string>
     <string name="home_simulation">Simulation avant dépôt</string>
     <string name="home_settings">Paramètres (serveur — optionnel)</string>
     <string name="home_about">À propos</string>

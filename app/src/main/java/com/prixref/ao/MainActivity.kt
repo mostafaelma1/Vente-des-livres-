@@ -17,6 +17,22 @@ class MainActivity : AppCompatActivity() {
         binding.btnUrl.setOnClickListener { open(UrlAnalysisActivity::class.java) }
         binding.btnSimulation.setOnClickListener { open(SimulationActivity::class.java) }
         binding.btnCompanies.setOnClickListener { open(CompanyStatsActivity::class.java) }
+        binding.btnPremium.setOnClickListener { showPremium() }
+    }
+
+    private fun showPremium() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("B Marche Premium")
+            .setMessage(
+                "Bientôt disponible :\n\n" +
+                    "• Analyses illimitées\n" +
+                    "• Rapports PDF professionnels\n" +
+                    "• Historique et statistiques avancés par société\n" +
+                    "• Sauvegarde en ligne et multi-appareils\n\n" +
+                    "Restez à l'écoute — l'abonnement arrive très bientôt."
+            )
+            .setPositiveButton("J'ai hâte !", null)
+            .show()
     }
 
     private fun open(cls: Class<*>) {

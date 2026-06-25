@@ -1,129 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg"
-    android:orientation="vertical">
+    android:background="@color/bg">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Analyse locale par URL"
-        app:titleTextColor="@color/on_primary"
-        app:navigationIconTint="@color/on_primary" />
-
-    <!-- Saisie de l'URL -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Analyse locale disponible. Aucun serveur nécessaire. Collez le lien et chargez la page : l'analyse se lance automatiquement."
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="URL marchespublics.gov.ma">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textUri"
-                android:maxLines="3" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLoad"
-            style="@style/PrimaryButton"
-            android:layout_marginTop="8dp"
-            android:text="Charger la page" />
-
-        <TextView
-            android:id="@+id/tvRefOrg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:visibility="gone" />
-    </LinearLayout>
-
-    <!-- Navigateur intégré (WebView) -->
+    <!-- WebView en arrière-plan : toujours recouverte par les panneaux opaques
+         (l'utilisateur ne la voit jamais), mais rendue pour le scraping local. -->
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone" />
+        android:layout_height="match_parent" />
 
-    <!-- Panneau d'action -->
+    <!-- ÉCRAN 1 : saisie de l'URL -->
     <LinearLayout
-        android:id="@+id/actionPanel"
+        android:id="@+id/setupPanel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/surface"
-        android:orientation="vertical"
-        android:padding="12dp"
-        android:visibility="gone">
+        android:layout_height="match_parent"
+        android:background="@color/bg"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Nouvelle analyse"
+            app:titleTextColor="@color/on_primary"
+            app:navigationIconTint="@color/on_primary" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <ProgressBar
-                android:id="@+id/progress"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone" />
+            android:orientation="vertical"
+            android:padding="18dp">
+
             <TextView
-                android:id="@+id/tvMessage"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
+                android:text="Analyse locale automatique. Aucun serveur. Collez le lien et lancez : l'app s'occupe de tout."
+                android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="URL marchespublics.gov.ma">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUrl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri"
+                    android:maxLines="3" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLoad"
+                style="@style/PrimaryButton"
+                android:layout_marginTop="14dp"
+                android:text="Analyser" />
         </LinearLayout>
+    </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnExtract"
-            style="@style/PrimaryButton"
-            android:layout_marginTop="8dp"
-            android:enabled="false"
-            android:text="Extraire les données de la page" />
+    <!-- ÉCRAN 2 : animation pendant l'analyse (cache la WebView) -->
+    <LinearLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/surface"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="28dp"
+        android:visibility="gone">
 
+        <ImageView
+            android:id="@+id/ivPulse"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/logo_bmarche" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:indeterminate="true"
+            app:indicatorColor="@color/brand_orange"
+            app:trackCornerRadius="4dp"
+            app:trackThickness="5dp" />
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Analyse en cours…"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Actions de secours (affichées seulement si l'auto échoue) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnContinue"
             style="@style/PrimaryButton"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="22dp"
             android:visibility="gone"
-            android:text="Vérifier et calculer" />
+            android:text="Continuer en mode manuel" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnColumns"
             style="@style/OutlineButton"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:visibility="gone"
-            android:text="Choisir les colonnes manuellement" />
+            android:text="Choisir les colonnes" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRetry"
+            style="@style/OutlineButton"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:text="Réessayer" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExport"
             style="@style/OutlineButton"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:visibility="gone"
-            android:text="Exporter les données brutes (debug)" />
+            android:text="Exporter les données (debug)" />
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

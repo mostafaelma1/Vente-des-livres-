@@ -1,5 +1,8 @@
 package com.prixref.ao
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -24,13 +27,14 @@ import com.prixref.ao.data.JsonStore
 import com.prixref.ao.databinding.ActivityUrlBinding
 import com.prixref.ao.databinding.DialogColumnPickerBinding
 import com.prixref.ao.model.AnalysisInput
+import com.prixref.ao.model.TypeMarche
 import com.prixref.ao.util.Sharing
 import java.io.File
 
 /**
- * Analyse par URL **100 % locale** : la page officielle est ouverte dans une
- * WebView intégrée (comme un navigateur), puis les données sont extraites par
- * JavaScript injecté et analysées sur l'appareil. Aucun serveur n'est requis.
+ * Analyse par URL **100 % locale**. La page officielle est chargée dans une
+ * WebView **invisible** (arrière-plan) ; l'utilisateur ne voit qu'une animation
+ * « Analyse en cours… », puis directement le résultat. Aucun serveur requis.
  */
 class UrlAnalysisActivity : AppCompatActivity() {
 
@@ -42,10 +46,10 @@ class UrlAnalysisActivity : AppCompatActivity() {
     private var lastPage: PageData? = null
     private var lastInput: AnalysisInput? = null
 
-    // Extraction automatique : on réessaie pendant que la page dynamique se remplit.
     private val handler = Handler(Looper.getMainLooper())
     private var autoAttempts = 0
     private var autoDone = false
+    private var pulse: ObjectAnimator? = null
 
     private companion object {
         const val MAX_AUTO_ATTEMPTS = 8
@@ -64,40 +68,32 @@ class UrlAnalysisActivity : AppCompatActivity() {
             domStorageEnabled = true
             loadWithOverviewMode = true
             useWideViewPort = true
-            builtInZoomControls = true
-            displayZoomControls = false
-            // Mode « Site PC » (bureau) : marchespublics.gov.ma n'affiche le
-            // tableau des résultats qu'en version bureau. On force donc un
-            // user-agent de bureau pour que la page (et les tableaux) se charge
-            // comme sur ordinateur.
+            // Mode « Site PC » : le tableau n'apparaît qu'en version bureau.
             userAgentString =
                 "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
                     "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         binding.webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
-                setBusy(false)
-                binding.btnExtract.isEnabled = true
-                // Extraction AUTOMATIQUE : on lance la recherche du tableau dès
-                // que la page a fini de charger (avec plusieurs tentatives, le
-                // temps que le contenu dynamique apparaisse).
                 startAutoExtraction()
             }
         }
 
-        binding.btnLoad.setOnClickListener { loadPage() }
-        binding.btnExtract.setOnClickListener { extract() }
+        binding.btnLoad.setOnClickListener { startAnalysis() }
         binding.btnContinue.setOnClickListener { openManual() }
         binding.btnColumns.setOnClickListener { showColumnPicker() }
+        binding.btnRetry.setOnClickListener { startAnalysis() }
         binding.btnExport.setOnClickListener { exportRaw() }
     }
 
-    private fun loadPage() {
+    // ------------------------------------------------------------------ //
+    // Lancement de l'analyse (WebView cachée + animation)
+    // ------------------------------------------------------------------ //
+    private fun startAnalysis() {
         val url = binding.etUrl.text?.toString().orEmpty().trim()
         val parsed = parseMarchesPublicsUrl(url)
         if (parsed == null) {
-            binding.etUrl.error =
-                "Lien invalide. Collez un lien de suivi de consultation valide."
+            binding.etUrl.error = "Lien invalide. Collez un lien de suivi de consultation valide."
             return
         }
         fallbackReference = parsed.refConsultation
@@ -109,34 +105,28 @@ class UrlAnalysisActivity : AppCompatActivity() {
         autoDone = false
         autoAttempts = 0
 
-        binding.tvRefOrg.visibility = View.VISIBLE
-        binding.tvRefOrg.text = "refConsultation : ${parsed.refConsultation}   |   orgAcronyme : ${parsed.orgAcronyme}"
+        // Bascule vers l'écran d'animation ; la WebView travaille en arrière-plan.
+        binding.setupPanel.visibility = View.GONE
+        binding.loadingPanel.visibility = View.VISIBLE
+        hideFallbackButtons()
+        binding.progressBar.visibility = View.VISIBLE
+        binding.tvMessage.text = "Analyse en cours…"
+        startPulse()
 
-        binding.webView.visibility = View.VISIBLE
-        binding.actionPanel.visibility = View.VISIBLE
-        binding.btnExtract.isEnabled = false
-        binding.btnContinue.visibility = View.GONE
-        binding.btnColumns.visibility = View.GONE
-        binding.btnExport.visibility = View.GONE
-
-        setBusy(true)
-        binding.tvMessage.text = "Chargement de la page officielle…"
         binding.webView.loadUrl(url)
     }
 
-    /** Lance l'extraction automatique (plusieurs tentatives le temps que la page se remplisse). */
     private fun startAutoExtraction() {
         if (autoDone) return
         handler.removeCallbacksAndMessages(null)
         autoAttempts = 0
-        binding.tvMessage.text = "Analyse automatique en cours…"
         handler.postDelayed(::autoExtractTick, AUTO_DELAY_MS)
     }
 
     private fun autoExtractTick() {
         if (autoDone || isFinishing) return
         autoAttempts++
-        // 1) déplier les sections « + » de la page, 2) lire après un court délai.
+        // 1) déplier les « + », 2) lire après un court délai.
         binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
             handler.postDelayed({ readAndHandle() }, 1000)
         }
@@ -151,50 +141,16 @@ class UrlAnalysisActivity : AppCompatActivity() {
             when {
                 page != null && result != null && result.offersDetected -> {
                     autoDone = true
-                    lastPage = page
-                    lastInput = result.input
-                    binding.btnExport.visibility = View.VISIBLE
-                    proceed(result)
+                    handlePage(page)
                 }
                 autoAttempts < MAX_AUTO_ATTEMPTS -> {
-                    binding.tvMessage.text =
-                        "Recherche automatique du tableau des résultats… (essai $autoAttempts/$MAX_AUTO_ATTEMPTS)"
                     handler.postDelayed(::autoExtractTick, AUTO_DELAY_MS)
                 }
                 else -> {
-                    // Échec de l'automatique : on laisse les options manuelles.
-                    if (page != null) handlePage(page) else failAutoExtraction()
+                    autoDone = true
+                    if (page != null) handlePage(page) else failLocal()
                 }
             }
-        }
-    }
-
-    private fun failAutoExtraction() {
-        binding.tvMessage.text =
-            "Extraction automatique impossible. Quand le tableau des résultats est visible " +
-                "à l'écran, appuyez sur « Extraire les données de la page », ou continuez en mode manuel."
-        binding.btnContinue.visibility = View.VISIBLE
-        binding.btnContinue.text = "Continuer en mode manuel"
-    }
-
-    /** Extraction manuelle (bouton), au cas où l'automatique n'a rien trouvé. */
-    private fun extract() {
-        autoDone = true // stoppe les tentatives automatiques en cours
-        handler.removeCallbacksAndMessages(null)
-        setBusy(true)
-        binding.tvMessage.text = "Extraction locale en cours…"
-        binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
-            handler.postDelayed({
-                binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
-                    setBusy(false)
-                    val page = parsePage(value)
-                    if (page == null || (page.tables.isEmpty() && page.rawText.isBlank())) {
-                        failLocal()
-                    } else {
-                        handlePage(page)
-                    }
-                }
-            }, 1000)
         }
     }
 
@@ -203,57 +159,58 @@ class UrlAnalysisActivity : AppCompatActivity() {
         val result = LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl)
         lastInput = result.input
 
-        binding.btnExport.visibility = View.VISIBLE
         when {
-            // Offres avec montants : calcul direct (ou manuel si estimation manque).
+            // Offres avec montants : calcul direct, ou manuel si estimation manque.
             result.offersDetected -> proceed(result)
-            // Infos partielles (sociétés sans montant, et/ou estimation) :
-            // on ouvre automatiquement le mode manuel pré-rempli.
-            result.input.estimation > 0.0 || result.input.competitors.isNotEmpty() -> {
-                binding.tvMessage.text =
-                    "Informations récupérées automatiquement. Complétez les montants/estimation si besoin."
-                openManual()
-            }
-            // Rien d'exploitable : on propose le choix des colonnes ou le manuel.
-            else -> {
-                binding.tvMessage.text = result.summary
-                binding.btnContinue.visibility = View.VISIBLE
-                binding.btnContinue.text = "Continuer en mode manuel"
-                binding.btnColumns.visibility = if (page.tables.isNotEmpty()) View.VISIBLE else View.GONE
-            }
+            // Infos partielles (sociétés sans montant et/ou estimation) : manuel pré-rempli.
+            result.input.estimation > 0.0 || result.input.competitors.isNotEmpty() -> openManual()
+            // Rien d'exploitable : on propose colonnes / manuel / réessayer.
+            else -> showFallback(result.summary, page.tables.isNotEmpty())
         }
     }
 
-    /**
-     * Enchaînement automatique après détection : si l'estimation et les offres
-     * sont disponibles, on calcule et on affiche directement le résultat ; sinon
-     * on ouvre le mode manuel pré-rempli (l'utilisateur n'a plus qu'à compléter).
-     */
+    /** Calcule et affiche directement le résultat si possible, sinon mode manuel. */
     private fun proceed(result: LocalAnalyzer.Result) {
         val input = result.input
         if (input.estimation > 0.0 && input.competitors.any { it.retained && it.amount > 0.0 }) {
             try {
                 val analysis = ReferenceCalculator.analyze(input)
-                startActivity(
+                goTo(
                     Intent(this, ResultActivity::class.java)
                         .putExtra(ResultActivity.EXTRA_RESULT_JSON, JsonStore.toJson(analysis))
                 )
                 return
             } catch (_: Exception) {
-                // Estimation/offres insuffisantes : on bascule en mode manuel.
+                // bascule en manuel
             }
         }
         openManual()
     }
 
-    /** Échec d'extraction : message dédié puis ouverture du mode manuel pré-rempli. */
     private fun failLocal() {
-        lastPage = null
-        lastInput = null
-        binding.tvMessage.text =
-            "Extraction automatique locale impossible. Vous pouvez compléter les données manuellement."
+        showFallback(
+            "Extraction automatique impossible. Vous pouvez compléter les données manuellement.",
+            lastPage?.tables?.isNotEmpty() == true,
+        )
+    }
+
+    /** Affiche les options de secours sur l'écran d'animation (sans montrer la WebView). */
+    private fun showFallback(message: String, hasTables: Boolean) {
+        stopPulse()
+        binding.progressBar.visibility = View.GONE
+        binding.tvMessage.text = message
+        binding.btnContinue.visibility = View.VISIBLE
+        binding.btnContinue.text = "Continuer en mode manuel"
+        binding.btnColumns.visibility = if (hasTables) View.VISIBLE else View.GONE
+        binding.btnRetry.visibility = View.VISIBLE
+        binding.btnExport.visibility = if (lastPage != null) View.VISIBLE else View.GONE
+    }
+
+    private fun hideFallbackButtons() {
+        binding.btnContinue.visibility = View.GONE
+        binding.btnColumns.visibility = View.GONE
+        binding.btnRetry.visibility = View.GONE
         binding.btnExport.visibility = View.GONE
-        openManual()
     }
 
     private fun openManual() {
@@ -264,11 +221,43 @@ class UrlAnalysisActivity : AppCompatActivity() {
         } else {
             intent.putExtra(ManualAnalysisActivity.EXTRA_REFERENCE, fallbackReference)
         }
+        goTo(intent)
+    }
+
+    /** Ouvre l'écran cible et ferme celui-ci : l'utilisateur ne voit que le résultat. */
+    private fun goTo(intent: Intent) {
+        handler.removeCallbacksAndMessages(null)
+        stopPulse()
         startActivity(intent)
+        finish()
     }
 
     // ------------------------------------------------------------------ //
-    // Choix manuel des colonnes (quand la détection automatique échoue)
+    // Animation
+    // ------------------------------------------------------------------ //
+    private fun startPulse() {
+        pulse?.cancel()
+        pulse = ObjectAnimator.ofPropertyValuesHolder(
+            binding.ivPulse,
+            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.08f),
+            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.08f),
+        ).apply {
+            duration = 700
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            start()
+        }
+    }
+
+    private fun stopPulse() {
+        pulse?.cancel()
+        pulse = null
+        binding.ivPulse.scaleX = 1f
+        binding.ivPulse.scaleY = 1f
+    }
+
+    // ------------------------------------------------------------------ //
+    // Choix manuel des colonnes
     // ------------------------------------------------------------------ //
     private fun showColumnPicker() {
         val page = lastPage ?: return
@@ -319,7 +308,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
                     page.tables[dlg.spTable.selectedItemPosition],
                     nameCol = dlg.spSociete.selectedItemPosition,
                     amountCol = dlg.spMontant.selectedItemPosition,
-                    statusCol = dlg.spStatut.selectedItemPosition - 1, // -1 = aucune
+                    statusCol = dlg.spStatut.selectedItemPosition - 1,
                     lotCol = dlg.spLot.selectedItemPosition - 1,
                 )
             }
@@ -329,7 +318,6 @@ class UrlAnalysisActivity : AppCompatActivity() {
 
     private fun applyColumnChoice(table: ExtractedTable, nameCol: Int, amountCol: Int, statusCol: Int, lotCol: Int) {
         val raw = LocalAnalyzer.mapColumns(table, nameCol, amountCol, statusCol)
-        // "(aucune)" colonne statut => toutes les offres sont considérées retenues.
         val competitors = if (statusCol < 0) raw.map { it.copy(retained = true) } else raw
         if (competitors.isEmpty()) {
             binding.tvMessage.text =
@@ -342,7 +330,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
             reference = base?.reference ?: fallbackReference,
             objet = base?.objet.orEmpty(),
             maitreOuvrage = base?.maitreOuvrage.orEmpty(),
-            typeMarche = base?.typeMarche ?: com.prixref.ao.model.TypeMarche.FOURNITURES,
+            typeMarche = base?.typeMarche ?: TypeMarche.FOURNITURES,
             lieu = base?.lieu.orEmpty(),
             estimation = base?.estimation ?: 0.0,
             lotNumero = lotNumero,
@@ -350,21 +338,16 @@ class UrlAnalysisActivity : AppCompatActivity() {
             competitors = competitors,
             dateLimite = base?.dateLimite.orEmpty(),
         )
-        binding.tvMessage.text =
-            "${competitors.size} offre(s) construite(s) depuis vos colonnes. Vérifiez puis calculez."
-        binding.btnContinue.visibility = View.VISIBLE
-        binding.btnContinue.text = "Vérifier et calculer"
         openManual()
     }
 
-    /** Exporte les données brutes extraites localement (JSON partageable, pour debug). */
     private fun exportRaw() {
         val page = lastPage ?: return
         try {
             val json = GsonBuilder().setPrettyPrinting().create().toJson(page)
             val file = File(cacheDir, "extraction_${fallbackReference.ifBlank { "page" }}.json")
             file.writeText(json)
-            Sharing.shareFile(this, file, "application/json", "Données extraites PrixRef AO")
+            Sharing.shareFile(this, file, "application/json", "Données extraites B Marche")
         } catch (e: Exception) {
             binding.tvMessage.text = "Erreur export : ${e.message}"
         }
@@ -389,22 +372,9 @@ class UrlAnalysisActivity : AppCompatActivity() {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
 
-    private fun setBusy(busy: Boolean) {
-        binding.progress.visibility = if (busy) View.VISIBLE else View.GONE
-        binding.btnLoad.isEnabled = !busy
-    }
-
     override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
+        stopPulse()
         super.onDestroy()
-    }
-
-    @Suppress("DEPRECATION")
-    override fun onBackPressed() {
-        if (binding.webView.visibility == View.VISIBLE && binding.webView.canGoBack()) {
-            binding.webView.goBack()
-        } else {
-            super.onBackPressed()
-        }
     }
 }
