@@ -149,6 +149,30 @@ object CompetitorEngine {
     fun find(sources: List<Source>, normName: String, hidden: Set<String> = emptySet()): Competitor? =
         build(sources, hidden).firstOrNull { it.nom_norm == normName }
 
+    const val TOUS = "(tous les domaines)"
+
+    /** Concurrent dans un domaine précis (stats limitées à ce domaine). */
+    data class DomCompetitor(val nom: String, val stats: Stats)
+
+    /** Domaines présents dans l'historique pour une catégorie donnée. */
+    fun domainesForCategory(competitors: List<Competitor>, categorie: String): List<String> =
+        competitors.flatMap { it.participations }
+            .filter { it.categorie.equals(categorie, ignoreCase = true) }
+            .map { it.domaine }.distinct().sorted()
+
+    /**
+     * « Paysage concurrentiel » : pour une catégorie + domaine donnés, les
+     * sociétés habituelles avec leurs stats limitées à ce domaine.
+     */
+    fun landscape(competitors: List<Competitor>, categorie: String, domaine: String): List<DomCompetitor> =
+        competitors.mapNotNull { c ->
+            val parts = c.participations.filter {
+                it.categorie.equals(categorie, ignoreCase = true) &&
+                    (domaine == TOUS || it.domaine == domaine)
+            }
+            if (parts.isEmpty()) null else DomCompetitor(c.nom, statsOf(parts))
+        }.sortedBy { it.stats.classementMoyen ?: 99.0 }
+
     // ------------------------------------------------------------------ //
     private fun statsOf(
         parts: List<Participation>,
