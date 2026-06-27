@@ -1,0 +1,231 @@
+package com.prixref.ao.data
+
+import com.prixref.ao.model.AnalysisResult
+import kotlin.math.abs
+import kotlin.math.sqrt
+
+/**
+ * Moteur « Statistiques des concurrents » : transforme l'historique local des
+ * appels d'offres en profils de sociétés concurrentes (comportement de prix,
+ * domaines/villes de force, fiabilité). 100 % local, aucune donnée envoyée.
+ *
+ * Tous les résultats sont indicatifs (voir [DISCLAIMER]).
+ */
+object CompetitorEngine {
+
+    const val DISCLAIMER =
+        "Les résultats fournis par B Marche sont indicatifs. Ils aident à l'analyse " +
+            "de prix mais ne garantissent pas l'attribution du marché. Vérifiez toujours " +
+            "vos coûts réels, votre marge, le règlement de consultation et la conformité."
+
+    /** Une analyse source (date d'enregistrement + résultat complet). */
+    data class Source(val date: Long, val result: AnalysisResult)
+
+    /** Participation d'une société à un marché. */
+    data class Participation(
+        val reference: String,
+        val objet: String,
+        val acheteur: String,
+        val ville: String,
+        val categorie: String,
+        val domaine: String,
+        val estimation: Double,
+        val prixRef: Double,
+        val montant: Double,
+        val ecartPrPct: Double,      // signé : (montant - prixRef)/prixRef*100
+        val ecartEstimPct: Double,   // signé : (montant - estimation)/estimation*100
+        val rang: Int,               // 0 = écartée / hors classement
+        val nbConcurrents: Int,
+        val date: Long,              // date limite si dispo, sinon enregistrement
+    )
+
+    /** Indicateurs agrégés d'un sous-ensemble de participations (global, par domaine ou par ville). */
+    data class Stats(
+        val nb: Int,
+        val ecartPrMoyen: Double,
+        val ecartEstimMoyen: Double,
+        val classementMoyen: Double?,   // null si aucun rang connu
+        val meilleurRang: Int?,
+        val pireRang: Int?,
+        val tauxTop3: Double,
+        val tauxProchePR: Double,
+        val tauxOffreBasse: Double,
+        val tauxOffreHaute: Double,
+        val montantMoyen: Double,
+        val estimationMoyenne: Double,
+        val variabilite: Double,        // écart-type des écarts vs PR
+        val profil: String,
+        val fiabilite: String,
+    )
+
+    data class DomaineStat(val domaine: String, val categorie: String, val stats: Stats)
+    data class VilleStat(val ville: String, val stats: Stats)
+
+    /** Profil complet d'une société. */
+    data class Competitor(
+        val nom: String,
+        val nom_norm: String,
+        val stats: Stats,
+        val categories: List<String>,
+        val domaines: List<DomaineStat>,
+        val villes: List<VilleStat>,
+        val premiereDate: Long,
+        val derniereDate: Long,
+        val participations: List<Participation>,
+    )
+
+    // ---- Niveaux ----
+    const val PROFIL_STRATEGIQUE = "Concurrent stratégique"
+    const val PROFIL_AGRESSIF = "Concurrent agressif"
+    const val PROFIL_STABLE = "Concurrent stable"
+    const val PROFIL_IRREGULIER = "Concurrent irrégulier"
+    const val PROFIL_FAIBLE = "Concurrent faible"
+    const val PROFIL_LOCAL = "Concurrent local fort"
+    const val PROFIL_INSUFFISANT = "Données insuffisantes"
+
+    const val FIAB_INSUFFISANT = "Données insuffisantes"
+    const val FIAB_FAIBLE = "Fiabilité faible"
+    const val FIAB_MOYENNE = "Fiabilité moyenne"
+    const val FIAB_FORTE = "Fiabilité forte"
+
+    // ------------------------------------------------------------------ //
+    fun build(sources: List<Source>, hidden: Set<String> = emptySet()): List<Competitor> {
+        val map = LinkedHashMap<String, MutableList<Participation>>()
+        val display = HashMap<String, String>()
+
+        for (s in sources) {
+            val input = s.result.input
+            val prixRef = s.result.referencePrice
+            val est = input.estimation
+            val ville = input.lieu.ifBlank { "—" }
+            val categorie = input.categorieLabel.ifBlank { input.typeMarche.label }
+            val domaine = input.domaine.ifBlank { "(domaine non précisé)" }
+            val date = CompanyStats.parseDate(input.dateLimite) ?: s.date
+            val nbConc = s.result.ranking.size + s.result.excluded.size
+
+            fun add(name: String, montant: Double, rang: Int) {
+                val norm = CompanyStats.normalize(name)
+                if (norm.length < 2 || hidden.contains(norm)) return
+                val ecartPr = if (prixRef > 0.0) (montant - prixRef) / prixRef * 100.0 else 0.0
+                val ecartEst = if (est > 0.0) (montant - est) / est * 100.0 else 0.0
+                map.getOrPut(norm) { mutableListOf() }.add(
+                    Participation(
+                        reference = input.reference.ifBlank { "—" },
+                        objet = input.objet, acheteur = input.maitreOuvrage, ville = ville,
+                        categorie = categorie, domaine = domaine, estimation = est, prixRef = prixRef,
+                        montant = montant, ecartPrPct = ecartPr, ecartEstimPct = ecartEst,
+                        rang = rang, nbConcurrents = nbConc, date = date,
+                    )
+                )
+                display.putIfAbsent(norm, name.trim())
+            }
+
+            for (o in s.result.ranking) add(o.name, o.amount, o.rank)
+            for (c in s.result.excluded) add(c.name, c.amount, 0)
+        }
+
+        return map.map { (norm, parts) ->
+            val villes = parts.groupBy { it.ville }.map { (v, list) ->
+                VilleStat(v, statsOf(list, villeContext = true))
+            }.sortedByDescending { it.stats.nb }
+            val domaines = parts.groupBy { it.categorie to it.domaine }.map { (k, list) ->
+                DomaineStat(k.second, k.first, statsOf(list))
+            }.sortedByDescending { it.stats.nb }
+            val global = statsOf(parts, villes = villes)
+            Competitor(
+                nom = display[norm] ?: norm,
+                nom_norm = norm,
+                stats = global,
+                categories = parts.map { it.categorie }.distinct(),
+                domaines = domaines,
+                villes = villes,
+                premiereDate = parts.minOf { it.date },
+                derniereDate = parts.maxOf { it.date },
+                participations = parts.sortedByDescending { it.date },
+            )
+        }.sortedByDescending { it.stats.nb }
+    }
+
+    fun find(sources: List<Source>, normName: String, hidden: Set<String> = emptySet()): Competitor? =
+        build(sources, hidden).firstOrNull { it.nom_norm == normName }
+
+    // ------------------------------------------------------------------ //
+    private fun statsOf(
+        parts: List<Participation>,
+        villes: List<VilleStat>? = null,
+        villeContext: Boolean = false,
+    ): Stats {
+        val nb = parts.size
+        val pr = parts.filter { it.prixRef > 0.0 }.map { it.ecartPrPct }
+        val est = parts.filter { it.estimation > 0.0 }.map { it.ecartEstimPct }
+        val rangs = parts.map { it.rang }.filter { it > 0 }
+
+        val ecartPrMoyen = pr.avgOr0()
+        val classementMoyen = if (rangs.isNotEmpty()) rangs.average() else null
+        val tauxTop3 = pct(parts.count { it.rang in 1..3 }, nb)
+        val tauxProchePR = pct(pr.count { abs(it) <= 3.0 }, nb)
+        val tauxBasse = pct(pr.count { it < -10.0 }, nb)
+        val tauxHaute = pct(pr.count { it > 10.0 }, nb)
+        val variabilite = stdDev(pr)
+
+        val fiab = when {
+            nb <= 2 -> FIAB_INSUFFISANT
+            nb <= 5 -> FIAB_FAIBLE
+            nb <= 10 -> FIAB_MOYENNE
+            else -> FIAB_FORTE
+        }
+
+        val profil = pickProfil(
+            nb, ecartPrMoyen, tauxProchePR, classementMoyen, tauxBasse, tauxTop3, variabilite,
+            localStrong = !villeContext && villes != null && villes.any { it.stats.nb >= 4 && (it.stats.classementMoyen ?: 99.0) <= 2.5 },
+        )
+
+        return Stats(
+            nb = nb, ecartPrMoyen = ecartPrMoyen, ecartEstimMoyen = est.avgOr0(),
+            classementMoyen = classementMoyen, meilleurRang = rangs.minOrNull(), pireRang = rangs.maxOrNull(),
+            tauxTop3 = tauxTop3, tauxProchePR = tauxProchePR, tauxOffreBasse = tauxBasse, tauxOffreHaute = tauxHaute,
+            montantMoyen = parts.map { it.montant }.avgOr0(), estimationMoyenne = parts.map { it.estimation }.avgOr0(),
+            variabilite = variabilite, profil = profil, fiabilite = fiab,
+        )
+    }
+
+    private fun pickProfil(
+        nb: Int, ecartPrMoyen: Double, tauxProchePR: Double, classementMoyen: Double?,
+        tauxBasse: Double, tauxTop3: Double, variabilite: Double, localStrong: Boolean,
+    ): String = when {
+        nb < 3 -> PROFIL_INSUFFISANT
+        ecartPrMoyen < -7.0 && tauxBasse >= 30.0 -> PROFIL_AGRESSIF
+        ecartPrMoyen in -3.0..3.0 && tauxProchePR >= 40.0 && (classementMoyen ?: 99.0) <= 3.0 -> PROFIL_STRATEGIQUE
+        localStrong -> PROFIL_LOCAL
+        variabilite >= 12.0 -> PROFIL_IRREGULIER
+        ((classementMoyen ?: 99.0) >= 5.0) && tauxTop3 <= 10.0 && tauxProchePR < 20.0 -> PROFIL_FAIBLE
+        else -> PROFIL_STABLE
+    }
+
+    /** Texte d'analyse automatique selon le profil. */
+    fun profilDescription(profil: String): String = when (profil) {
+        PROFIL_STRATEGIQUE -> "Cette société se positionne souvent très proche du prix de référence. Elle semble avoir une stratégie de prix bien maîtrisée."
+        PROFIL_AGRESSIF -> "Cette société adopte souvent une stratégie de prix bas. Sa présence peut rendre la concurrence plus difficile sur le prix."
+        PROFIL_STABLE -> "Cette société présente un comportement relativement stable. Ses offres restent généralement dans une zone prévisible."
+        PROFIL_IRREGULIER -> "Cette société présente un comportement irrégulier. Son positionnement change fortement selon les marchés."
+        PROFIL_FAIBLE -> "Cette société est souvent éloignée du positionnement optimal. Elle semble moins compétitive dans les marchés analysés."
+        PROFIL_LOCAL -> "Cette société semble particulièrement compétitive dans certaines villes ou régions."
+        else -> "Données insuffisantes pour conclure : analyse basée sur trop peu de participations."
+    }
+
+    fun reliabilityNote(stats: Stats): String = when (stats.fiabilite) {
+        FIAB_FORTE -> "Analyse basée sur ${stats.nb} participations : tendances représentatives."
+        FIAB_MOYENNE -> "Analyse basée sur ${stats.nb} participations : tendance indicative."
+        FIAB_FAIBLE -> "Attention : analyse basée sur seulement ${stats.nb} participations."
+        else -> "Données insuffisantes (${stats.nb} participation(s)) : à utiliser avec prudence."
+    }
+
+    // ---- utils ----
+    private fun pct(n: Int, total: Int) = if (total > 0) n.toDouble() / total * 100.0 else 0.0
+    private fun List<Double>.avgOr0() = if (isEmpty()) 0.0 else average()
+    private fun stdDev(v: List<Double>): Double {
+        if (v.size < 2) return 0.0
+        val m = v.average()
+        return sqrt(v.sumOf { (it - m) * (it - m) } / v.size)
+    }
+}

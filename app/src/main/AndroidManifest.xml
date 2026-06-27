@@ -67,6 +67,16 @@
             android:parentActivityName=".MainActivity" />
 
         <activity
+            android:name=".CompetitorsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".CompetitorDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".CompetitorsActivity" />
+
+        <activity
             android:name=".SimulationActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />

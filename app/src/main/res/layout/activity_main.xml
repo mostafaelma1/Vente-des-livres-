@@ -180,6 +180,24 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Statistiques concurrents -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnCompetitors"
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:background="@drawable/circle_dark">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_competitors" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Profil et comportement de chaque concurrent" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Historique des analyses -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnHistory"
