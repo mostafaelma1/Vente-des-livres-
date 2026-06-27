@@ -57,7 +57,7 @@
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".AdvancedStatsActivity"
+            android:name=".ContactActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 

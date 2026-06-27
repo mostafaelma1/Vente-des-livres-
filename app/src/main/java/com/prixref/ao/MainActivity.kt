@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnCompanies.setOnClickListener { open(CompanyStatsActivity::class.java) }
         binding.btnSociety.setOnClickListener { open(SocietyStatsActivity::class.java) }
         binding.btnHistory.setOnClickListener { open(HistoryActivity::class.java) }
-        binding.btnAdvanced.setOnClickListener { open(AdvancedStatsActivity::class.java) }
+        binding.btnContact.setOnClickListener { open(ContactActivity::class.java) }
         binding.btnPremium.setOnClickListener { showPremium() }
     }
 

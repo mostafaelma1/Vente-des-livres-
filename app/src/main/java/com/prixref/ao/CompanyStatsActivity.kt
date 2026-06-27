@@ -125,24 +125,43 @@ class CompanyStatsActivity : AppCompatActivity() {
         val companies = CompanyStats.companiesForDomaine(sources, HiddenCompanies.get(this), query, cat, dom)
         binding.tvEmpty.visibility = if (companies.isEmpty()) View.VISIBLE else View.GONE
 
-        val card = ItemCompanyBinding.inflate(layoutInflater, binding.statsContainer, false)
-        card.tvName.text = dom
-        card.tvName.setTextColor(ContextCompat.getColor(this, categoryColor(cat)))
-        card.tvSummary.text = "$cat · ${companies.size} société(s)"
+        // Une carte par société, avec le même détail que « Statistiques par société ».
         for (co in companies) {
-            val pct = if (co.participations.any { it.estimation > 0.0 })
+            val card = ItemCompanyBinding.inflate(layoutInflater, binding.statsContainer, false)
+            card.tvName.text = co.name
+            card.tvName.setTextColor(ContextCompat.getColor(this, categoryColor(cat)))
+            val moy = if (co.participations.any { it.estimation > 0.0 })
                 " · moy. ${Format.signedPercent(co.averagePercent)}" else ""
-            val line = TextView(this).apply {
-                text = "• ${co.name} — ${co.count} marché(s)$pct"
-                textSize = 13.5f
-                setTextColor(ContextCompat.getColor(this@CompanyStatsActivity, R.color.text_primary))
-                setPadding(0, dp(8), 0, dp(8))
-                setOnLongClickListener { confirmDelete(co.name); true }
+            card.tvSummary.text = "${co.count} marché(s)$moy"
+            card.root.setOnLongClickListener { confirmDelete(co.name); true }
+
+            for (p in co.participations) {
+                val statut = if (p.retained) "" else "  · écartée"
+                val pct = if (p.estimation > 0.0) Format.signedPercent(p.percentVsEstimation) else "—"
+                card.linesContainer.addView(
+                    detailLine("• N° ${p.reference.ifBlank { "—" }}  ·  ${Format.date(p.date)}$statut",
+                        if (p.retained) R.color.text_primary else R.color.text_secondary, 8, bold = true)
+                )
+                card.linesContainer.addView(
+                    detailLine("    Ville : ${p.lieu.ifBlank { "—" }}  ·  Catégorie : ${p.categorie}", R.color.text_secondary, 1)
+                )
+                card.linesContainer.addView(
+                    detailLine("    Estimation : ${Format.money(p.estimation)}  ·  Offre : ${Format.money(p.amount)}  ·  Écart : $pct",
+                        R.color.text_secondary, 1)
+                )
             }
-            card.linesContainer.addView(line)
+            binding.statsContainer.addView(card.root)
         }
-        if (companies.isNotEmpty()) binding.statsContainer.addView(card.root)
     }
+
+    private fun detailLine(value: String, colorRes: Int, topPad: Int, bold: Boolean = false): TextView =
+        TextView(this).apply {
+            text = value
+            textSize = if (bold) 12.5f else 12f
+            setTextColor(ContextCompat.getColor(this@CompanyStatsActivity, colorRes))
+            setPadding(0, dp(topPad), 0, dp(2))
+            if (bold) setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
 
     private fun confirmDelete(companyName: String) {
         MaterialAlertDialogBuilder(this)
