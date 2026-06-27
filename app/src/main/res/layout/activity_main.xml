@@ -198,6 +198,24 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Top concurrents par domaine -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnTop"
+                style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap"
+                        android:background="@drawable/circle_amber">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_top" />
+                        <TextView style="@style/HomeCardSub"
+                            android:text="Les sociétés les plus fortes par domaine" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Historique des analyses -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnHistory"

@@ -152,13 +152,30 @@ object CompetitorEngine {
     const val TOUS = "(tous les domaines)"
 
     /** Concurrent dans un domaine précis (stats limitées à ce domaine). */
-    data class DomCompetitor(val nom: String, val stats: Stats)
+    data class DomCompetitor(
+        val nom: String,
+        val nom_norm: String,
+        val stats: Stats,
+        val domainePrincipal: String = "",
+        val score: Double = 0.0,
+    )
+
+    const val TOUTES_VILLES = "(toutes les villes)"
 
     /** Domaines présents dans l'historique pour une catégorie donnée. */
     fun domainesForCategory(competitors: List<Competitor>, categorie: String): List<String> =
         competitors.flatMap { it.participations }
             .filter { it.categorie.equals(categorie, ignoreCase = true) }
             .map { it.domaine }.distinct().sorted()
+
+    /** Villes présentes pour une catégorie + domaine donnés. */
+    fun villesForDomaine(competitors: List<Competitor>, categorie: String, domaine: String): List<String> =
+        competitors.flatMap { it.participations }
+            .filter {
+                it.categorie.equals(categorie, ignoreCase = true) &&
+                    (domaine == TOUS || it.domaine == domaine)
+            }
+            .map { it.ville }.filter { it.isNotBlank() && it != "—" }.distinct().sorted()
 
     /**
      * « Paysage concurrentiel » : pour une catégorie + domaine donnés, les
@@ -170,8 +187,45 @@ object CompetitorEngine {
                 it.categorie.equals(categorie, ignoreCase = true) &&
                     (domaine == TOUS || it.domaine == domaine)
             }
-            if (parts.isEmpty()) null else DomCompetitor(c.nom, statsOf(parts))
+            if (parts.isEmpty()) null
+            else DomCompetitor(c.nom, c.nom_norm, statsOf(parts), c.domaines.firstOrNull()?.domaine ?: "")
         }.sortedBy { it.stats.classementMoyen ?: 99.0 }
+
+    /**
+     * Classement « Top concurrents » : catégorie + domaine (+ ville optionnelle),
+     * trié par un score de force (fiabilité, classement, top 3, proximité du
+     * prix de référence, nombre de participations).
+     */
+    fun topInDomaine(
+        competitors: List<Competitor>,
+        categorie: String,
+        domaine: String,
+        ville: String = TOUTES_VILLES,
+        minNb: Int = 1,
+    ): List<DomCompetitor> =
+        competitors.mapNotNull { c ->
+            val parts = c.participations.filter {
+                it.categorie.equals(categorie, ignoreCase = true) &&
+                    (domaine == TOUS || it.domaine == domaine) &&
+                    (ville == TOUTES_VILLES || it.ville.equals(ville, ignoreCase = true))
+            }
+            if (parts.size < minNb) null else {
+                val s = statsOf(parts)
+                DomCompetitor(c.nom, c.nom_norm, s, c.domaines.firstOrNull()?.domaine ?: "", scoreOf(s))
+            }
+        }.sortedByDescending { it.score }
+
+    /** Score de « force » d'un concurrent dans un domaine (0 = faible, ~12 = très fort). */
+    private fun scoreOf(s: Stats): Double {
+        val reliability = when (s.fiabilite) {
+            FIAB_FORTE -> 3.0; FIAB_MOYENNE -> 2.0; FIAB_FAIBLE -> 1.0; else -> 0.0
+        }
+        val top3 = s.tauxTop3 / 100.0 * 3.0
+        val proximity = (1.0 - abs(s.ecartPrMoyen) / 10.0).coerceIn(0.0, 1.0) * 3.0
+        val classement = (1.0 - ((s.classementMoyen ?: 6.0) - 1.0) / 5.0).coerceIn(0.0, 1.0) * 2.0
+        val volume = (s.nb / 10.0).coerceIn(0.0, 1.0) * 1.0
+        return reliability + top3 + proximity + classement + volume
+    }
 
     // ------------------------------------------------------------------ //
     private fun statsOf(
