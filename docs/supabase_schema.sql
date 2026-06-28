@@ -400,6 +400,48 @@ end; $$;
 grant execute on function public.robot_mark_visited(uuid,text,text,text,text) to anon, authenticated;
 grant execute on function public.robot_visited_pairs(uuid,text,integer)       to anon, authenticated;
 
+-- Écriture par le ROBOT SERVEUR (clé service_role uniquement). Upsert dédupliqué
+-- du marché + journal + marquage visité. NON accessible à la clé anon.
+create or replace function public.robot_ingest(
+    p_ref text, p_org text, p_dedup_key text, p_reference text, p_objet text,
+    p_acheteur text, p_ville text, p_categorie text, p_domaine text,
+    p_estimation numeric, p_reference_price numeric, p_date_limite text,
+    p_participants jsonb, p_completeness int, p_payload jsonb, p_status text
+) returns jsonb language plpgsql security definer set search_path = public as $$
+declare t public.tenders; v_new boolean := false;
+begin
+    insert into public.robot_visited(ref, org, status) values (p_ref, p_org, p_status)
+        on conflict (ref, org) do update set status = excluded.status, visited_at = now();
+
+    if p_status <> 'ok' or coalesce(p_dedup_key,'') = '' then
+        return jsonb_build_object('status','visited_only');
+    end if;
+
+    select * into t from public.tenders where dedup_key = p_dedup_key;
+    if not found then
+        insert into public.tenders(dedup_key, reference, objet, acheteur, ville, categorie, domaine,
+            estimation, reference_price, date_limite, participants, analyzed_by_count, completeness)
+        values (p_dedup_key, p_reference, p_objet, p_acheteur, p_ville, p_categorie, p_domaine,
+            p_estimation, p_reference_price, p_date_limite, p_participants, 1, coalesce(p_completeness,0))
+        returning * into t; v_new := true;
+    else
+        update public.tenders set
+            analyzed_by_count = analyzed_by_count + 1,
+            participants    = case when coalesce(p_completeness,0) > completeness then p_participants    else participants    end,
+            reference_price = case when coalesce(p_completeness,0) > completeness then p_reference_price else reference_price end,
+            estimation      = coalesce(estimation, p_estimation),
+            objet           = coalesce(nullif(objet,''), p_objet),
+            completeness    = greatest(completeness, coalesce(p_completeness,0)),
+            updated_at      = now()
+        where id = t.id returning * into t;
+    end if;
+    insert into public.analyses(user_id, device_id, tender_id, dedup_key, source, payload)
+        values (null, 'robot', t.id, p_dedup_key, 'robot', p_payload);
+    return jsonb_build_object('status','ok','is_new', v_new);
+end; $$;
+
+revoke execute on function public.robot_ingest(text,text,text,text,text,text,text,text,text,numeric,numeric,text,jsonb,integer,jsonb,text) from public, anon, authenticated;
+
 -- Références déjà présentes (anti-doublon du robot : ne pas refaire).
 create or replace function public.robot_seen_refs(p_user_id uuid, p_device text, p_limit int default 3000)
 returns setof text language plpgsql security definer set search_path = public as $$

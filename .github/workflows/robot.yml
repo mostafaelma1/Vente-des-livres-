@@ -1,0 +1,38 @@
+name: Robot B Marche (analyse serveur)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Nombre d'analyses à envoyer"
+        required: false
+        default: "10"
+  # Décommenter pour une exécution planifiée automatique (ex. chaque nuit 02:00 UTC) :
+  # schedule:
+  #   - cron: "0 2 * * *"
+
+jobs:
+  robot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies + Chromium
+        working-directory: tools/robot
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Run robot
+        working-directory: tools/robot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ROBOT_TARGET: ${{ github.event.inputs.target || '10' }}
+        run: node robot.mjs

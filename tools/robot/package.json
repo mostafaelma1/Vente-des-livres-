@@ -1,0 +1,13 @@
+{
+  "name": "bmarche-robot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Robot serveur B Marche : analyse automatique des consultations marchespublics et écriture dans Supabase.",
+  "scripts": {
+    "robot": "node robot.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}
