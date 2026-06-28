@@ -223,8 +223,12 @@ class BatchAnalysisActivity : AppCompatActivity() {
         if (value == null || value == "null") return emptyList()
         return try {
             val json = runCatching { Gson().fromJson(value, String::class.java) }.getOrNull() ?: value
-            val arr = Gson().fromJson(json, Array<Map<String, String>>::class.java)
-            arr.mapNotNull { m -> val r = m["ref"]; val o = m["org"]; if (r != null && o != null) r to o else null }
+            com.google.gson.JsonParser.parseString(json).asJsonArray.mapNotNull { el ->
+                val o = el.asJsonObject
+                val r = o.get("ref")?.takeIf { !it.isJsonNull }?.asString
+                val org = o.get("org")?.takeIf { !it.isJsonNull }?.asString
+                if (r != null && org != null) r to org else null
+            }
         } catch (e: Exception) {
             emptyList()
         }
