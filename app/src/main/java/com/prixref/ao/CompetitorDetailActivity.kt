@@ -42,11 +42,8 @@ class CompetitorDetailActivity : AppCompatActivity() {
         val norm = intent.getStringExtra(EXTRA_NORM).orEmpty()
         region = intent.getStringExtra(EXTRA_REGION).orEmpty()
         lifecycleScope.launch {
-            val dao = AppDatabase.get(this@CompetitorDetailActivity).analysisDao()
+            val sources = com.prixref.ao.data.ConcurrentsData.sources(this@CompetitorDetailActivity)
             val competitor = withContext(Dispatchers.IO) {
-                val sources = dao.getAll().mapNotNull { e ->
-                    runCatching { CompetitorEngine.Source(e.date, JsonStore.fromJson(e.json)) }.getOrNull()
-                }
                 val c = CompetitorEngine.find(sources, norm, HiddenCompanies.get(this@CompetitorDetailActivity))
                 if (c != null && region.isNotBlank())
                     CompetitorEngine.scope(c) { com.prixref.ao.data.Regions.regionOf(it.ville) == region }

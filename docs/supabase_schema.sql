@@ -350,6 +350,29 @@ begin
         limit p_limit;
 end; $$;
 
+-- Accès complet = Premium actif OU essai en cours (et compte non bloqué).
+create or replace function public._has_access(p_user_id uuid, p_device text)
+returns boolean language sql security definer set search_path = public as $$
+    select exists(
+        select 1 from public.users
+        where id = p_user_id and device_id = p_device and not is_blocked
+          and ((plan = 'premium' and (premium_expiry is null or premium_expiry > now()))
+               or (trial_expiry is not null and trial_expiry > now()))
+    );
+$$;
+
+-- Pool partagé des marchés (alimente "Analyse des concurrents" pour tous).
+create or replace function public.fetch_tenders(p_user_id uuid, p_device text, p_limit int default 500)
+returns setof public.tenders
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._has_access(p_user_id, p_device) then raise exception 'no_access'; end if;
+    return query select * from public.tenders order by updated_at desc limit p_limit;
+end; $$;
+
+grant execute on function public._has_access(uuid,text)              to anon, authenticated;
+grant execute on function public.fetch_tenders(uuid,text,integer)    to anon, authenticated;
+
 -- ----------------------------------------------------------------------------
 -- 6. DROITS : la clé "anon" ne peut appeler QUE ces fonctions.
 -- ----------------------------------------------------------------------------

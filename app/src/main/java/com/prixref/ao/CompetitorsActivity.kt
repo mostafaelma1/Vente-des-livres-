@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import com.prixref.ao.data.AppDatabase
 import com.prixref.ao.data.CompetitorEngine
 import com.prixref.ao.data.HiddenCompanies
+import com.prixref.ao.data.ConcurrentsData
 import com.prixref.ao.data.JsonStore
 import com.prixref.ao.data.Regions
 import com.prixref.ao.databinding.ActivityCompetitorsBinding
@@ -59,11 +60,8 @@ class CompetitorsActivity : AppCompatActivity() {
 
     private fun load() {
         lifecycleScope.launch {
-            val dao = AppDatabase.get(this@CompetitorsActivity).analysisDao()
+            val sources = ConcurrentsData.sources(this@CompetitorsActivity)
             competitors = withContext(Dispatchers.IO) {
-                val sources = dao.getAll().mapNotNull { e ->
-                    runCatching { CompetitorEngine.Source(e.date, JsonStore.fromJson(e.json)) }.getOrNull()
-                }
                 CompetitorEngine.build(sources, HiddenCompanies.get(this@CompetitorsActivity))
             }
             render()

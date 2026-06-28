@@ -1,5 +1,6 @@
 package com.prixref.ao
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
@@ -34,6 +35,7 @@ class AdminActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener { finish() }
         binding.etSearch.doAfterTextChanged { load(it?.toString().orEmpty()) }
         binding.btnTrialDays.setOnClickListener { setTrialDaysDialog() }
+        binding.btnRobot.setOnClickListener { startActivity(Intent(this, BatchAnalysisActivity::class.java)) }
 
         if (!Backend.isConfigured) {
             toast("Backend non configuré.")

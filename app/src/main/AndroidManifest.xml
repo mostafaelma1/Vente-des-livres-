@@ -41,6 +41,11 @@
             android:parentActivityName=".AccountActivity" />
 
         <activity
+            android:name=".BatchAnalysisActivity"
+            android:exported="false"
+            android:parentActivityName=".AdminActivity" />
+
+        <activity
             android:name=".ManualAnalysisActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />

@@ -4,7 +4,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.prixref.ao.BuildConfig
+import com.prixref.ao.model.AnalysisInput
 import com.prixref.ao.model.AnalysisResult
+import com.prixref.ao.model.RankedOffer
+import com.prixref.ao.model.TypeMarche
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -243,6 +246,51 @@ object Backend {
             int(o, "nb_offres"), dbl(o, "avg_ref"), dbl(o, "avg_amount"),
             dbl(o, "min_amount"), dbl(o, "max_amount"), dbl(o, "pct_above_me"),
         )
+    }
+
+    /**
+     * Récupère le pool partagé des marchés (serveur) et le convertit en sources
+     * pour le moteur de statistiques (fusion avec l'historique local).
+     */
+    suspend fun fetchSources(account: Account, deviceId: String, limit: Int = 500): List<CompetitorEngine.Source> {
+        val arr = rpcArray("fetch_tenders", JsonObject().apply {
+            addProperty("p_user_id", account.id)
+            addProperty("p_device", deviceId)
+            addProperty("p_limit", limit)
+        }) ?: return emptyList()
+        val out = ArrayList<CompetitorEngine.Source>()
+        for (el in arr) {
+            val o = el.asJsonObject
+            val parts = o.get("participants")?.takeIf { it.isJsonArray }?.asJsonArray ?: continue
+            val ranking = parts.mapNotNull {
+                val p = it.asJsonObject
+                val name = p.get("name")?.takeIf { e -> !e.isJsonNull }?.asString ?: return@mapNotNull null
+                RankedOffer(
+                    rank = p.get("rank")?.takeIf { e -> !e.isJsonNull }?.asInt ?: 0,
+                    name = name,
+                    amount = p.get("amount")?.takeIf { e -> !e.isJsonNull }?.asDouble ?: 0.0,
+                    gap = 0.0, gapPercent = 0.0, observation = "", risk = "",
+                    isProbableWinner = (p.get("rank")?.takeIf { e -> !e.isJsonNull }?.asInt ?: 0) == 1,
+                )
+            }
+            if (ranking.isEmpty()) continue
+            val cat = str(o, "categorie")
+            val input = AnalysisInput(
+                reference = str(o, "reference"), objet = str(o, "objet"), maitreOuvrage = str(o, "acheteur"),
+                typeMarche = TypeMarche.fromLabel(cat), lieu = str(o, "ville"),
+                estimation = dbl(o, "estimation") ?: 0.0, lotNumero = "1", lotDesignation = "",
+                competitors = emptyList(), dateLimite = str(o, "date_limite"),
+                categorieLabel = cat, domaine = str(o, "domaine"),
+            )
+            val result = AnalysisResult(
+                input = input, averageRetained = 0.0, referencePrice = dbl(o, "reference_price") ?: 0.0,
+                retainedCount = ranking.size, excludedCount = 0, ranking = ranking,
+                excluded = emptyList(), probableWinner = ranking.firstOrNull { it.rank == 1 }?.name,
+            )
+            val date = CompanyStats.parseDate(input.dateLimite) ?: System.currentTimeMillis()
+            out.add(CompetitorEngine.Source(date, result))
+        }
+        return out
     }
 
     data class MarketRow(
