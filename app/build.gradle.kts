@@ -16,6 +16,13 @@ android {
         // versionCode auto-incrémenté en CI (-PappVersionCode=<run_number>) ; 2 par défaut en local.
         versionCode = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 2
         versionName = "1.0.1"
+
+        // Backend Supabase : injecté à la compilation via -PsupabaseUrl / -PsupabaseAnonKey
+        // (ou les propriétés gradle.properties). Vide = mode local seul (sans serveur).
+        val supabaseUrl = (project.findProperty("supabaseUrl") as String?) ?: ""
+        val supabaseAnonKey = (project.findProperty("supabaseAnonKey") as String?) ?: ""
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
     }
 
     signingConfigs {
@@ -46,6 +53,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     compileOptions {
@@ -76,6 +84,9 @@ dependencies {
 
     // Gson — sérialisation JSON des analyses complètes.
     implementation("com.google.code.gson:gson:2.11.0")
+
+    // OkHttp — appels REST vers le backend Supabase (envoi des analyses, comptes, Premium).
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Tests unitaires (calcul, stats, extraction).
     testImplementation("junit:junit:4.13.2")

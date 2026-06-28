@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnCompetitors.setOnClickListener { open(CompetitorsActivity::class.java) }
         binding.btnHistory.setOnClickListener { open(HistoryActivity::class.java) }
         binding.btnContact.setOnClickListener { open(ContactActivity::class.java) }
+        binding.btnAccount.setOnClickListener { open(AccountActivity::class.java) }
     }
 
     private fun open(cls: Class<*>) {

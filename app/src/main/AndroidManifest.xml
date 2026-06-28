@@ -32,6 +32,15 @@
             android:exported="false" />
 
         <activity
+            android:name=".AccountActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".AdminActivity"
+            android:exported="false"
+            android:parentActivityName=".AccountActivity" />
+
+        <activity
             android:name=".ManualAnalysisActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />

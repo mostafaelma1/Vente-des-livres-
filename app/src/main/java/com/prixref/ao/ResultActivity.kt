@@ -53,6 +53,23 @@ class ResultActivity : AppCompatActivity() {
         binding.btnSave.visibility = android.view.View.GONE
         if (!intent.getBooleanExtra(EXTRA_FROM_HISTORY, false)) {
             autoSaveToHistory()
+            uploadToServer()
+        }
+    }
+
+    /**
+     * Envoie l'analyse au serveur pour alimenter les statistiques globales
+     * (anti-doublon côté serveur). Seules les données de l'appel d'offres sont
+     * partagées — jamais les simulations privées. Échoue en silence si hors ligne.
+     */
+    private fun uploadToServer() {
+        val account = com.prixref.ao.data.AccountStore.get(this) ?: return
+        if (!com.prixref.ao.data.Backend.isConfigured || account.id.startsWith("local-")) return
+        val deviceId = com.prixref.ao.util.DeviceId.get(this)
+        lifecycleScope.launch {
+            runCatching {
+                com.prixref.ao.data.Backend.submitAnalysis(account, deviceId, result, "auto")
+            }
         }
     }
 

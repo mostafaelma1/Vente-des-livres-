@@ -18,8 +18,12 @@
     <string name="home_premium_title">Passer à Premium</string>
     <string name="home_premium_sub">Analyses illimitées · Rapports PDF · Statistiques avancées</string>
     <string name="home_simulation">Tester mon prix avant dépôt</string>
+    <string name="home_account">Mon compte</string>
     <string name="home_value">Analysez un appel d\'offres, calculez le prix de référence et positionnez votre offre avant le dépôt.</string>
-    <string name="trust_local">B Marche fonctionne localement sur votre téléphone. Aucune donnée n\'est envoyée vers un serveur.</string>
+    <string name="trust_local">Le calcul, l\'historique et les statistiques locales restent sur votre téléphone. Seules les données des appels d\'offres analysés alimentent les statistiques globales.</string>
+    <string name="privacy_sync">Les analyses envoyées au serveur concernent les données des appels d\'offres analysés afin d\'améliorer les statistiques globales B Marche. Les données privées de simulation de l\'utilisateur ne sont pas partagées. Les statistiques fournies sont indicatives et ne garantissent pas l\'attribution d\'un marché.</string>
+    <string name="stats_local_note">Ces statistiques sont basées uniquement sur vos analyses enregistrées sur ce téléphone.</string>
+    <string name="stats_global_note">Les statistiques globales sont basées sur les analyses de tous les utilisateurs B Marche. Elles permettent d\'identifier les concurrents habituels, les profils de prix et les tendances par domaine et par ville.</string>
 
     <!-- Commun -->
     <string name="calculate">Calculer le prix de référence</string>

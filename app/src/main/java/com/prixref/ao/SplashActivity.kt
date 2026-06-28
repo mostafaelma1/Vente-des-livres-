@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import com.prixref.ao.data.AccountStore
 import com.prixref.ao.databinding.ActivitySplashBinding
 
 /** Écran d'ouverture animé : logo « B Marche » qui apparaît, puis accueil. */
@@ -30,7 +31,10 @@ class SplashActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             if (!isFinishing) {
-                startActivity(Intent(this, MainActivity::class.java))
+                // Inscription obligatoire avant d'utiliser l'application.
+                val next = if (AccountStore.isRegistered(this)) MainActivity::class.java
+                else AccountActivity::class.java
+                startActivity(Intent(this, next))
                 @Suppress("DEPRECATION")
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 finish()
