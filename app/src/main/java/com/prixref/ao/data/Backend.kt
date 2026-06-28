@@ -293,6 +293,24 @@ object Backend {
         return out
     }
 
+    /** Couples (réf|acronyme) déjà visités par le robot — pour ne jamais y revenir. */
+    suspend fun visitedPairs(account: Account, deviceId: String): Set<String> {
+        val arr = rpcArray("robot_visited_pairs", JsonObject().apply {
+            addProperty("p_user_id", account.id); addProperty("p_device", deviceId); addProperty("p_limit", 8000)
+        }) ?: return emptySet()
+        return arr.mapNotNull { runCatching { it.asString }.getOrNull() }.toSet()
+    }
+
+    /** Marque une consultation (réf + acronyme) comme visitée. */
+    suspend fun markVisited(account: Account, deviceId: String, ref: String, org: String, status: String): Boolean {
+        if (!isConfigured) return false
+        val params = JsonObject().apply {
+            addProperty("p_user_id", account.id); addProperty("p_device", deviceId)
+            addProperty("p_ref", ref); addProperty("p_org", org); addProperty("p_status", status)
+        }
+        return try { rpc("robot_mark_visited", params) != null } catch (e: Exception) { false }
+    }
+
     /** Références déjà en base (pour que le robot ne refasse pas les mêmes). */
     suspend fun seenRefs(account: Account, deviceId: String): Set<String> {
         val arr = rpcArray("robot_seen_refs", JsonObject().apply {

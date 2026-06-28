@@ -51,6 +51,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
     private var winFrom = ""
     private var winTo = ""
     private var seenRefs: Set<String> = emptySet()
+    private var visited: Set<String> = emptySet()
     private var perPageMaximized = false
 
     private companion object {
@@ -100,7 +101,8 @@ class BatchAnalysisActivity : AppCompatActivity() {
         status("Chargement des références déjà analysées…")
         lifecycleScope.launch {
             seenRefs = runCatching { Backend.seenRefs(account, deviceId) }.getOrDefault(emptySet())
-            log("Déjà en base : ${seenRefs.size} réf. (seront sautées).")
+            visited = runCatching { Backend.visitedPairs(account, deviceId) }.getOrDefault(emptySet())
+            log("Déjà en base : ${seenRefs.size} réf. · déjà visitées : ${visited.size} (seront sautées).")
             status("Ouverture de la recherche…")
             binding.webView.loadUrl(SEARCH_URL)
         }
@@ -229,8 +231,10 @@ class BatchAnalysisActivity : AppCompatActivity() {
             }
             harvested = true
             queue.clear()
-            // Mélange aléatoire + on saute les réf. déjà en base → consultations nouvelles.
-            val fresh = pairs.distinct().filter { it.first !in seenRefs }
+            // Mélange aléatoire + on saute les réf. déjà en base ET les couples déjà visités.
+            val fresh = pairs.distinct().filter {
+                it.first !in seenRefs && (it.first + "|" + it.second) !in visited
+            }
             queue.addAll(fresh.shuffled().take(MAX))
             log("${queue.size} nouvelle(s) consultation(s) (sur ${pairs.size} trouvées) ; objectif $TARGET envoyées.")
             phase = Phase.ANALYZE
@@ -290,19 +294,26 @@ class BatchAnalysisActivity : AppCompatActivity() {
 
     private fun uploadAndNext(analysis: com.prixref.ao.model.AnalysisResult) {
         val account = AccountStore.get(this) ?: return
+        val (ref, org) = queue[index]
         lifecycleScope.launch {
             val ok = runCatching { Backend.submitAnalysis(account, deviceId, analysis, "robot") }.getOrDefault(false)
-            if (ok) { uploaded++; log("✓ réf. ${queue[index].first} envoyée. ($uploaded/$TARGET)") }
-            else log("✗ réf. ${queue[index].first} non envoyée.")
+            if (ok) { uploaded++; log("✓ réf. $ref envoyée. ($uploaded/$TARGET)") }
+            else log("✗ réf. $ref non envoyée.")
+            runCatching { Backend.markVisited(account, deviceId, ref, org, if (ok) "ok" else "send_fail") }
             index++
             loadCurrent()
         }
     }
 
     private fun skipNext(reason: String) {
-        log("– réf. ${queue[index].first} ignorée ($reason).")
-        index++
-        loadCurrent()
+        val account = AccountStore.get(this)
+        val (ref, org) = queue[index]
+        log("– réf. $ref ignorée ($reason).")
+        lifecycleScope.launch {
+            if (account != null) runCatching { Backend.markVisited(account, deviceId, ref, org, reason) }
+            index++
+            loadCurrent()
+        }
     }
 
     private fun done() {

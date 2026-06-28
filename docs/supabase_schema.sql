@@ -370,6 +370,36 @@ begin
     return query select * from public.tenders order by updated_at desc limit p_limit;
 end; $$;
 
+-- Consultations DÉJÀ VISITÉES par le robot (réf + acronyme), même si échec :
+-- on n'y revient jamais.
+create table if not exists public.robot_visited (
+    ref        text not null,
+    org        text not null,
+    status     text,
+    visited_at timestamptz not null default now(),
+    primary key (ref, org)
+);
+alter table public.robot_visited enable row level security;
+
+create or replace function public.robot_mark_visited(
+    p_user_id uuid, p_device text, p_ref text, p_org text, p_status text
+) returns void language plpgsql security definer set search_path = public as $$
+begin
+    if not public._has_access(p_user_id, p_device) then raise exception 'no_access'; end if;
+    insert into public.robot_visited(ref, org, status) values (p_ref, p_org, p_status)
+    on conflict (ref, org) do update set status = excluded.status, visited_at = now();
+end; $$;
+
+create or replace function public.robot_visited_pairs(p_user_id uuid, p_device text, p_limit int default 8000)
+returns setof text language plpgsql security definer set search_path = public as $$
+begin
+    if not public._has_access(p_user_id, p_device) then raise exception 'no_access'; end if;
+    return query select ref || '|' || org from public.robot_visited order by visited_at desc limit p_limit;
+end; $$;
+
+grant execute on function public.robot_mark_visited(uuid,text,text,text,text) to anon, authenticated;
+grant execute on function public.robot_visited_pairs(uuid,text,integer)       to anon, authenticated;
+
 -- Références déjà présentes (anti-doublon du robot : ne pas refaire).
 create or replace function public.robot_seen_refs(p_user_id uuid, p_device text, p_limit int default 3000)
 returns setof text language plpgsql security definer set search_path = public as $$
