@@ -1,6 +1,14 @@
 CAPTURES D'ÉCRAN POUR GOOGLE PLAY
 ==================================
 
+>>> DÉJÀ INCLUS : des captures promotionnelles prêtes à téléverser <<<
+- telephone/      : 6 visuels 1080 x 1920 (téléphone)
+- tablette_10/    : 6 visuels 1600 x 2560 (tablette 10")
+Tu peux les utiliser telles quelles, ou les remplacer par de vraies captures
+de l'app (recommandé si possible) en suivant les indications ci-dessous.
+
+
+
 Google Play exige de VRAIES captures d'écran de l'application. Elles doivent
 être prises sur un appareil (impossible à générer automatiquement). Place tes
 fichiers PNG/JPG ici, par taille.
