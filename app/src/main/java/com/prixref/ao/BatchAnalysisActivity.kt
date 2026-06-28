@@ -52,7 +52,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
     private var winTo = ""
 
     private companion object {
-        const val SEARCH_URL = "https://www.marchespublics.gov.ma/index.php?page=entreprise.EntrepriseAdvancedSearch"
+        const val SEARCH_URL = "https://www.marchespublics.gov.ma/index.php?page=entreprise.EntrepriseAdvancedSearch&searchAnnCons"
         const val BASE = "https://www.marchespublics.gov.ma/index.php?page=entreprise.SuiviConsultation"
         const val MAX = 10
         const val DAYS_MIN = 3           // date limite passée d'au moins 3 jours
