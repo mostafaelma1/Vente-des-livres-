@@ -36,7 +36,6 @@ class AdminActivity : AppCompatActivity() {
         binding.etSearch.doAfterTextChanged { load(it?.toString().orEmpty()) }
         binding.btnTrialDays.setOnClickListener { setTrialDaysDialog() }
         binding.btnRobot.setOnClickListener { startActivity(Intent(this, BatchAnalysisActivity::class.java)) }
-        binding.btnRobotServer.setOnClickListener { launchServerRobot() }
 
         if (!Backend.isConfigured) {
             toast("Backend non configuré.")
@@ -142,29 +141,6 @@ class AdminActivity : AppCompatActivity() {
             .setItems(labels) { _, i ->
                 run("Essai prolongé (${labels[i]})") {
                     Backend.adminSetUserTrial(adminPhone, deviceId, u.id, days[i])
-                }
-            }
-            .show()
-    }
-
-    private fun launchServerRobot() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Robot serveur")
-            .setMessage("Lancer l'analyse automatique sur le serveur ? Vous pourrez fermer l'application ; les résultats apparaîtront dans quelques minutes.")
-            .setNegativeButton("Annuler", null)
-            .setPositiveButton("Lancer") { _, _ ->
-                loading(true)
-                lifecycleScope.launch {
-                    val st = Backend.triggerServerRobot(AccountStore.get(this@AdminActivity)!!, deviceId, 10)
-                    loading(false)
-                    toast(
-                        when (st) {
-                            "ok" -> "Robot serveur lancé. Les résultats arrivent dans quelques minutes."
-                            "not_admin" -> "Accès admin requis (ou appareil différent)."
-                            "not_configured" -> "Backend non configuré."
-                            else -> "Impossible de lancer le robot serveur (vérifiez la fonction/les secrets)."
-                        }
-                    )
                 }
             }
             .show()
