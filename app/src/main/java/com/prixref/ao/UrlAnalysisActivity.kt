@@ -193,7 +193,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
 
     private fun failLocal() {
         showFallback(
-            "Extraction automatique impossible. Vous pouvez compléter les données manuellement.",
+            "Analyse automatique incomplète. Vous pouvez compléter les informations manuellement en moins d'une minute.",
             lastPage?.tables?.isNotEmpty() == true,
         )
     }

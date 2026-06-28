@@ -13,7 +13,8 @@ android {
         // Android 8.0 (Oreo) et plus.
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        // versionCode auto-incrémenté en CI (-PappVersionCode=<run_number>) ; 1 par défaut en local.
+        versionCode = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 1
         versionName = "1.0"
     }
 
@@ -76,12 +77,6 @@ dependencies {
     // Gson — sérialisation JSON des analyses complètes.
     implementation("com.google.code.gson:gson:2.11.0")
 
-    // Retrofit + OkHttp — appel du backend d'analyse (scraping Playwright).
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    // Tests unitaires du moteur de calcul.
+    // Tests unitaires (calcul, stats, extraction).
     testImplementation("junit:junit:4.13.2")
 }

@@ -34,6 +34,29 @@
             android:layout_marginTop="6dp"
             android:background="@drawable/bg_title_underline" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTop" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp" android:insetTop="0dp" android:insetBottom="0dp"
+                android:textSize="11sp" android:text="Top domaine" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSociety" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp" android:insetTop="0dp" android:insetBottom="0dp"
+                android:textSize="11sp" android:text="Par société" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCategory" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                android:layout_marginStart="4dp" android:insetTop="0dp" android:insetBottom="0dp"
+                android:textSize="11sp" android:text="Par catégorie" />
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"

@@ -16,10 +16,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnUrl.setOnClickListener { open(UrlAnalysisActivity::class.java) }
         binding.btnSimulation.setOnClickListener { open(SimulationActivity::class.java) }
-        binding.btnCompanies.setOnClickListener { open(CompanyStatsActivity::class.java) }
-        binding.btnSociety.setOnClickListener { open(SocietyStatsActivity::class.java) }
         binding.btnCompetitors.setOnClickListener { open(CompetitorsActivity::class.java) }
-        binding.btnTop.setOnClickListener { open(TopCompetitorsActivity::class.java) }
         binding.btnHistory.setOnClickListener { open(HistoryActivity::class.java) }
         binding.btnContact.setOnClickListener { open(ContactActivity::class.java) }
         binding.btnPremium.setOnClickListener { showPremium() }

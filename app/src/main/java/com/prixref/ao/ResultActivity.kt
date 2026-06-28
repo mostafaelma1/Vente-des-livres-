@@ -65,8 +65,17 @@ class ResultActivity : AppCompatActivity() {
         binding.tvAverage.text = Format.money(result.averageRetained)
         binding.tvReference.text = Format.money(result.referencePrice)
         binding.tvWinner.text = result.probableWinner ?: "—"
+        // Offre la plus proche du prix de référence (plus petit écart absolu).
+        val closest = result.ranking.minByOrNull { it.gap }
+        binding.tvClosest.text = closest?.let {
+            "Offre la plus proche : ${it.name} (${Format.money(it.amount)}, écart ${Format.percent(it.gapPercent)})"
+        }.orEmpty()
         binding.tvCounts.text =
             "Offres retenues : ${result.retainedCount} • écartées : ${result.excludedCount}"
+        binding.tvConseil.text =
+            "Conseil : les offres proches du prix de référence sont généralement les mieux positionnées. " +
+                "Vérifiez toujours votre marge, vos coûts réels et la conformité administrative avant le dépôt. " +
+                "Résultat indicatif — ne garantit pas l'attribution du marché."
 
         binding.rankingContainer.removeAllViews()
         for (offer in result.ranking) {

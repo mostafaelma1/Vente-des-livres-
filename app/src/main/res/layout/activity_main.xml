@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/bg">
 
-    <!-- Arrière-plan plein écran (logo + arc orange intégrés à l'image) -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,29 +27,40 @@
             android:paddingTop="150dp"
             android:paddingBottom="18dp">
 
-            <!-- Bannière Premium -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnPremium"
+            <!-- Phrase de valeur -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
+                android:layout_marginBottom="14dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp"
+                android:text="@string/home_value"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:gravity="center" />
+
+            <!-- CTA principal : Nouvelle analyse par lien -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
-                app:cardCornerRadius="26dp"
+                app:cardCornerRadius="22dp"
                 app:cardElevation="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_premium_gradient"
+                    android:background="@drawable/bg_cta_orange"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="18dp">
+                    android:padding="20dp">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_star"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_link"
                         android:tint="@color/white" />
 
                     <LinearLayout
@@ -59,225 +69,150 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
                         android:orientation="vertical">
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/home_premium_title"
+                            android:text="@string/home_new_analysis"
                             android:textColor="@color/white"
-                            android:textSize="17sp"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
-
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:alpha="0.95"
-                            android:text="@string/home_premium_sub"
+                            android:text="Coller le lien et lancer l'analyse"
                             android:textColor="@color/white"
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_white"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="5dp"
-                        android:text="Bientôt"
-                        android:textColor="@color/white"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_chevron"
+                        android:tint="@color/white" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="Que voulez-vous faire ?"
-                android:textColor="@color/text_primary"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="48dp"
-                android:layout_height="4dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="6dp"
-                android:background="@drawable/bg_title_underline" />
-
-            <!-- Nouvelle analyse -->
+            <!-- Accès secondaires -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnUrl"
-                style="@style/HomeCard">
+                android:id="@+id/btnSimulation" style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_orange">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_link" />
-                    </FrameLayout>
-                    <LinearLayout style="@style/HomeCardText">
-                        <TextView style="@style/HomeCardTitle" android:text="@string/home_new_analysis" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Analyse automatique d'un lien" />
-                    </LinearLayout>
-                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Simulation avant dépôt -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnSimulation"
-                style="@style/HomeCard">
-                <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_brown">
+                    <FrameLayout style="@style/HomeIconWrap" android:background="@drawable/circle_brown">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_simulation" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Estimer votre position avant de déposer" />
+                        <TextView style="@style/HomeCardSub" android:text="Comparer votre offre au prix de référence" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Statistiques par catégorie -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnCompanies"
-                style="@style/HomeCard">
+                android:id="@+id/btnCompetitors" style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_dark">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
-                    </FrameLayout>
-                    <LinearLayout style="@style/HomeCardText">
-                        <TextView style="@style/HomeCardTitle" android:text="@string/home_companies" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Catégorie → domaine → sociétés" />
-                    </LinearLayout>
-                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Statistiques par société -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnSociety"
-                style="@style/HomeCard">
-                <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_deep">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
-                    </FrameLayout>
-                    <LinearLayout style="@style/HomeCardText">
-                        <TextView style="@style/HomeCardTitle" android:text="@string/home_society" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="% de chaque société par domaine" />
-                    </LinearLayout>
-                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Statistiques concurrents -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnCompetitors"
-                style="@style/HomeCard">
-                <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_dark">
+                    <FrameLayout style="@style/HomeIconWrap" android:background="@drawable/circle_dark">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_clients" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_competitors" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Profil et comportement de chaque concurrent" />
+                        <TextView style="@style/HomeCardSub" android:text="Profils, par société, par domaine" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Top concurrents par domaine -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnTop"
-                style="@style/HomeCard">
+                android:id="@+id/btnHistory" style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_amber">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
-                    </FrameLayout>
-                    <LinearLayout style="@style/HomeCardText">
-                        <TextView style="@style/HomeCardTitle" android:text="@string/home_top" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Les sociétés les plus fortes par domaine" />
-                    </LinearLayout>
-                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Historique des analyses -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnHistory"
-                style="@style/HomeCard">
-                <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_brown">
+                    <FrameLayout style="@style/HomeIconWrap" android:background="@drawable/circle_amber">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_calendar" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_history" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Toutes vos analyses enregistrées" />
+                        <TextView style="@style/HomeCardSub" android:text="Toutes vos analyses enregistrées" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Contact -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnContact"
-                style="@style/HomeCard">
+                android:id="@+id/btnContact" style="@style/HomeCard">
                 <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap"
-                        android:background="@drawable/circle_amber">
+                    <FrameLayout style="@style/HomeIconWrap" android:background="@drawable/circle_deep">
                         <ImageView style="@style/HomeIcon" android:src="@drawable/ic_info" />
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_contact" />
-                        <TextView style="@style/HomeCardSub"
-                            android:text="Nous écrire / nous joindre" />
+                        <TextView style="@style/HomeCardSub" android:text="Nous écrire / nous joindre" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Bannière Premium (discrète) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnPremium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="3dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_premium_gradient"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+                    <ImageView android:layout_width="34dp" android:layout_height="34dp"
+                        android:src="@drawable/ic_star" android:tint="@color/white" />
+                    <LinearLayout android:layout_width="0dp" android:layout_weight="1"
+                        android:layout_height="wrap_content" android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/home_premium_title" android:textColor="@color/white"
+                            android:textSize="16sp" android:textStyle="bold" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp" android:alpha="0.95"
+                            android:text="@string/home_premium_sub" android:textColor="@color/white"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:background="@drawable/bg_pill_white" android:paddingHorizontal="12dp"
+                        android:paddingVertical="5dp" android:text="Bientôt" android:textColor="@color/white"
+                        android:textSize="11sp" android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Confiance -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
+                android:layout_marginTop="18dp"
                 android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginTop="2dp"
-                    android:src="@drawable/ic_info"
-                    android:tint="@color/text_secondary" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="@string/disclaimer"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp" />
+                <ImageView android:layout_width="16dp" android:layout_height="16dp"
+                    android:layout_marginEnd="8dp" android:layout_marginTop="2dp"
+                    android:src="@drawable/ic_info" android:tint="@color/brand_green" />
+                <TextView android:layout_width="0dp" android:layout_weight="1"
+                    android:layout_height="wrap_content" android:text="@string/trust_local"
+                    android:textColor="@color/text_secondary" android:textSize="11sp" />
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/disclaimer"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp"
+                android:textStyle="italic" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Logo fixe en haut (superposé, ne défile pas) -->
     <ImageView
         android:layout_width="128dp"
         android:layout_height="128dp"

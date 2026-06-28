@@ -47,6 +47,10 @@ class CompetitorsActivity : AppCompatActivity() {
         binding.spCategorie.onItemSelectedListener = onSel
         binding.spMin.onItemSelectedListener = onSel
         binding.etSearch.doAfterTextChanged { render() }
+
+        binding.btnTop.setOnClickListener { startActivity(Intent(this, TopCompetitorsActivity::class.java)) }
+        binding.btnSociety.setOnClickListener { startActivity(Intent(this, SocietyStatsActivity::class.java)) }
+        binding.btnCategory.setOnClickListener { startActivity(Intent(this, CompanyStatsActivity::class.java)) }
         load()
     }
 
