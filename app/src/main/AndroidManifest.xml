@@ -100,6 +100,11 @@
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 
+        <activity
+            android:name=".GlobalCompanyActivity"
+            android:exported="false"
+            android:parentActivityName=".GlobalStatsActivity" />
+
         <!-- Partage des PDF / CSV générés via WhatsApp, Gmail, etc. -->
         <provider
             android:name="androidx.core.content.FileProvider"

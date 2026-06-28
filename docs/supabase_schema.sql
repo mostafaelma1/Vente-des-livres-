@@ -426,10 +426,34 @@ begin
         from parts;
 end; $$;
 
+-- Détail marché par marché d'une société (chaque marché séparément).
+create or replace function public.global_company_markets(
+    p_user_id uuid, p_device text, p_name text,
+    p_categorie text default null, p_limit integer default 60
+) returns table(reference text, ville text, date_limite text, estimation numeric,
+                rang int, amount numeric, ecart_estim numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._require_premium(p_user_id, p_device) then raise exception 'premium_required'; end if;
+    return query
+        select t.reference, t.ville, t.date_limite, t.estimation,
+               p.rank, p.amount,
+               case when t.estimation is not null and t.estimation > 0
+                    then (p.amount - t.estimation) / t.estimation * 100 end
+        from public.tenders t
+        cross join lateral jsonb_to_recordset(t.participants)
+                   as p(name text, amount numeric, rank int)
+        where p.name = p_name
+          and (p_categorie is null or t.categorie = p_categorie)
+        order by t.date_limite desc nulls last
+        limit p_limit;
+end; $$;
+
 grant execute on function public.global_profiles(uuid,text,text,text,text,integer)         to anon, authenticated;
 grant execute on function public.global_competition_index(uuid,text,text,text,text)        to anon, authenticated;
 grant execute on function public.global_trends(uuid,text,text,text,integer)                to anon, authenticated;
 grant execute on function public.global_compare_offer(uuid,text,text,text,text,numeric)    to anon, authenticated;
+grant execute on function public.global_company_markets(uuid,text,text,text,integer)       to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
 -- 7ter. PURGE AUTOMATIQUE — suppression des données de plus de 2 mois

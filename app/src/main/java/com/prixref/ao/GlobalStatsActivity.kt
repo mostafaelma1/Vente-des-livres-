@@ -264,7 +264,7 @@ class GlobalStatsActivity : AppCompatActivity() {
     private fun profileLine(label: String, p: Backend.GlobalProfile, colorRes: Int = R.color.text_primary): View {
         val ll = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, dp(6), 0, dp(2)) }
         ll.addView(TextView(this).apply {
-            text = label; textSize = 13.5f; setTypeface(typeface, Typeface.BOLD)
+            text = "$label  ›"; textSize = 13.5f; setTypeface(typeface, Typeface.BOLD)
             setTextColor(ContextCompat.getColor(this@GlobalStatsActivity, colorRes))
         })
         val cm = p.avgRank?.let { "%.1f".format(it) } ?: "—"
@@ -273,7 +273,17 @@ class GlobalStatsActivity : AppCompatActivity() {
             textSize = 12f
             setTextColor(ContextCompat.getColor(this@GlobalStatsActivity, R.color.text_secondary))
         })
+        // Cliquable : ouvre le détail marché par marché de la société.
+        ll.setOnClickListener { openCompany(p.name) }
         return ll
+    }
+
+    private fun openCompany(name: String) {
+        startActivity(
+            Intent(this, GlobalCompanyActivity::class.java)
+                .putExtra(GlobalCompanyActivity.EXTRA_NAME, name)
+                .putExtra(GlobalCompanyActivity.EXTRA_CAT, currentCategorie())
+        )
     }
 
     private fun kv(k: String, v: String) = TextView(this).apply {

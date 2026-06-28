@@ -237,6 +237,26 @@ object Backend {
         )
     }
 
+    data class MarketRow(
+        val reference: String, val ville: String, val dateLimite: String,
+        val estimation: Double?, val rang: Int, val amount: Double?, val ecartEstim: Double?,
+    )
+
+    suspend fun globalCompanyMarkets(
+        account: Account, deviceId: String, name: String, categorie: String?, limit: Int = 60,
+    ): List<MarketRow> {
+        val arr = rpcArray("global_company_markets", baseParams(account, deviceId).apply {
+            addProperty("p_name", name); put(this, "p_categorie", categorie); addProperty("p_limit", limit)
+        }) ?: return emptyList()
+        return arr.map {
+            val o = it.asJsonObject
+            MarketRow(
+                str(o, "reference"), str(o, "ville"), str(o, "date_limite"),
+                dbl(o, "estimation"), int(o, "rang"), dbl(o, "amount"), dbl(o, "ecart_estim"),
+            )
+        }
+    }
+
     private fun baseParams(account: Account, deviceId: String) = JsonObject().apply {
         addProperty("p_user_id", account.id)
         addProperty("p_device", deviceId)

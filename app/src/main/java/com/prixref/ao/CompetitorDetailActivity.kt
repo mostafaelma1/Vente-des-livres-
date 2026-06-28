@@ -119,6 +119,23 @@ class CompetitorDetailActivity : AppCompatActivity() {
             commit(v)
         }
 
+        // Détail par marché (chaque marché séparément).
+        if (c.participations.isNotEmpty()) {
+            val m = card()
+            m.addView(boldLine("Détail par marché", R.color.brand_orange_dark, 15f))
+            for (p in c.participations) {
+                val titre = listOf(p.reference, p.ville)
+                    .filter { it.isNotBlank() && it != "—" }.joinToString(" · ").ifBlank { "Marché" }
+                m.addView(boldLine("▸ $titre", R.color.text_primary, 13f))
+                m.addView(plain("Date limite : ${Format.date(p.date)}", R.color.text_secondary))
+                m.addView(plain(
+                    "Classement : ${if (p.rang > 0) "${p.rang}e" else "écartée"}" +
+                        "  ·  Estimation : ${Format.money(p.estimation)}", R.color.text_secondary))
+                m.addView(plain("Écart vs estimation : ${Format.signedPercent(p.ecartEstimPct)}", R.color.text_secondary))
+            }
+            commit(m)
+        }
+
         // Disclaimer
         binding.statsContainer.addView(plain(CompetitorEngine.DISCLAIMER, R.color.text_secondary).apply {
             setPadding(dp(4), dp(14), dp(4), dp(8)); textSize = 11f
