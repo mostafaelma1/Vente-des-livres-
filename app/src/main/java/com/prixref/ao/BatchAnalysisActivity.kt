@@ -57,8 +57,10 @@ class BatchAnalysisActivity : AppCompatActivity() {
         const val MAX = 10
         const val DAYS_MIN = 3           // date limite passée d'au moins 3 jours
         const val DAYS_MAX = 8           // … et au plus 8 jours
-        const val EXTRACT_TRIES = 6      // tentatives d'extraction par consultation
-        const val RETRY_MS = 2300L
+        const val EXTRACT_TRIES = 8      // tentatives d'extraction par consultation
+        const val RETRY_MS = 2500L       // comme "Nouvelle analyse par lien"
+        const val FIRST_MS = 2500L
+        const val AFTER_EXPAND_MS = 1300L
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -109,7 +111,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
             Phase.ANALYZE -> if (index != pageHandledForIndex) {
                 pageHandledForIndex = index
                 tries = 0
-                handler.postDelayed({ extractCurrent() }, 1800)
+                handler.postDelayed({ extractCurrent() }, FIRST_MS)
             }
         }
     }
@@ -181,21 +183,24 @@ class BatchAnalysisActivity : AppCompatActivity() {
     }
 
     private fun extractCurrent() {
+        // Même méthode que "Nouvelle analyse par lien" : déplier les « + », puis lire.
         binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
             handler.postDelayed({
                 binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
                     processPage(value)
                 }
-            }, 1200)
+            }, AFTER_EXPAND_MS)
         }
     }
 
     private fun processPage(value: String?) {
         val (ref, org) = queue[index]
+        val url = "$BASE&refConsultation=$ref&orgAcronyme=$org"
         val page = parsePage(value)
-        val result = page?.let { LocalAnalyzer.analyze(it, ref, org, "$BASE&refConsultation=$ref&orgAcronyme=$org") }
+        val result = page?.let { LocalAnalyzer.analyze(it, ref, org, url) }
         val input = result?.input
-        if (input != null && input.estimation > 0.0 && input.competitors.any { it.retained && it.amount > 0.0 }) {
+        if (result != null && result.offersDetected && input != null &&
+            input.estimation > 0.0 && input.competitors.any { it.retained && it.amount > 0.0 }) {
             runCatching {
                 val analysis = ReferenceCalculator.analyze(input)
                 uploadAndNext(analysis)
@@ -205,9 +210,15 @@ class BatchAnalysisActivity : AppCompatActivity() {
         // Pas encore exploitable : la page n'est peut-être pas finie de charger → on réessaie.
         if (++tries < EXTRACT_TRIES) {
             handler.postDelayed({ extractCurrent() }, RETRY_MS)
-        } else {
-            skipNext("données incomplètes")
+            return
         }
+        val reason = when {
+            result == null -> "page illisible"
+            !result.offersDetected -> "aucune offre détectée"
+            (input?.estimation ?: 0.0) <= 0.0 -> "estimation absente"
+            else -> "non calculable"
+        }
+        skipNext(reason)
     }
 
     private fun uploadAndNext(analysis: com.prixref.ao.model.AnalysisResult) {
