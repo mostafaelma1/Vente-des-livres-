@@ -308,17 +308,22 @@ object CompetitorEngine {
                 "Données insuffisantes pour détecter un pourcentage fréquent fiable.",
             )
         }
-        // Intervalles de 5 points : borne basse = floor(écart / 5) * 5.
-        val buckets = ecarts.groupingBy { kotlin.math.floor(it / 5.0).toInt() * 5 }.eachCount()
-        val modeLow = buckets.maxByOrNull { it.value }!!.key
-        val freqCount = buckets[modeLow]!!
+        // Tranches personnalisées (plus fines près de 0, plus larges aux extrêmes).
+        val n = EDGES.size
+        val counts = IntArray(n + 1)
+        ecarts.forEach { counts[bucketIndex(it)]++ }
+        val modeIdx = counts.indices.maxByOrNull { counts[it] }!!
+        val freqCount = counts[modeIdx]
         val rate = freqCount.toDouble() / total * 100.0
-        // Intervalle habituel : on élargit aux voisins ayant au moins la moitié du mode.
+        // Intervalle habituel : on élargit aux tranches voisines ayant au moins la moitié du mode.
         val threshold = kotlin.math.max(1, freqCount / 2)
-        var lo = modeLow
-        while ((buckets[lo - 5] ?: 0) >= threshold) lo -= 5
-        var hi = modeLow
-        while ((buckets[hi + 5] ?: 0) >= threshold) hi += 5
+        var lo = modeIdx
+        while (lo - 1 >= 0 && counts[lo - 1] >= threshold) lo--
+        var hi = modeIdx
+        while (hi + 1 <= n && counts[hi + 1] >= threshold) hi++
+        val (fLow, fHigh) = bucketBounds(modeIdx)
+        val uLow = bucketBounds(lo).first
+        val uHigh = bucketBounds(hi).second
         val stab = when {
             rate > 60.0 -> STAB_STABLE
             rate >= 40.0 -> STAB_PARTIEL
@@ -329,7 +334,24 @@ object CompetitorEngine {
             rate >= 40.0 -> "Cette société présente une tendance partielle, mais son comportement doit être interprété avec prudence."
             else -> "Cette société ne présente pas encore un intervalle de prix clairement dominant. Son comportement semble irrégulier ou les données sont insuffisantes."
         }
-        return Behavior(total, moyenne, modeLow, modeLow + 5, freqCount, rate, lo, hi + 5, stab, lecture)
+        return Behavior(total, moyenne, fLow, fHigh, freqCount, rate, uLow, uHigh, stab, lecture)
+    }
+
+    // Bornes des tranches d'écart vs estimation (en %), plus fines autour de 0.
+    private val EDGES = intArrayOf(-25, -20, -15, -10, -8, -6, -5, -4, -3, -2, 0, 2, 3, 4, 5, 6, 8, 10, 15, 20)
+
+    /** Index de la tranche d'un écart : 0 = « moins de -25 % », EDGES.size = « +20 % et plus ». */
+    private fun bucketIndex(e: Double): Int {
+        if (e < EDGES[0]) return 0
+        for (i in 1 until EDGES.size) if (e < EDGES[i]) return i
+        return EDGES.size
+    }
+
+    /** Bornes (basse, haute) d'une tranche ; null = ouverte (extrémité). */
+    private fun bucketBounds(idx: Int): Pair<Int?, Int?> = when {
+        idx == 0 -> null to EDGES[0]
+        idx == EDGES.size -> EDGES[EDGES.size - 1] to null
+        else -> EDGES[idx - 1] to EDGES[idx]
     }
 
     /** Comportement fréquent vs estimation pour un domaine (et catégorie) donné. */
@@ -340,9 +362,13 @@ object CompetitorEngine {
             }
         )
 
-    /** Libellé d'un intervalle, ex. « -20% à -15% ». */
-    fun intervalLabel(low: Int?, high: Int?): String =
-        if (low == null || high == null) "—" else "${low}% à ${high}%"
+    /** Libellé d'un intervalle, ex. « -20% à -15% », « moins de -25% », « +20% et plus ». */
+    fun intervalLabel(low: Int?, high: Int?): String = when {
+        low == null && high == null -> "—"
+        low == null -> "moins de ${high}%"
+        high == null -> "${low}% et plus"
+        else -> "${low}% à ${high}%"
+    }
 
     private fun pickProfil(
         nb: Int, ecartPrMoyen: Double, tauxProchePR: Double, classementMoyen: Double?,
