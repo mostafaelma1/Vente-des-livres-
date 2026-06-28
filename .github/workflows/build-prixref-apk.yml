@@ -36,7 +36,8 @@ jobs:
         run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
 
       - name: Build signed release APK
-        run: ./gradlew assembleRelease --no-daemon --stacktrace -PappVersionCode=${{ github.run_number }} -PsupabaseUrl="${{ secrets.SUPABASE_URL }}" -PsupabaseAnonKey="${{ secrets.SUPABASE_ANON_KEY }}"
+        # Les clés Supabase (URL + clé publique) viennent de gradle.properties.
+        run: ./gradlew assembleRelease --no-daemon --stacktrace -PappVersionCode=${{ github.run_number }}
 
       - name: Stage APK
         run: |

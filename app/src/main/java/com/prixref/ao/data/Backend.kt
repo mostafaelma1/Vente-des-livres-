@@ -176,14 +176,17 @@ object Backend {
 
     /** Appel RPC PostgREST. Retourne le corps si HTTP 2xx, sinon null. */
     private suspend fun rpc(fn: String, params: JsonObject): String? = withContext(Dispatchers.IO) {
+        val key = BuildConfig.SUPABASE_ANON_KEY
         val url = BuildConfig.SUPABASE_URL.trimEnd('/') + "/rest/v1/rpc/" + fn
-        val req = Request.Builder()
+        val builder = Request.Builder()
             .url(url)
             .post(params.toString().toRequestBody(JSON))
-            .addHeader("apikey", BuildConfig.SUPABASE_ANON_KEY)
-            .addHeader("Authorization", "Bearer " + BuildConfig.SUPABASE_ANON_KEY)
+            .addHeader("apikey", key)
             .addHeader("Content-Type", "application/json")
-            .build()
+        // Les clés JWT héritées (eyJ...) passent aussi en Bearer ; les nouvelles
+        // clés publiques (sb_publishable_...) s'authentifient via l'en-tête apikey seul.
+        if (key.startsWith("eyJ")) builder.addHeader("Authorization", "Bearer $key")
+        val req = builder.build()
         client.newCall(req).execute().use { resp ->
             if (resp.isSuccessful) resp.body?.string() else null
         }
