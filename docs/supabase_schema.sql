@@ -326,6 +326,112 @@ grant execute on function public.admin_set_blocked(text,text,uuid,boolean)      
 grant execute on function public.global_top_competitors(uuid,text,text,text,text,integer) to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
+-- 7bis. STATISTIQUES GLOBALES PREMIUM — Phase 2
+--       (toutes vérifient _require_premium avant de renvoyer des données)
+-- ----------------------------------------------------------------------------
+
+-- Profils des concurrents (alimente Top / Agressives / Stratégiques / Alertes).
+create or replace function public.global_profiles(
+    p_user_id uuid, p_device text, p_categorie text default null,
+    p_domaine text default null, p_ville text default null, p_limit integer default 40
+) returns table(name text, participations bigint, avg_rank numeric,
+                avg_ecart numeric, pct_low numeric, pct_close numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._require_premium(p_user_id, p_device) then raise exception 'premium_required'; end if;
+    return query
+        with e as (
+            select p.name, p.rank,
+                   case when t.reference_price is not null and t.reference_price > 0
+                        then (p.amount - t.reference_price) / t.reference_price * 100 end as ecart
+            from public.tenders t
+            cross join lateral jsonb_to_recordset(t.participants)
+                       as p(name text, amount numeric, rank int)
+            where (p_categorie is null or t.categorie = p_categorie)
+              and (p_domaine   is null or t.domaine   = p_domaine)
+              and (p_ville     is null or t.ville      = p_ville)
+              and p.name is not null and p.name <> ''
+        )
+        select name,
+               count(*)::bigint as participations,
+               avg(rank::numeric) as avg_rank,
+               avg(ecart) as avg_ecart,
+               100.0 * count(*) filter (where ecart < -10) / count(*) as pct_low,
+               100.0 * count(*) filter (where ecart between -3 and 3) / count(*) as pct_close
+        from e
+        group by name
+        order by participations desc
+        limit p_limit;
+end; $$;
+
+-- Indice de concurrence : nb d'AO + nb moyen de participants + estimation moyenne.
+create or replace function public.global_competition_index(
+    p_user_id uuid, p_device text, p_categorie text default null,
+    p_domaine text default null, p_ville text default null
+) returns table(nb_tenders bigint, avg_participants numeric, avg_estimation numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._require_premium(p_user_id, p_device) then raise exception 'premium_required'; end if;
+    return query
+        select count(*)::bigint,
+               avg(jsonb_array_length(coalesce(participants, '[]'::jsonb)))::numeric,
+               avg(estimation)::numeric
+        from public.tenders t
+        where (p_categorie is null or t.categorie = p_categorie)
+          and (p_domaine   is null or t.domaine   = p_domaine)
+          and (p_ville     is null or t.ville      = p_ville);
+end; $$;
+
+-- Tendances par ville (nb d'AO + estimation moyenne).
+create or replace function public.global_trends(
+    p_user_id uuid, p_device text, p_categorie text default null,
+    p_domaine text default null, p_limit integer default 30
+) returns table(ville text, nb_tenders bigint, avg_estimation numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._require_premium(p_user_id, p_device) then raise exception 'premium_required'; end if;
+    return query
+        select coalesce(nullif(ville,''), '(non précisé)') as ville,
+               count(*)::bigint, avg(estimation)::numeric
+        from public.tenders t
+        where (p_categorie is null or t.categorie = p_categorie)
+          and (p_domaine   is null or t.domaine   = p_domaine)
+        group by 1 order by 2 desc limit p_limit;
+end; $$;
+
+-- Comparaison de mon offre avec le marché global.
+create or replace function public.global_compare_offer(
+    p_user_id uuid, p_device text, p_categorie text, p_domaine text,
+    p_ville text, p_amount numeric
+) returns table(nb_offres bigint, avg_ref numeric, avg_amount numeric,
+                min_amount numeric, max_amount numeric, pct_above_me numeric)
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._require_premium(p_user_id, p_device) then raise exception 'premium_required'; end if;
+    return query
+        with parts as (
+            select p.amount, t.reference_price as ref
+            from public.tenders t
+            cross join lateral jsonb_to_recordset(t.participants)
+                       as p(name text, amount numeric, rank int)
+            where (p_categorie is null or t.categorie = p_categorie)
+              and (p_domaine   is null or t.domaine   = p_domaine)
+              and (p_ville     is null or t.ville      = p_ville)
+              and p.amount is not null
+        )
+        select count(*)::bigint, avg(ref)::numeric, avg(amount)::numeric,
+               min(amount)::numeric, max(amount)::numeric,
+               case when count(*) > 0
+                    then 100.0 * count(*) filter (where amount > p_amount) / count(*) end
+        from parts;
+end; $$;
+
+grant execute on function public.global_profiles(uuid,text,text,text,text,integer)         to anon, authenticated;
+grant execute on function public.global_competition_index(uuid,text,text,text,text)        to anon, authenticated;
+grant execute on function public.global_trends(uuid,text,text,text,integer)                to anon, authenticated;
+grant execute on function public.global_compare_offer(uuid,text,text,text,text,numeric)    to anon, authenticated;
+
+-- ----------------------------------------------------------------------------
 -- 7. CRÉER LE PREMIER ADMIN
 --    Après ta 1re inscription dans l'app, récupère ton téléphone et exécute :
 --      update public.users set is_admin = true where phone = '+2126XXXXXXXX';

@@ -172,6 +172,92 @@ object Backend {
         }
     }
 
+    // ----- Statistiques globales (Premium) -----
+
+    data class GlobalProfile(
+        val name: String, val participations: Int, val avgRank: Double?,
+        val avgEcart: Double?, val pctLow: Double?, val pctClose: Double?,
+    )
+    data class CompetitionIndex(val nbTenders: Int, val avgParticipants: Double?, val avgEstimation: Double?)
+    data class Trend(val ville: String, val nbTenders: Int, val avgEstimation: Double?)
+    data class OfferComparison(
+        val nbOffres: Int, val avgRef: Double?, val avgAmount: Double?,
+        val minAmount: Double?, val maxAmount: Double?, val pctAboveMe: Double?,
+    )
+
+    suspend fun globalProfiles(
+        account: Account, deviceId: String, categorie: String?, domaine: String?, ville: String?, limit: Int = 40,
+    ): List<GlobalProfile> {
+        val arr = rpcArray("global_profiles", baseParams(account, deviceId).apply {
+            put(this, "p_categorie", categorie); put(this, "p_domaine", domaine); put(this, "p_ville", ville)
+            addProperty("p_limit", limit)
+        }) ?: return emptyList()
+        return arr.map {
+            val o = it.asJsonObject
+            GlobalProfile(
+                str(o, "name"), int(o, "participations"),
+                dbl(o, "avg_rank"), dbl(o, "avg_ecart"), dbl(o, "pct_low"), dbl(o, "pct_close"),
+            )
+        }
+    }
+
+    suspend fun globalCompetitionIndex(
+        account: Account, deviceId: String, categorie: String?, domaine: String?, ville: String?,
+    ): CompetitionIndex? {
+        val arr = rpcArray("global_competition_index", baseParams(account, deviceId).apply {
+            put(this, "p_categorie", categorie); put(this, "p_domaine", domaine); put(this, "p_ville", ville)
+        }) ?: return null
+        val o = arr.firstOrNull()?.asJsonObject ?: return null
+        return CompetitionIndex(int(o, "nb_tenders"), dbl(o, "avg_participants"), dbl(o, "avg_estimation"))
+    }
+
+    suspend fun globalTrends(
+        account: Account, deviceId: String, categorie: String?, domaine: String?, limit: Int = 30,
+    ): List<Trend> {
+        val arr = rpcArray("global_trends", baseParams(account, deviceId).apply {
+            put(this, "p_categorie", categorie); put(this, "p_domaine", domaine); addProperty("p_limit", limit)
+        }) ?: return emptyList()
+        return arr.map {
+            val o = it.asJsonObject
+            Trend(str(o, "ville"), int(o, "nb_tenders"), dbl(o, "avg_estimation"))
+        }
+    }
+
+    suspend fun globalCompareOffer(
+        account: Account, deviceId: String, categorie: String?, domaine: String?, ville: String?, amount: Double,
+    ): OfferComparison? {
+        val arr = rpcArray("global_compare_offer", baseParams(account, deviceId).apply {
+            put(this, "p_categorie", categorie); put(this, "p_domaine", domaine); put(this, "p_ville", ville)
+            addProperty("p_amount", amount)
+        }) ?: return null
+        val o = arr.firstOrNull()?.asJsonObject ?: return null
+        return OfferComparison(
+            int(o, "nb_offres"), dbl(o, "avg_ref"), dbl(o, "avg_amount"),
+            dbl(o, "min_amount"), dbl(o, "max_amount"), dbl(o, "pct_above_me"),
+        )
+    }
+
+    private fun baseParams(account: Account, deviceId: String) = JsonObject().apply {
+        addProperty("p_user_id", account.id)
+        addProperty("p_device", deviceId)
+    }
+    private fun put(o: JsonObject, key: String, value: String?) {
+        if (value.isNullOrBlank()) o.add(key, com.google.gson.JsonNull.INSTANCE) else o.addProperty(key, value)
+    }
+    private fun str(o: JsonObject, k: String) = o.get(k)?.takeIf { !it.isJsonNull }?.asString ?: ""
+    private fun int(o: JsonObject, k: String) = o.get(k)?.takeIf { !it.isJsonNull }?.asInt ?: 0
+    private fun dbl(o: JsonObject, k: String) = o.get(k)?.takeIf { !it.isJsonNull }?.asDouble
+
+    private suspend fun rpcArray(fn: String, params: JsonObject): com.google.gson.JsonArray? {
+        if (!isConfigured) return null
+        return try {
+            val body = rpc(fn, params) ?: return null
+            JsonParser.parseString(body).asJsonArray
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     // ----- Bas niveau -----
 
     /** Appel RPC PostgREST. Retourne le corps si HTTP 2xx, sinon null. */

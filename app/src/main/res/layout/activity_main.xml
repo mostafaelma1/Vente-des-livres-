@@ -111,7 +111,21 @@
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_competitors" />
-                        <TextView style="@style/HomeCardSub" android:text="Profils, par société, par domaine" />
+                        <TextView style="@style/HomeCardSub" android:text="Statistiques locales (gratuit)" />
+                    </LinearLayout>
+                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnGlobal" style="@style/HomeCard">
+                <LinearLayout style="@style/HomeCardRow">
+                    <FrameLayout style="@style/HomeIconWrap" android:background="@drawable/circle_amber">
+                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
+                    </FrameLayout>
+                    <LinearLayout style="@style/HomeCardText">
+                        <TextView style="@style/HomeCardTitle" android:text="@string/home_global" />
+                        <TextView style="@style/HomeCardSub" android:text="Concurrents et tendances du marché (Premium)" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
