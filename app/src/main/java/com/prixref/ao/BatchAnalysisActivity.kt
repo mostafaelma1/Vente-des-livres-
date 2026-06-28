@@ -127,29 +127,30 @@ class BatchAnalysisActivity : AppCompatActivity() {
                     var ty=(i.type||'text').toLowerCase(); return ty==='text'||ty==='';
                   });
                 }
-                // Cible la LIGNE "Date limite de remise des plis" via son libelle.
-                var target=null, all=document.querySelectorAll('td,th,label,span,div');
-                for(var i=0;i<all.length;i++){
-                  var t=(all[i].textContent||'').toLowerCase();
-                  if(t.indexOf('remise des plis')>=0 && all[i].querySelectorAll('input').length===0){ target=all[i]; break; }
-                }
-                var ins=[];
-                if(target){
-                  var row=target;
-                  for(var up=0; up<5 && row; up++){
-                    row=row.parentElement; if(!row) break;
-                    var ti=txtInputs(row);
-                    if(ti.length>=2){ ins=ti; break; }
+                // Classe un champ : 'dl' = ligne "remise des plis", 'ml' = "mise en ligne".
+                function classify(inp){
+                  var p=inp;
+                  for(var up=0; up<8 && p.parentElement; up++){
+                    p=p.parentElement;
+                    var s=(p.textContent||'').toLowerCase();
+                    var a=s.indexOf('remise des plis')>=0, b=s.indexOf('mise en ligne')>=0;
+                    if(a&&!b) return 'dl';
+                    if(b&&!a) return 'ml';
+                    if(a&&b) return '?';
                   }
+                  return '';
                 }
-                if(ins.length>=2){ ins[0].value='$from'; ins[1].value='$to'; }
+                var all=txtInputs(document);
+                var dl=all.filter(function(i){return classify(i)==='dl';});
+                if(dl.length>=2){ dl[0].value='$from'; dl[1].value='$to'; }
                 var els=[].slice.call(document.querySelectorAll('a,input,button'));
                 var b=els.filter(function(e){
                   var t=((e.value||e.innerText||e.textContent||'')+'').toLowerCase();
                   return t.indexOf('lancer la recherche')>=0;
                 })[0];
-                if(b){ b.click(); return 'submit dl='+ins.length+' label='+(target?1:0); }
-                return 'nobtn dl='+ins.length+' label='+(target?1:0);
+                var st=(b?'submit':'nobtn');
+                if(b){ b.click(); }
+                return st+' dl='+dl.length+' total='+all.length;
               }catch(e){ return 'err:'+e; }
             })();
         """.trimIndent()
@@ -296,6 +297,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
     private fun status(s: String) { binding.tvStatus.text = s }
     private fun log(s: String) {
         binding.tvLog.append(s + "\n")
+        binding.logScroll.post { binding.logScroll.fullScroll(android.view.View.FOCUS_DOWN) }
     }
 
     override fun onDestroy() {

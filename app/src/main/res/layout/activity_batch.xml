@@ -1,70 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:background="@color/bg"
+    android:orientation="vertical">
 
-    <!-- WebView de travail (cachée derrière le panneau). -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="Analyse automatique (robot)"
+        android:textColor="@color/text_primary"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="Préparation…"
+        android:textColor="@color/text_secondary"
+        android:textSize="12.5sp" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        android:indeterminate="true"
+        app:indicatorColor="@color/action"
+        app:trackCornerRadius="4dp"
+        app:trackThickness="4dp" />
+
+    <!-- WebView VISIBLE : on voit ce que fait le robot. -->
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/logScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="150dp"
         android:background="@color/surface"
-        android:orientation="vertical"
-        android:padding="18dp">
+        android:padding="8dp">
 
         <TextView
+            android:id="@+id/tvLog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="Analyse automatique (robot)"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Préparation…"
+            android:fontFamily="monospace"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
+            android:textSize="11sp" />
+    </ScrollView>
 
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/progress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:indeterminate="true"
-            app:indicatorColor="@color/action"
-            app:trackCornerRadius="4dp"
-            app:trackThickness="5dp" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="14dp">
-
-            <TextView
-                android:id="@+id/tvLog"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:textColor="@color/text_secondary"
-                android:textSize="11.5sp" />
-        </ScrollView>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnClose"
-            style="@style/OutlineButton"
-            android:layout_marginTop="10dp"
-            android:text="Fermer" />
-    </LinearLayout>
-</FrameLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnClose"
+        style="@style/OutlineButton"
+        android:layout_margin="8dp"
+        android:text="Fermer" />
+</LinearLayout>
