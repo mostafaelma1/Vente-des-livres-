@@ -174,8 +174,8 @@ class BatchAnalysisActivity : AppCompatActivity() {
         if (!perPageMaximized) {
             perPageMaximized = true
             maximizePerPage()
-            // Le changement recharge la liste ; on récolte après (avec repli si pas d'event).
-            handler.postDelayed({ if (!harvested) harvest() }, 5000)
+            // Le postback recharge la liste (500 lignes) ; on récolte après (repli si pas d'event).
+            handler.postDelayed({ if (!harvested) harvest() }, 8000)
         } else if (!harvested) {
             handler.postDelayed({ if (!harvested) harvest() }, 2500)
         }
@@ -197,8 +197,10 @@ class BatchAnalysisActivity : AppCompatActivity() {
                     }
                     s.dispatchEvent(new Event('input',{bubbles:true}));
                     s.dispatchEvent(new Event('change',{bubbles:true}));
-                    if(typeof s.onchange==='function'){ s.onchange(); }
-                    return 'perpage='+max;
+                    if(typeof s.onchange==='function'){ try{ s.onchange(); }catch(e){} }
+                    // PLACE/Prado : forcer le rechargement serveur de la liste.
+                    if(typeof window.__doPostBack==='function' && s.name){ try{ window.__doPostBack(s.name,''); }catch(e){} }
+                    return 'perpage='+max+' name='+(s.name||'?');
                   }
                 }
                 return 'noselect';
