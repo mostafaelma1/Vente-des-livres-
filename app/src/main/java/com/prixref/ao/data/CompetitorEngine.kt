@@ -174,6 +174,34 @@ object CompetitorEngine {
     fun find(sources: List<Source>, normName: String, hidden: Set<String> = emptySet()): Competitor? =
         build(sources, hidden).firstOrNull { it.nom_norm == normName }
 
+    /** Statistiques d'un sous-ensemble de participations (API publique). */
+    fun computeStats(parts: List<Participation>): Stats = statsOf(parts)
+
+    /**
+     * Restreint un concurrent à un sous-ensemble de ses participations (ex. une
+     * région) et recalcule ses stats, domaines, villes et comportement.
+     * Retourne null si aucune participation ne correspond.
+     */
+    fun scope(c: Competitor, predicate: (Participation) -> Boolean): Competitor? {
+        val parts = c.participations.filter(predicate)
+        if (parts.isEmpty()) return null
+        val villes = parts.groupBy { it.ville }.map { (v, list) ->
+            VilleStat(v, statsOf(list, villeContext = true))
+        }.sortedByDescending { it.stats.nb }
+        val domaines = parts.groupBy { it.categorie to it.domaine }.map { (k, list) ->
+            DomaineStat(k.second, k.first, statsOf(list))
+        }.sortedByDescending { it.stats.nb }
+        return c.copy(
+            stats = statsOf(parts, villes = villes),
+            categories = parts.map { it.categorie }.distinct(),
+            domaines = domaines,
+            villes = villes,
+            premiereDate = parts.minOf { it.date },
+            derniereDate = parts.maxOf { it.date },
+            participations = parts.sortedByDescending { it.date },
+        )
+    }
+
     const val TOUS = "(tous les domaines)"
 
     /** Concurrent dans un domaine précis (stats limitées à ce domaine). */

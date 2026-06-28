@@ -15,6 +15,7 @@ import com.prixref.ao.data.AppDatabase
 import com.prixref.ao.data.CompetitorEngine
 import com.prixref.ao.data.HiddenCompanies
 import com.prixref.ao.data.JsonStore
+import com.prixref.ao.data.Regions
 import com.prixref.ao.databinding.ActivityCompetitorsBinding
 import com.prixref.ao.databinding.ItemCompanyBinding
 import com.prixref.ao.util.Format
@@ -44,8 +45,10 @@ class CompetitorsActivity : AppCompatActivity() {
             override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) = render()
             override fun onNothingSelected(p: AdapterView<*>?) {}
         }
+        binding.spRegion.adapter = adapter(listOf(Regions.ALL) + Regions.names())
         binding.spCategorie.onItemSelectedListener = onSel
         binding.spMin.onItemSelectedListener = onSel
+        binding.spRegion.onItemSelectedListener = onSel
         binding.etSearch.doAfterTextChanged { render() }
 
         binding.btnTop.setOnClickListener { startActivity(Intent(this, TopCompetitorsActivity::class.java)) }
@@ -71,17 +74,19 @@ class CompetitorsActivity : AppCompatActivity() {
         val q = binding.etSearch.text?.toString()?.trim()?.uppercase().orEmpty()
         val cat = binding.spCategorie.selectedItemPosition
         val minNb = minValues[binding.spMin.selectedItemPosition.coerceIn(0, minValues.size - 1)]
-
-        val list = competitors.filter { c ->
-            c.stats.nb >= minNb &&
-                (q.isEmpty() || c.nom_norm.contains(q)) &&
-                (cat == 0 || c.categories.any { it.equals(categories[cat], ignoreCase = true) })
-        }
+        val region = binding.spRegion.selectedItem?.toString() ?: Regions.ALL
 
         binding.statsContainer.removeAllViews()
-        binding.tvEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+        var shown = 0
 
-        for (c in list) {
+        for (c0 in competitors) {
+            // Restriction à la région choisie (stats recalculées sur cette région).
+            val c = if (region == Regions.ALL) c0
+            else CompetitorEngine.scope(c0) { Regions.regionOf(it.ville) == region } ?: continue
+            if (c.stats.nb < minNb) continue
+            if (q.isNotEmpty() && !c.nom_norm.contains(q)) continue
+            if (cat != 0 && c.categories.none { it.equals(categories[cat], ignoreCase = true) }) continue
+
             val card = ItemCompanyBinding.inflate(layoutInflater, binding.statsContainer, false)
             card.tvName.text = c.nom
             card.tvSummary.text = "${c.stats.nb} marché(s) · ${c.stats.profil} · ${c.stats.fiabilite}"
@@ -103,10 +108,13 @@ class CompetitorsActivity : AppCompatActivity() {
                     Intent(this, CompetitorDetailActivity::class.java)
                         .putExtra(CompetitorDetailActivity.EXTRA_NORM, c.nom_norm)
                         .putExtra(CompetitorDetailActivity.EXTRA_NOM, c.nom)
+                        .putExtra(CompetitorDetailActivity.EXTRA_REGION, if (region == Regions.ALL) "" else region)
                 )
             }
             binding.statsContainer.addView(card.root)
+            shown++
         }
+        binding.tvEmpty.visibility = if (shown == 0) View.VISIBLE else View.GONE
     }
 
     private fun line(card: ItemCompanyBinding, text: String, bold: Boolean, colorRes: Int = R.color.text_primary) {

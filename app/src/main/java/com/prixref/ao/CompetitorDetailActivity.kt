@@ -28,7 +28,10 @@ class CompetitorDetailActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_NORM = "extra_norm"
         const val EXTRA_NOM = "extra_nom"
+        const val EXTRA_REGION = "extra_region"
     }
+
+    private var region: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,13 +40,17 @@ class CompetitorDetailActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener { finish() }
 
         val norm = intent.getStringExtra(EXTRA_NORM).orEmpty()
+        region = intent.getStringExtra(EXTRA_REGION).orEmpty()
         lifecycleScope.launch {
             val dao = AppDatabase.get(this@CompetitorDetailActivity).analysisDao()
             val competitor = withContext(Dispatchers.IO) {
                 val sources = dao.getAll().mapNotNull { e ->
                     runCatching { CompetitorEngine.Source(e.date, JsonStore.fromJson(e.json)) }.getOrNull()
                 }
-                CompetitorEngine.find(sources, norm, HiddenCompanies.get(this@CompetitorDetailActivity))
+                val c = CompetitorEngine.find(sources, norm, HiddenCompanies.get(this@CompetitorDetailActivity))
+                if (c != null && region.isNotBlank())
+                    CompetitorEngine.scope(c) { com.prixref.ao.data.Regions.regionOf(it.ville) == region }
+                else c
             }
             render(competitor)
         }
@@ -60,6 +67,7 @@ class CompetitorDetailActivity : AppCompatActivity() {
         // En-tête nom + profil
         title(c.nom)
         val head = card()
+        if (region.isNotBlank()) head.addView(boldLine("Région : $region", R.color.action, 13f))
         head.addView(boldLine(s.profil, profilColor(s.profil), 16f))
         head.addView(plain(CompetitorEngine.profilDescription(s.profil), R.color.text_primary))
         head.addView(plain(CompetitorEngine.reliabilityNote(s), R.color.text_secondary))
