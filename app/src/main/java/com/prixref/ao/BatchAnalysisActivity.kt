@@ -56,8 +56,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
         const val BASE = "https://www.marchespublics.gov.ma/index.php?page=entreprise.SuiviConsultation"
         const val MAX = 10
         const val DAYS_MIN = 3           // date limite passée d'au moins 3 jours
-        const val DAYS_MAX = 60          // … et au plus 60 jours
-        const val WINDOW = 4             // largeur de la fenêtre (jours) — peu de résultats
+        const val DAYS_MAX = 8           // … et au plus 8 jours
         const val EXTRACT_TRIES = 6      // tentatives d'extraction par consultation
         const val RETRY_MS = 2300L
     }
@@ -88,11 +87,10 @@ class BatchAnalysisActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView?, url: String?) = onPage()
         }
 
-        // Fenêtre de dates aléatoire (largeur WINDOW) glissée dans [DAYS_MIN, DAYS_MAX]
-        // → varie les consultations à chaque exécution.
-        val offset = (DAYS_MIN..(DAYS_MAX - WINDOW)).random()
-        winFrom = dateMinus(offset + WINDOW)
-        winTo = dateMinus(offset)
+        // Fenêtre fixe : date limite passée entre 3 et 8 jours. La variété entre
+        // exécutions vient du mélange aléatoire des résultats trouvés.
+        winFrom = dateMinus(DAYS_MAX)
+        winTo = dateMinus(DAYS_MIN)
         log("Fenêtre date limite : $winFrom → $winTo")
         status("Ouverture de la recherche…")
         binding.webView.loadUrl(SEARCH_URL)
