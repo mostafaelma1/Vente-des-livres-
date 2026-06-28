@@ -46,12 +46,20 @@ class BatchAnalysisActivity : AppCompatActivity() {
     private var uploaded = 0
     private var pageHandledForIndex = -1
 
+    private var tries = 0
+    private var harvestTries = 0
+    private var winFrom = ""
+    private var winTo = ""
+
     private companion object {
-        const val SEARCH_URL = "https://www.marchespublics.gov.ma/?page=entreprise.EntrepriseAdvancedSearch"
-        const val BASE = "https://www.marchespublics.gov.ma/?page=entreprise.SuiviConsultation"
+        const val SEARCH_URL = "https://www.marchespublics.gov.ma/index.php?page=entreprise.EntrepriseAdvancedSearch"
+        const val BASE = "https://www.marchespublics.gov.ma/index.php?page=entreprise.SuiviConsultation"
         const val MAX = 10
-        const val DAYS_MIN = 3
-        const val DAYS_MAX = 7
+        const val DAYS_MIN = 3           // date limite passée d'au moins 3 jours
+        const val DAYS_MAX = 60          // … et au plus 60 jours
+        const val WINDOW = 4             // largeur de la fenêtre (jours) — peu de résultats
+        const val EXTRACT_TRIES = 6      // tentatives d'extraction par consultation
+        const val RETRY_MS = 2300L
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -80,9 +88,12 @@ class BatchAnalysisActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView?, url: String?) = onPage()
         }
 
-        val from = dateMinus(DAYS_MAX)
-        val to = dateMinus(DAYS_MIN)
-        log("Fenêtre date limite : $from → $to")
+        // Fenêtre de dates aléatoire (largeur WINDOW) glissée dans [DAYS_MIN, DAYS_MAX]
+        // → varie les consultations à chaque exécution.
+        val offset = (DAYS_MIN..(DAYS_MAX - WINDOW)).random()
+        winFrom = dateMinus(offset + WINDOW)
+        winTo = dateMinus(offset)
+        log("Fenêtre date limite : $winFrom → $winTo")
         status("Ouverture de la recherche…")
         binding.webView.loadUrl(SEARCH_URL)
     }
@@ -99,14 +110,15 @@ class BatchAnalysisActivity : AppCompatActivity() {
             Phase.RESULTS -> if (!harvested) handler.postDelayed({ if (!harvested) harvest() }, 3000)
             Phase.ANALYZE -> if (index != pageHandledForIndex) {
                 pageHandledForIndex = index
-                handler.postDelayed({ extractCurrent() }, 1500)
+                tries = 0
+                handler.postDelayed({ extractCurrent() }, 1800)
             }
         }
     }
 
     private fun submitSearch() {
-        val from = dateMinus(DAYS_MAX)
-        val to = dateMinus(DAYS_MIN)
+        val from = winFrom
+        val to = winTo
         val js = """
             (function(){
               try{
@@ -142,6 +154,10 @@ class BatchAnalysisActivity : AppCompatActivity() {
         binding.webView.evaluateJavascript(js) { value ->
             val pairs = parsePairs(value)
             if (pairs.isEmpty()) {
+                if (++harvestTries < 4) {
+                    handler.postDelayed({ if (!harvested) harvest() }, 3000)
+                    return@evaluateJavascript
+                }
                 log("Aucune consultation trouvée sur la page de résultats.")
                 status("Aucune consultation trouvée. Vérifiez la recherche.")
                 binding.progress.visibility = android.view.View.GONE
@@ -149,7 +165,8 @@ class BatchAnalysisActivity : AppCompatActivity() {
             }
             harvested = true
             queue.clear()
-            queue.addAll(pairs.distinct().take(MAX))
+            // Mélange aléatoire → on n'analyse pas toujours les mêmes consultations.
+            queue.addAll(pairs.distinct().shuffled().take(MAX))
             log("${queue.size} consultation(s) à analyser.")
             phase = Phase.ANALYZE
             index = 0
@@ -185,6 +202,11 @@ class BatchAnalysisActivity : AppCompatActivity() {
                 val analysis = ReferenceCalculator.analyze(input)
                 uploadAndNext(analysis)
             }.onFailure { skipNext("calcul impossible") }
+            return
+        }
+        // Pas encore exploitable : la page n'est peut-être pas finie de charger → on réessaie.
+        if (++tries < EXTRACT_TRIES) {
+            handler.postDelayed({ extractCurrent() }, RETRY_MS)
         } else {
             skipNext("données incomplètes")
         }
