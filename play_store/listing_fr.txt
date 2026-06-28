@@ -1,0 +1,50 @@
+==================================================
+FICHE PLAY STORE — FRANÇAIS
+==================================================
+
+NOM DE L'APPLICATION (max 30 caractères) :
+B Marche – Prix Référence
+
+DESCRIPTION COURTE (max 80 caractères) :
+Analyse des appels d'offres et calcul du prix de référence (Maroc).
+
+--------------------------------------------------
+DESCRIPTION COMPLÈTE (max 4000 caractères) :
+--------------------------------------------------
+B Marche aide les entreprises marocaines à analyser les appels d'offres publics et à mieux positionner leur offre avant le dépôt.
+
+À partir d'un appel d'offres (lien marchespublics.gov.ma ou saisie manuelle), l'application calcule un PRIX DE RÉFÉRENCE indicatif, classe les offres et met en avant l'offre la mieux positionnée selon le calcul.
+
+FONCTIONNALITÉS
+• Calcul du prix de référence : (estimation + moyenne des offres retenues) / 2.
+• Classement clair des offres avec badges : Proche PR, Basse, Haute, Élevée.
+• Écart de chaque offre par rapport à l'estimation et au prix de référence (avec signe + / −).
+• Analyse des concurrents : profils (stratégique, agressif, stable…), historique par société, par domaine et par ville.
+• Intervalle de prix le plus fréquent d'une société par rapport à l'estimation (comportement répété, taux de répétition).
+• Analyse par région (12 régions du Maroc).
+• « Tester mon prix avant dépôt » : positionnement, écart, niveau de risque et conseils.
+• Historique local de toutes vos analyses, export PDF / Excel (CSV).
+• Interface bilingue Français / العربية avec affichage de droite à gauche.
+
+GRATUIT / PREMIUM
+• Période d'essai à l'inscription : accès complet.
+• Après l'essai : la nouvelle analyse et l'historique restent gratuits.
+• Premium : statistiques et outils d'analyse avancés.
+
+CONFIDENTIALITÉ
+Le calcul et l'historique restent sur votre téléphone. Seules les données des appels d'offres analysés alimentent les statistiques globales. Les données de simulation privées ne sont pas partagées.
+
+IMPORTANT
+Les résultats fournis par B Marche sont indicatifs. Ils aident à l'analyse de prix mais ne garantissent pas l'attribution d'un marché. L'utilisateur reste responsable de son offre, de ses coûts et de sa conformité administrative et technique. Application non officielle, non affiliée à marchespublics.gov.ma.
+
+CONTACT
+E-mail : bmaffaire@gmail.com
+Téléphone / WhatsApp : +212 7 00 02 97 36
+
+--------------------------------------------------
+COORDONNÉES & CLASSIFICATION
+--------------------------------------------------
+Catégorie suggérée : Entreprise (Business) — ou Productivité
+E-mail développeur : bmaffaire@gmail.com
+Site web (facultatif) : —
+Politique de confidentialité : héberger le fichier privacy_policy_fr.md et coller son URL (obligatoire).

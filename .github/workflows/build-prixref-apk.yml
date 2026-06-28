@@ -35,21 +35,24 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest --no-daemon --stacktrace
 
-      - name: Build signed release APK
+      - name: Build signed release APK + AAB (Play Store)
         # Les clés Supabase (URL + clé publique) viennent de gradle.properties.
-        run: ./gradlew assembleRelease --no-daemon --stacktrace -PappVersionCode=${{ github.run_number }}
+        run: ./gradlew assembleRelease bundleRelease --no-daemon --stacktrace -PappVersionCode=${{ github.run_number }}
 
-      - name: Stage APK
+      - name: Stage APK + AAB
         run: |
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk dist/BMarche-v1.0.1.apk
+          cp app/build/outputs/bundle/release/app-release.aab dist/BMarche-release.aab
           ls -la dist
 
-      - name: Upload APK artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: BMarche-apk
-          path: dist/BMarche-v1.0.1.apk
+          path: |
+            dist/BMarche-v1.0.1.apk
+            dist/BMarche-release.aab
           if-no-files-found: error
 
       - name: Publish APK to a Release (direct download link)
@@ -72,4 +75,8 @@ jobs:
 
             Application non officielle, non affiliée à marchespublics.gov.ma.
             Résultats indicatifs ; ne garantit pas l'attribution du marché.
-          files: dist/BMarche-v1.0.1.apk
+
+            **BMarche-release.aab** : fichier à téléverser sur Google Play Store.
+          files: |
+            dist/BMarche-v1.0.1.apk
+            dist/BMarche-release.aab
