@@ -57,7 +57,31 @@ object CompetitorEngine {
         val variabilite: Double,        // écart-type des écarts vs PR
         val profil: String,
         val fiabilite: String,
+        val behavior: Behavior,         // comportement de prix fréquent vs estimation
     )
+
+    /**
+     * Comportement de prix fréquent d'une société par rapport à l'ESTIMATION.
+     * Indicateur principal : l'intervalle (zone de %) où la société se positionne
+     * le plus souvent — plus utile que la simple moyenne.
+     */
+    data class Behavior(
+        val total: Int,                 // nb de participations avec estimation connue
+        val moyenne: Double,            // écart moyen vs estimation (indicateur secondaire)
+        val freqLow: Int?,              // borne basse de l'intervalle le plus fréquent (%)
+        val freqHigh: Int?,             // borne haute de l'intervalle le plus fréquent (%)
+        val freqCount: Int,             // nb de participations dans cet intervalle
+        val repetitionRate: Double,     // taux de répétition (%)
+        val usualLow: Int?,             // intervalle habituel observé (élargi)
+        val usualHigh: Int?,
+        val stabilite: String,
+        val lecture: String,
+    )
+
+    const val STAB_STABLE = "Comportement prévisible"
+    const val STAB_PARTIEL = "Tendance partielle"
+    const val STAB_IRREGULIER = "Comportement irrégulier"
+    const val STAB_INSUFFISANT = "Données insuffisantes"
 
     data class DomaineStat(val domaine: String, val categorie: String, val stats: Stats)
     data class VilleStat(val ville: String, val stats: Stats)
@@ -265,8 +289,60 @@ object CompetitorEngine {
             tauxTop3 = tauxTop3, tauxProchePR = tauxProchePR, tauxOffreBasse = tauxBasse, tauxOffreHaute = tauxHaute,
             montantMoyen = parts.map { it.montant }.avgOr0(), estimationMoyenne = parts.map { it.estimation }.avgOr0(),
             variabilite = variabilite, profil = profil, fiabilite = fiab,
+            behavior = behaviorVsEstimation(parts),
         )
     }
+
+    /**
+     * Calcule le comportement de prix fréquent vs estimation à partir d'une liste
+     * de participations : regroupe les écarts en intervalles de 5 points et
+     * détecte l'intervalle dominant (le plus répété).
+     */
+    fun behaviorVsEstimation(parts: List<Participation>): Behavior {
+        val ecarts = parts.filter { it.estimation > 0.0 }.map { it.ecartEstimPct }
+        val total = ecarts.size
+        val moyenne = ecarts.avgOr0()
+        if (total < 3) {
+            return Behavior(
+                total, moyenne, null, null, 0, 0.0, null, null, STAB_INSUFFISANT,
+                "Données insuffisantes pour détecter un pourcentage fréquent fiable.",
+            )
+        }
+        // Intervalles de 5 points : borne basse = floor(écart / 5) * 5.
+        val buckets = ecarts.groupingBy { kotlin.math.floor(it / 5.0).toInt() * 5 }.eachCount()
+        val modeLow = buckets.maxByOrNull { it.value }!!.key
+        val freqCount = buckets[modeLow]!!
+        val rate = freqCount.toDouble() / total * 100.0
+        // Intervalle habituel : on élargit aux voisins ayant au moins la moitié du mode.
+        val threshold = kotlin.math.max(1, freqCount / 2)
+        var lo = modeLow
+        while ((buckets[lo - 5] ?: 0) >= threshold) lo -= 5
+        var hi = modeLow
+        while ((buckets[hi + 5] ?: 0) >= threshold) hi += 5
+        val stab = when {
+            rate > 60.0 -> STAB_STABLE
+            rate >= 40.0 -> STAB_PARTIEL
+            else -> STAB_IRREGULIER
+        }
+        val lecture = when {
+            rate > 60.0 -> "Cette société répète souvent le même positionnement par rapport à l'estimation. Son comportement semble relativement prévisible."
+            rate >= 40.0 -> "Cette société présente une tendance partielle, mais son comportement doit être interprété avec prudence."
+            else -> "Cette société ne présente pas encore un intervalle de prix clairement dominant. Son comportement semble irrégulier ou les données sont insuffisantes."
+        }
+        return Behavior(total, moyenne, modeLow, modeLow + 5, freqCount, rate, lo, hi + 5, stab, lecture)
+    }
+
+    /** Comportement fréquent vs estimation pour un domaine (et catégorie) donné. */
+    fun behaviorForDomaine(competitors: List<Competitor>, categorie: String, domaine: String): Behavior =
+        behaviorVsEstimation(
+            competitors.flatMap { it.participations }.filter {
+                it.categorie.equals(categorie, ignoreCase = true) && (domaine == TOUS || it.domaine == domaine)
+            }
+        )
+
+    /** Libellé d'un intervalle, ex. « -20% à -15% ». */
+    fun intervalLabel(low: Int?, high: Int?): String =
+        if (low == null || high == null) "—" else "${low}% à ${high}%"
 
     private fun pickProfil(
         nb: Int, ecartPrMoyen: Double, tauxProchePR: Double, classementMoyen: Double?,

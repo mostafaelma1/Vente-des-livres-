@@ -89,6 +89,11 @@ class CompetitorsActivity : AppCompatActivity() {
 
             val domPrincipal = c.domaines.firstOrNull()?.domaine ?: "—"
             line(card, "Domaine principal : $domPrincipal", true)
+            val b = c.stats.behavior
+            val freq = if (b.total >= 3)
+                "Intervalle fréquent vs estimation : ${CompetitorEngine.intervalLabel(b.freqLow, b.freqHigh)} (${"%.0f".format(b.repetitionRate)} %)"
+            else "Intervalle fréquent : données insuffisantes"
+            line(card, freq, false)
             line(card, "Écart moyen vs prix de réf. : ${Format.signedPercent(c.stats.ecartPrMoyen)}", false)
             val cm = c.stats.classementMoyen?.let { "%.1f".format(it) } ?: "—"
             line(card, "Classement moyen : $cm · Top 3 : ${"%.0f".format(c.stats.tauxTop3)} %", false)

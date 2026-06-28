@@ -128,18 +128,27 @@ class SimulationActivity : AppCompatActivity() {
         val cat = categories[binding.spCategorie.selectedItemPosition.coerceIn(0, categories.size - 1)]
         val dom = binding.spDomaine.selectedItem?.toString() ?: CompetitorEngine.TOUS
         val landscape = CompetitorEngine.landscape(competitors, cat, dom)
+        val domBehavior = CompetitorEngine.behaviorForDomaine(competitors, cat, dom)
 
-        renderLandscape(landscape)
+        renderLandscape(landscape, domBehavior)
         val avgComp = landscape.map { it.stats.ecartPrMoyen }.takeIf { it.isNotEmpty() }?.average()
         renderAdvice(ecartRef, ecartEstim, landscape, avgComp)
-        renderAlerts(ecartRef, ecartEstim, landscape, avgComp)
+        renderAlerts(ecartRef, ecartEstim, landscape, avgComp, domBehavior)
 
         binding.cardResult.visibility = View.VISIBLE
     }
 
-    private fun renderLandscape(landscape: List<CompetitorEngine.DomCompetitor>) {
+    private fun renderLandscape(landscape: List<CompetitorEngine.DomCompetitor>, domBehavior: CompetitorEngine.Behavior) {
         binding.landscapeContainer.removeAllViews()
         binding.tvLandscapeTitle.visibility = View.VISIBLE
+
+        // Zone de prix fréquente du domaine (indicateur principal).
+        if (domBehavior.total >= 3) {
+            binding.landscapeContainer.addView(plain(
+                "Zone de prix fréquente du domaine : ${CompetitorEngine.intervalLabel(domBehavior.freqLow, domBehavior.freqHigh)} vs estimation " +
+                    "(répétition ${"%.0f".format(domBehavior.repetitionRate)} %).", R.color.brand_orange_dark, bold = true))
+        }
+
         if (landscape.isEmpty()) {
             binding.landscapeContainer.addView(plain(
                 "Aucun concurrent enregistré dans ce domaine pour le moment.", R.color.text_secondary))
@@ -148,8 +157,12 @@ class SimulationActivity : AppCompatActivity() {
         for (c in landscape.take(12)) {
             val s = c.stats
             binding.landscapeContainer.addView(plain("• ${c.nom}", R.color.text_primary, bold = true))
+            val freq = if (s.behavior.total >= 3)
+                "intervalle fréquent ${CompetitorEngine.intervalLabel(s.behavior.freqLow, s.behavior.freqHigh)} (${"%.0f".format(s.behavior.repetitionRate)} %)"
+            else "intervalle fréquent : données insuffisantes"
+            binding.landscapeContainer.addView(plain("   $freq", R.color.brand_orange_dark))
             binding.landscapeContainer.addView(plain(
-                "   écart moyen vs réf. : ${Format.signedPercent(s.ecartPrMoyen)} · ${s.profil} · ${s.fiabilite} (${s.nb} marché(s))",
+                "   ${s.profil} · ${s.fiabilite} (${s.nb} marché(s))",
                 R.color.text_secondary))
         }
     }
@@ -169,10 +182,28 @@ class SimulationActivity : AppCompatActivity() {
         binding.tvAdvice.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, tintRes))
     }
 
-    private fun renderAlerts(ecartRef: Double, ecartEstim: Double, landscape: List<CompetitorEngine.DomCompetitor>, avgComp: Double?) {
+    private fun renderAlerts(
+        ecartRef: Double, ecartEstim: Double, landscape: List<CompetitorEngine.DomCompetitor>,
+        avgComp: Double?, domBehavior: CompetitorEngine.Behavior,
+    ) {
         binding.alertsContainer.removeAllViews()
         binding.tvAlertsTitle.visibility = View.VISIBLE
         val alerts = mutableListOf<Pair<String, Int>>()
+
+        // Comparaison de mon offre avec la zone de prix fréquente du domaine.
+        val ulo = domBehavior.usualLow
+        val uhi = domBehavior.usualHigh
+        if (domBehavior.total >= 3 && ulo != null && uhi != null) {
+            val zone = CompetitorEngine.intervalLabel(ulo, uhi)
+            when {
+                ecartEstim in ulo.toDouble()..uhi.toDouble() ->
+                    alerts += "Votre écart vs estimation (${Format.signedPercent(ecartEstim)}) se situe dans la zone habituelle du domaine ($zone)." to R.color.positive
+                ecartEstim > uhi.toDouble() ->
+                    alerts += "Votre offre est AU-DESSUS de la zone habituelle du domaine ($zone). Vous risquez d'être moins compétitif sur le prix." to R.color.warning
+                else ->
+                    alerts += "Votre offre est EN DESSOUS de la zone habituelle du domaine ($zone). Vérifiez votre marge et le risque d'offre anormalement basse." to R.color.warning
+            }
+        }
 
         if (ecartRef > 10 || ecartEstim > 10)
             alerts += "Votre offre semble élevée par rapport au prix de référence et à l'estimation." to R.color.danger

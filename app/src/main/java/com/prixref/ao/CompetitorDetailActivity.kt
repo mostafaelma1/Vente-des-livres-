@@ -65,6 +65,9 @@ class CompetitorDetailActivity : AppCompatActivity() {
         head.addView(plain(CompetitorEngine.reliabilityNote(s), R.color.text_secondary))
         commit(head)
 
+        // Comportement par rapport à l'estimation (INDICATEUR PRINCIPAL).
+        commit(behaviorCard(s.behavior))
+
         // Général
         val gen = card()
         gen.addView(boldLine("Général", R.color.brand_orange_dark, 15f))
@@ -98,6 +101,7 @@ class CompetitorDetailActivity : AppCompatActivity() {
             for (dom in c.domaines) {
                 d.addView(boldLine("▸ ${dom.categorie} · ${dom.domaine}", R.color.text_primary, 13f))
                 d.addView(plain(statLine(dom.stats), R.color.text_secondary))
+                d.addView(plain(behaviorLine(dom.stats.behavior), R.color.brand_orange_dark))
                 d.addView(plain("${dom.stats.profil} · ${dom.stats.fiabilite}", R.color.text_secondary))
             }
             commit(d)
@@ -115,6 +119,7 @@ class CompetitorDetailActivity : AppCompatActivity() {
                 }
                 v.addView(boldLine("▸ ${ville.ville}", R.color.text_primary, 13f))
                 v.addView(plain(statLine(ville.stats) + " · $force", R.color.text_secondary))
+                v.addView(plain(behaviorLine(ville.stats.behavior), R.color.brand_orange_dark))
             }
             commit(v)
         }
@@ -141,6 +146,29 @@ class CompetitorDetailActivity : AppCompatActivity() {
             setPadding(dp(4), dp(14), dp(4), dp(8)); textSize = 11f
         })
     }
+
+    /** Carte « Comportement par rapport à l'estimation » (indicateur principal). */
+    private fun behaviorCard(b: CompetitorEngine.Behavior): LinearLayout {
+        val card = card()
+        card.addView(boldLine("Comportement par rapport à l'estimation", R.color.primary, 15f))
+        if (b.total < 3) {
+            card.addView(plain(b.lecture, R.color.text_secondary))
+            return card
+        }
+        card.addView(kv("Intervalle le plus fréquent", CompetitorEngine.intervalLabel(b.freqLow, b.freqHigh)))
+        card.addView(kv("Répétition", "${b.freqCount}/${b.total} analyses"))
+        card.addView(kv("Taux de répétition", "${"%.1f".format(b.repetitionRate)} %"))
+        card.addView(kv("Intervalle habituel", CompetitorEngine.intervalLabel(b.usualLow, b.usualHigh)))
+        card.addView(kv("Stabilité", b.stabilite))
+        card.addView(kv("Écart moyen vs estimation", Format.signedPercent(b.moyenne)))
+        card.addView(plain("Lecture : ${b.lecture}", R.color.text_secondary))
+        return card
+    }
+
+    /** Ligne courte de comportement fréquent (sections par domaine / par ville). */
+    private fun behaviorLine(b: CompetitorEngine.Behavior): String =
+        if (b.total < 3) "Intervalle fréquent : données insuffisantes"
+        else "Intervalle fréquent : ${CompetitorEngine.intervalLabel(b.freqLow, b.freqHigh)} · répétition ${"%.0f".format(b.repetitionRate)} %"
 
     private fun statLine(s: Stats): String {
         val cm = s.classementMoyen?.let { "%.1f".format(it) } ?: "—"
