@@ -12,7 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Résultat de l'analyse"
+        app:title="@string/result_title"
         app:titleTextColor="@color/on_primary"
         app:navigationIconTint="@color/on_primary" />
 
@@ -52,7 +52,7 @@
                         <LinearLayout android:layout_width="0dp" android:layout_weight="1"
                             android:layout_height="wrap_content" android:orientation="vertical">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Estimation" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                                android:text="@string/result_estimation_label" android:textColor="@color/text_secondary" android:textSize="12sp" />
                             <TextView android:id="@+id/tvEstimation" android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" android:textColor="@color/text_primary"
                                 android:textSize="15sp" android:textStyle="bold" />
@@ -60,7 +60,7 @@
                         <LinearLayout android:layout_width="0dp" android:layout_weight="1"
                             android:layout_height="wrap_content" android:orientation="vertical">
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                                android:text="Moyenne retenues" android:textColor="@color/text_secondary" android:textSize="12sp" />
+                                android:text="@string/result_avg_label" android:textColor="@color/text_secondary" android:textSize="12sp" />
                             <TextView android:id="@+id/tvAverage" android:layout_width="wrap_content"
                                 android:layout_height="wrap_content" android:textColor="@color/text_primary"
                                 android:textSize="15sp" android:textStyle="bold" />
@@ -71,7 +71,7 @@
                         android:layout_marginTop="14dp" android:background="@color/primary_light"
                         android:padding="14dp" android:orientation="vertical">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="PRIX DE RÉFÉRENCE" android:textColor="@color/primary_dark"
+                            android:text="@string/result_refprice_label" android:textColor="@color/primary_dark"
                             android:textSize="12sp" android:textStyle="bold" />
                         <TextView android:id="@+id/tvReference" android:layout_width="wrap_content"
                             android:layout_height="wrap_content" android:textColor="@color/primary_dark"
@@ -82,7 +82,7 @@
                         android:layout_marginTop="10dp" android:background="@color/positive_tint"
                         android:padding="14dp" android:orientation="vertical">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="MIEUX POSITIONNÉE (SELON LE CALCUL)" android:textColor="@color/positive"
+                            android:text="@string/result_best_label" android:textColor="@color/positive"
                             android:textSize="12sp" android:textStyle="bold" />
                         <TextView android:id="@+id/tvWinner" android:layout_width="wrap_content"
                             android:layout_height="wrap_content" android:textColor="@color/positive"
@@ -105,7 +105,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView style="@style/SectionTitle" android:layout_marginTop="18dp"
-                android:text="Classement des offres" />
+                android:text="@string/result_ranking_title" />
 
             <LinearLayout
                 android:id="@+id/rankingContainer"

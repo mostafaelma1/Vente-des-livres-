@@ -99,4 +99,57 @@
     <string name="acc_err_name">أدخل اسمك أو شركتك.</string>
     <string name="acc_err_ville">أدخل مدينتك.</string>
     <string name="acc_err_login">تعذّر الاتصال. أعد المحاولة.</string>
+
+    <!-- تحليل جديد -->
+    <string name="url_title">تحليل جديد</string>
+    <string name="url_intro">تحليل محلي تلقائي. بدون خادم. الصق الرابط وابدأ: التطبيق يتكفّل بكل شيء.</string>
+    <string name="url_hint">رابط marchespublics.gov.ma</string>
+    <string name="url_analyze">تحليل</string>
+    <string name="url_loading">جارٍ التحليل…</string>
+    <string name="url_loading_sec">جارٍ التحليل… %1$dث</string>
+    <string name="url_finalizing">إنهاء التحليل…</string>
+    <string name="url_continue_manual">المتابعة يدوياً</string>
+    <string name="url_choose_columns">اختيار الأعمدة</string>
+    <string name="url_retry">إعادة المحاولة</string>
+    <string name="url_export_debug">تصدير البيانات (تتبّع)</string>
+    <string name="url_invalid">رابط غير صالح. الصق رابط متابعة استشارة صحيحاً.</string>
+    <string name="url_fail_incomplete">التحليل التلقائي غير مكتمل. يمكنك إكمال المعلومات يدوياً في أقل من دقيقة.</string>
+    <string name="url_table_label">جدول %1$d — %2$d سطر، %3$d عمود</string>
+    <string name="url_column_n">العمود %1$d</string>
+    <string name="url_none">(لا شيء)</string>
+    <string name="url_no_valid_cols">لا يوجد عرض صالح بهذه الأعمدة. أعد المحاولة أو أكمل يدوياً.</string>
+    <string name="btn_validate">تأكيد</string>
+
+    <!-- النتيجة -->
+    <string name="result_title">نتيجة التحليل</string>
+    <string name="result_estimation_label">التقدير</string>
+    <string name="result_avg_label">متوسط العروض المقبولة</string>
+    <string name="result_refprice_label">السعر المرجعي</string>
+    <string name="result_best_label">الأفضل موقعاً (حسب الحساب)</string>
+    <string name="result_ranking_title">ترتيب العروض</string>
+    <string name="result_ref_prefix">المرجع: %1$s</string>
+    <string name="result_objet_empty">الموضوع غير محدد</string>
+    <string name="result_maitre_empty">صاحب المشروع غير محدد</string>
+    <string name="result_closest">أقرب عرض: %1$s (%2$s، الفارق %3$s)</string>
+    <string name="result_counts">عروض مقبولة: %1$d • مستبعدة: %2$d</string>
+    <string name="result_conseil">نصيحة: العروض القريبة من السعر المرجعي تكون عادةً الأفضل موقعاً. تحقّق دائماً من هامشك وتكاليفك الحقيقية والمطابقة الإدارية قبل الإيداع. النتيجة إرشادية — لا تضمن الحصول على الصفقة.</string>
+    <string name="badge_close">قريب من المرجعي</string>
+    <string name="badge_low">منخفض</string>
+    <string name="badge_high">مرتفع</string>
+    <string name="badge_veryhigh">مرتفع جداً</string>
+    <string name="result_gap_estim">الفارق مقابل التقدير: %1$s (%2$s)</string>
+    <string name="risk_low">خطر عرض منخفض بشكل غير طبيعي</string>
+    <string name="risk_high">خطر عرض مرتفع جداً</string>
+    <string name="risk_good">وضعية مالية جيدة</string>
+    <string name="result_pdf_err">خطأ PDF: %1$s</string>
+    <string name="result_csv_err">خطأ التصدير: %1$s</string>
+    <string name="result_saved">تم حفظ التحليل تلقائياً في السجل.</string>
+
+    <!-- السجل -->
+    <string name="hist_search_hint">بحث (المرجع أو الموضوع)</string>
+    <string name="hist_empty">لا توجد تحليلات محفوظة.</string>
+    <string name="hist_delete_title">حذف هذا التحليل؟</string>
+    <string name="hist_no_ref">تحليل بدون مرجع</string>
+    <string name="hist_item_no_ref">(بدون مرجع)</string>
+    <string name="hist_meta">السعر المرجعي: %1$s  •  %2$s</string>
 </resources>

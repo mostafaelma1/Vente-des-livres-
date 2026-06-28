@@ -26,7 +26,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primary"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Nouvelle analyse"
+            app:title="@string/url_title"
             app:titleTextColor="@color/on_primary"
             app:navigationIconTint="@color/on_primary" />
 
@@ -39,7 +39,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Analyse locale automatique. Aucun serveur. Collez le lien et lancez : l'app s'occupe de tout."
+                android:text="@string/url_intro"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
 
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="URL marchespublics.gov.ma">
+                android:hint="@string/url_hint">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUrl"
                     android:layout_width="match_parent"
@@ -61,7 +61,7 @@
                 android:id="@+id/btnLoad"
                 style="@style/PrimaryButton"
                 android:layout_marginTop="14dp"
-                android:text="Analyser" />
+                android:text="@string/url_analyze" />
         </LinearLayout>
     </LinearLayout>
 
@@ -113,27 +113,27 @@
             style="@style/PrimaryButton"
             android:layout_marginTop="22dp"
             android:visibility="gone"
-            android:text="Continuer en mode manuel" />
+            android:text="@string/url_continue_manual" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnColumns"
             style="@style/OutlineButton"
             android:layout_marginTop="10dp"
             android:visibility="gone"
-            android:text="Choisir les colonnes" />
+            android:text="@string/url_choose_columns" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRetry"
             style="@style/OutlineButton"
             android:layout_marginTop="10dp"
             android:visibility="gone"
-            android:text="Réessayer" />
+            android:text="@string/url_retry" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExport"
             style="@style/OutlineButton"
             android:layout_marginTop="10dp"
             android:visibility="gone"
-            android:text="Exporter les données (debug)" />
+            android:text="@string/url_export_debug" />
     </LinearLayout>
 </FrameLayout>

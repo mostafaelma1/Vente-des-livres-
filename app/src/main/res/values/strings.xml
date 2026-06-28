@@ -99,4 +99,57 @@
     <string name="acc_err_name">Entrez votre nom ou société.</string>
     <string name="acc_err_ville">Entrez votre ville.</string>
     <string name="acc_err_login">Connexion impossible. Réessayez.</string>
+
+    <!-- Nouvelle analyse -->
+    <string name="url_title">Nouvelle analyse</string>
+    <string name="url_intro">Analyse locale automatique. Aucun serveur. Collez le lien et lancez : l\'app s\'occupe de tout.</string>
+    <string name="url_hint">URL marchespublics.gov.ma</string>
+    <string name="url_analyze">Analyser</string>
+    <string name="url_loading">Analyse en cours…</string>
+    <string name="url_loading_sec">Analyse en cours… %1$ds</string>
+    <string name="url_finalizing">Finalisation de l\'analyse…</string>
+    <string name="url_continue_manual">Continuer en mode manuel</string>
+    <string name="url_choose_columns">Choisir les colonnes</string>
+    <string name="url_retry">Réessayer</string>
+    <string name="url_export_debug">Exporter les données (debug)</string>
+    <string name="url_invalid">Lien invalide. Collez un lien de suivi de consultation valide.</string>
+    <string name="url_fail_incomplete">Analyse automatique incomplète. Vous pouvez compléter les informations manuellement en moins d\'une minute.</string>
+    <string name="url_table_label">Tableau %1$d — %2$d ligne(s), %3$d colonne(s)</string>
+    <string name="url_column_n">Colonne %1$d</string>
+    <string name="url_none">(aucune)</string>
+    <string name="url_no_valid_cols">Aucune offre valide avec ces colonnes. Réessayez ou complétez en mode manuel.</string>
+    <string name="btn_validate">Valider</string>
+
+    <!-- Résultat -->
+    <string name="result_title">Résultat de l\'analyse</string>
+    <string name="result_estimation_label">Estimation</string>
+    <string name="result_avg_label">Moyenne retenues</string>
+    <string name="result_refprice_label">PRIX DE RÉFÉRENCE</string>
+    <string name="result_best_label">MIEUX POSITIONNÉE (SELON LE CALCUL)</string>
+    <string name="result_ranking_title">Classement des offres</string>
+    <string name="result_ref_prefix">Réf. : %1$s</string>
+    <string name="result_objet_empty">Objet non renseigné</string>
+    <string name="result_maitre_empty">Maître d\'ouvrage non renseigné</string>
+    <string name="result_closest">Offre la plus proche : %1$s (%2$s, écart %3$s)</string>
+    <string name="result_counts">Offres retenues : %1$d • écartées : %2$d</string>
+    <string name="result_conseil">Conseil : les offres proches du prix de référence sont généralement les mieux positionnées. Vérifiez toujours votre marge, vos coûts réels et la conformité administrative avant le dépôt. Résultat indicatif — ne garantit pas l\'attribution du marché.</string>
+    <string name="badge_close">Proche PR</string>
+    <string name="badge_low">Basse</string>
+    <string name="badge_high">Haute</string>
+    <string name="badge_veryhigh">Élevée</string>
+    <string name="result_gap_estim">Écart vs estimation : %1$s (%2$s)</string>
+    <string name="risk_low">Risque d\'offre anormalement basse</string>
+    <string name="risk_high">Risque d\'offre excessive</string>
+    <string name="risk_good">Bonne position financière</string>
+    <string name="result_pdf_err">Erreur PDF : %1$s</string>
+    <string name="result_csv_err">Erreur export : %1$s</string>
+    <string name="result_saved">Analyse enregistrée automatiquement dans l\'historique.</string>
+
+    <!-- Historique -->
+    <string name="hist_search_hint">Rechercher (référence ou objet)</string>
+    <string name="hist_empty">Aucune analyse enregistrée.</string>
+    <string name="hist_delete_title">Supprimer cette analyse ?</string>
+    <string name="hist_no_ref">Analyse sans référence</string>
+    <string name="hist_item_no_ref">(sans référence)</string>
+    <string name="hist_meta">Prix réf. : %1$s  •  %2$s</string>
 </resources>

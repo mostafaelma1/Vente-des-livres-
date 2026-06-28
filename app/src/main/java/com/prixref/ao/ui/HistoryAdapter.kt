@@ -3,6 +3,7 @@ package com.prixref.ao.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.prixref.ao.R
 import com.prixref.ao.data.AnalysisEntity
 import com.prixref.ao.databinding.ItemHistoryBinding
 import com.prixref.ao.util.Format
@@ -33,10 +34,12 @@ class HistoryAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = items[position]
-        holder.binding.tvRef.text = item.reference.ifBlank { "(sans référence)" }
-        holder.binding.tvObjet.text = item.objet.ifBlank { "Objet non renseigné" }
-        holder.binding.tvMeta.text =
-            "Prix réf. : ${Format.money(item.referencePrice)}  •  ${item.probableWinner.ifBlank { "—" }}"
+        val ctx = holder.binding.root.context
+        holder.binding.tvRef.text = item.reference.ifBlank { ctx.getString(R.string.hist_item_no_ref) }
+        holder.binding.tvObjet.text = item.objet.ifBlank { ctx.getString(R.string.result_objet_empty) }
+        holder.binding.tvMeta.text = ctx.getString(
+            R.string.hist_meta, Format.money(item.referencePrice), item.probableWinner.ifBlank { "—" },
+        )
         holder.binding.tvDate.text = Format.dateTime(item.date)
         holder.binding.root.setOnClickListener { onClick(item) }
         holder.binding.btnDelete.setOnClickListener { onDelete(item) }

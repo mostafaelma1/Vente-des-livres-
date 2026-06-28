@@ -12,7 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Historique des analyses"
+        app:title="@string/home_history"
         app:titleTextColor="@color/on_primary"
         app:navigationIconTint="@color/on_primary" />
 
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:hint="Rechercher (référence ou objet)">
+        android:hint="@string/hist_search_hint">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:gravity="center"
-        android:text="Aucune analyse enregistrée."
+        android:text="@string/hist_empty"
         android:textColor="@color/text_secondary"
         android:visibility="gone" />
 

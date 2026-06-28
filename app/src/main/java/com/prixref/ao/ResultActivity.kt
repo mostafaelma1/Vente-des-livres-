@@ -75,9 +75,9 @@ class ResultActivity : AppCompatActivity() {
 
     private fun render() {
         val input = result.input
-        binding.tvHeaderRef.text = "Réf. : " + input.reference.ifBlank { "—" }
-        binding.tvHeaderObjet.text = input.objet.ifBlank { "Objet non renseigné" }
-        binding.tvHeaderMaitre.text = input.maitreOuvrage.ifBlank { "Maître d'ouvrage non renseigné" }
+        binding.tvHeaderRef.text = getString(R.string.result_ref_prefix, input.reference.ifBlank { "—" })
+        binding.tvHeaderObjet.text = input.objet.ifBlank { getString(R.string.result_objet_empty) }
+        binding.tvHeaderMaitre.text = input.maitreOuvrage.ifBlank { getString(R.string.result_maitre_empty) }
         binding.tvEstimation.text = Format.money(input.estimation)
         binding.tvAverage.text = Format.money(result.averageRetained)
         binding.tvReference.text = Format.money(result.referencePrice)
@@ -85,14 +85,14 @@ class ResultActivity : AppCompatActivity() {
         // Offre la plus proche du prix de référence (plus petit écart absolu).
         val closest = result.ranking.minByOrNull { it.gap }
         binding.tvClosest.text = closest?.let {
-            "Offre la plus proche : ${it.name} (${Format.money(it.amount)}, écart ${Format.signedPercent(signedPct(it.amount, result.referencePrice))})"
+            getString(
+                R.string.result_closest, it.name, Format.money(it.amount),
+                Format.signedPercent(signedPct(it.amount, result.referencePrice)),
+            )
         }.orEmpty()
         binding.tvCounts.text =
-            "Offres retenues : ${result.retainedCount} • écartées : ${result.excludedCount}"
-        binding.tvConseil.text =
-            "Conseil : les offres proches du prix de référence sont généralement les mieux positionnées. " +
-                "Vérifiez toujours votre marge, vos coûts réels et la conformité administrative avant le dépôt. " +
-                "Résultat indicatif — ne garantit pas l'attribution du marché."
+            getString(R.string.result_counts, result.retainedCount, result.excludedCount)
+        binding.tvConseil.text = getString(R.string.result_conseil)
 
         binding.rankingContainer.removeAllViews()
         for (offer in result.ranking) {
@@ -111,21 +111,29 @@ class ResultActivity : AppCompatActivity() {
         val est = result.input.estimation
         row.tvGap.text = Format.signedMoney(offer.amount - ref)
         row.tvGapPercent.text = Format.signedPercent(signedPct(offer.amount, ref))
-        row.tvGapEstimation.text =
-            "Écart vs estimation : ${Format.signedMoney(offer.amount - est)} (${Format.signedPercent(signedPct(offer.amount, est))})"
+        row.tvGapEstimation.text = getString(
+            R.string.result_gap_estim,
+            Format.signedMoney(offer.amount - est),
+            Format.signedPercent(signedPct(offer.amount, est)),
+        )
         // Badge de positionnement vs prix de référence : Proche PR / Basse / Haute / Élevée.
         val pr = signedPct(offer.amount, ref)
         val (badge, badgeColor) = when {
-            pr in -3.0..3.0 -> "Proche PR" to R.color.positive
-            pr < -3.0 -> "Basse" to R.color.action
-            pr <= 10.0 -> "Haute" to R.color.warning
-            else -> "Élevée" to R.color.danger
+            pr in -3.0..3.0 -> getString(R.string.badge_close) to R.color.positive
+            pr < -3.0 -> getString(R.string.badge_low) to R.color.action
+            pr <= 10.0 -> getString(R.string.badge_high) to R.color.warning
+            else -> getString(R.string.badge_veryhigh) to R.color.danger
         }
         row.tvObservation.text = badge
         row.tvObservation.backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(this, badgeColor))
 
-        row.tvRisk.text = offer.risk
+        row.tvRisk.text = when {
+            offer.risk.startsWith("Risque d'offre anormalement basse") -> getString(R.string.risk_low)
+            offer.risk.startsWith("Risque d'offre excessive") -> getString(R.string.risk_high)
+            offer.risk.startsWith("Bonne") -> getString(R.string.risk_good)
+            else -> offer.risk
+        }
         val riskColor = when {
             offer.risk.startsWith("Risque") -> R.color.danger
             offer.risk.startsWith("Bonne") -> R.color.positive
@@ -139,7 +147,7 @@ class ResultActivity : AppCompatActivity() {
             val file = PdfReportGenerator.generate(this, result)
             Sharing.shareFile(this, file, "application/pdf", "Rapport d'analyse PrixRef AO")
         } catch (e: Exception) {
-            toast("Erreur PDF : ${e.message}")
+            toast(getString(R.string.result_pdf_err, e.message ?: ""))
         }
     }
 
@@ -148,7 +156,7 @@ class ResultActivity : AppCompatActivity() {
             val file = CsvExporter.export(this, result)
             Sharing.shareFile(this, file, "text/csv", "Analyse PrixRef AO (Excel)")
         } catch (e: Exception) {
-            toast("Erreur export : ${e.message}")
+            toast(getString(R.string.result_csv_err, e.message ?: ""))
         }
     }
 
@@ -171,7 +179,7 @@ class ResultActivity : AppCompatActivity() {
             }
             if (!isDuplicate) {
                 withContext(Dispatchers.IO) { dao.insert(entity) }
-                toast("Analyse enregistrée automatiquement dans l'historique.")
+                toast(getString(R.string.result_saved))
             }
         }
     }

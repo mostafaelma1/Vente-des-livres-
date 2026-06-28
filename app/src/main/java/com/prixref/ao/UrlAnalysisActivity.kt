@@ -96,7 +96,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
         val url = binding.etUrl.text?.toString().orEmpty().trim()
         val parsed = parseMarchesPublicsUrl(url)
         if (parsed == null) {
-            binding.etUrl.error = "Lien invalide. Collez un lien de suivi de consultation valide."
+            binding.etUrl.error = getString(R.string.url_invalid)
             return
         }
         fallbackReference = parsed.refConsultation
@@ -113,7 +113,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
         binding.loadingPanel.visibility = View.VISIBLE
         hideFallbackButtons()
         binding.progressBar.visibility = View.VISIBLE
-        binding.tvMessage.text = "Analyse en cours…"
+        binding.tvMessage.text = getString(R.string.url_loading)
         startPulse()
         startCountdown()
 
@@ -193,7 +193,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
 
     private fun failLocal() {
         showFallback(
-            "Analyse automatique incomplète. Vous pouvez compléter les informations manuellement en moins d'une minute.",
+            getString(R.string.url_fail_incomplete),
             lastPage?.tables?.isNotEmpty() == true,
         )
     }
@@ -205,7 +205,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
         binding.progressBar.visibility = View.GONE
         binding.tvMessage.text = message
         binding.btnContinue.visibility = View.VISIBLE
-        binding.btnContinue.text = "Continuer en mode manuel"
+        binding.btnContinue.text = getString(R.string.url_continue_manual)
         binding.btnColumns.visibility = if (hasTables) View.VISIBLE else View.GONE
         binding.btnRetry.visibility = View.VISIBLE
         binding.btnExport.visibility = if (lastPage != null) View.VISIBLE else View.GONE
@@ -252,13 +252,13 @@ class UrlAnalysisActivity : AppCompatActivity() {
                 val elapsed = ESTIMATED_MS - msLeft
                 val pct = (elapsed * 95 / ESTIMATED_MS).toInt().coerceIn(0, 95)
                 binding.progressBar.setProgressCompat(pct, true)
-                val sec = (msLeft / 1000) + 1
-                binding.tvMessage.text = "Analyse en cours… ${sec}s"
+                val sec = ((msLeft / 1000) + 1).toInt()
+                binding.tvMessage.text = getString(R.string.url_loading_sec, sec)
             }
 
             override fun onFinish() {
                 binding.progressBar.setProgressCompat(96, true)
-                binding.tvMessage.text = "Finalisation de l'analyse…"
+                binding.tvMessage.text = getString(R.string.url_finalizing)
             }
         }.start()
     }
@@ -299,13 +299,13 @@ class UrlAnalysisActivity : AppCompatActivity() {
 
         val dlg = DialogColumnPickerBinding.inflate(layoutInflater)
         val tableLabels = page.tables.mapIndexed { i, t ->
-            "Tableau ${i + 1} — ${t.rows.size} ligne(s), ${t.columnCount} colonne(s)"
+            getString(R.string.url_table_label, i + 1, t.rows.size, t.columnCount)
         }
         dlg.spTable.adapter = simpleAdapter(tableLabels)
 
         fun colLabels(table: ExtractedTable): List<String> =
             (0 until table.columnCount).map { c ->
-                table.headers.getOrNull(c)?.takeIf { it.isNotBlank() } ?: "Colonne ${c + 1}"
+                table.headers.getOrNull(c)?.takeIf { it.isNotBlank() } ?: getString(R.string.url_column_n, c + 1)
             }
 
         fun populateColumns(tableIdx: Int) {
@@ -313,8 +313,8 @@ class UrlAnalysisActivity : AppCompatActivity() {
             val cols = colLabels(table)
             dlg.spSociete.adapter = simpleAdapter(cols)
             dlg.spMontant.adapter = simpleAdapter(cols)
-            dlg.spStatut.adapter = simpleAdapter(listOf("(aucune)") + cols)
-            dlg.spLot.adapter = simpleAdapter(listOf("(aucune)") + cols)
+            dlg.spStatut.adapter = simpleAdapter(listOf(getString(R.string.url_none)) + cols)
+            dlg.spLot.adapter = simpleAdapter(listOf(getString(R.string.url_none)) + cols)
             val maxIdx = (cols.size - 1).coerceAtLeast(0)
             if (tableIdx == result.guessedTableIndex && cols.isNotEmpty()) {
                 dlg.spSociete.setSelection(result.guessedNameCol.coerceIn(0, maxIdx))
@@ -334,9 +334,9 @@ class UrlAnalysisActivity : AppCompatActivity() {
         populateColumns(initialTable)
 
         AlertDialog.Builder(this)
-            .setTitle("Choisir les colonnes")
+            .setTitle(getString(R.string.url_choose_columns))
             .setView(dlg.root)
-            .setPositiveButton("Valider") { _, _ ->
+            .setPositiveButton(getString(R.string.btn_validate)) { _, _ ->
                 applyColumnChoice(
                     page.tables[dlg.spTable.selectedItemPosition],
                     nameCol = dlg.spSociete.selectedItemPosition,
@@ -345,7 +345,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
                     lotCol = dlg.spLot.selectedItemPosition - 1,
                 )
             }
-            .setNegativeButton("Annuler", null)
+            .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
 
@@ -353,8 +353,7 @@ class UrlAnalysisActivity : AppCompatActivity() {
         val raw = LocalAnalyzer.mapColumns(table, nameCol, amountCol, statusCol)
         val competitors = if (statusCol < 0) raw.map { it.copy(retained = true) } else raw
         if (competitors.isEmpty()) {
-            binding.tvMessage.text =
-                "Aucune offre valide avec ces colonnes. Réessayez ou complétez en mode manuel."
+            binding.tvMessage.text = getString(R.string.url_no_valid_cols)
             return
         }
         val lotNumero = if (lotCol >= 0) table.rows.firstOrNull()?.getOrNull(lotCol)?.trim().orEmpty().ifBlank { "1" } else "1"

@@ -59,10 +59,10 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun confirmDelete(item: AnalysisEntity) {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Supprimer cette analyse ?")
-            .setMessage(item.reference.ifBlank { "Analyse sans référence" })
-            .setNegativeButton("Annuler", null)
-            .setPositiveButton("Supprimer") { _, _ ->
+            .setTitle(getString(R.string.hist_delete_title))
+            .setMessage(item.reference.ifBlank { getString(R.string.hist_no_ref) })
+            .setNegativeButton(getString(R.string.btn_cancel), null)
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         AppDatabase.get(this@HistoryActivity).analysisDao().delete(item)
