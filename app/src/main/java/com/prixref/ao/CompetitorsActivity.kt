@@ -93,7 +93,7 @@ class CompetitorsActivity : AppCompatActivity() {
             val freq = if (b.total >= 3)
                 "Intervalle fréquent vs estimation : ${CompetitorEngine.intervalLabel(b.freqLow, b.freqHigh)} (${"%.0f".format(b.repetitionRate)} %)"
             else "Intervalle fréquent : données insuffisantes"
-            line(card, freq, false)
+            line(card, freq, true, R.color.action)
             line(card, "Écart moyen vs prix de réf. : ${Format.signedPercent(c.stats.ecartPrMoyen)}", false)
             val cm = c.stats.classementMoyen?.let { "%.1f".format(it) } ?: "—"
             line(card, "Classement moyen : $cm · Top 3 : ${"%.0f".format(c.stats.tauxTop3)} %", false)
@@ -109,11 +109,11 @@ class CompetitorsActivity : AppCompatActivity() {
         }
     }
 
-    private fun line(card: ItemCompanyBinding, text: String, bold: Boolean) {
+    private fun line(card: ItemCompanyBinding, text: String, bold: Boolean, colorRes: Int = R.color.text_primary) {
         card.linesContainer.addView(TextView(this).apply {
             this.text = text
             textSize = 12.5f
-            setTextColor(ContextCompat.getColor(this@CompetitorsActivity, R.color.text_primary))
+            setTextColor(ContextCompat.getColor(this@CompetitorsActivity, colorRes))
             setPadding(0, dp(if (bold) 8 else 2), 0, dp(2))
             if (bold) setTypeface(typeface, Typeface.BOLD)
         })

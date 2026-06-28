@@ -136,7 +136,7 @@ class CompetitorDetailActivity : AppCompatActivity() {
                 m.addView(plain(
                     "Classement : ${if (p.rang > 0) "${p.rang}e" else "écartée"}" +
                         "  ·  Estimation : ${Format.money(p.estimation)}", R.color.text_secondary))
-                m.addView(plain("Écart vs estimation : ${Format.signedPercent(p.ecartEstimPct)}", R.color.text_secondary))
+                m.addView(accentLine("Écart vs estimation : ${Format.signedPercent(p.ecartEstimPct)}"))
             }
             commit(m)
         }
@@ -155,7 +155,7 @@ class CompetitorDetailActivity : AppCompatActivity() {
             card.addView(plain(b.lecture, R.color.text_secondary))
             return card
         }
-        card.addView(kv("Intervalle le plus fréquent", CompetitorEngine.intervalLabel(b.freqLow, b.freqHigh)))
+        card.addView(accentKv("Intervalle le plus fréquent", CompetitorEngine.intervalLabel(b.freqLow, b.freqHigh)))
         card.addView(kv("Répétition", "${b.freqCount}/${b.total} analyses"))
         card.addView(kv("Taux de répétition", "${"%.1f".format(b.repetitionRate)} %"))
         card.addView(kv("Intervalle habituel", CompetitorEngine.intervalLabel(b.usualLow, b.usualHigh)))
@@ -225,6 +225,23 @@ class CompetitorDetailActivity : AppCompatActivity() {
         textSize = 12.5f
         setTextColor(ContextCompat.getColor(this@CompetitorDetailActivity, R.color.text_primary))
         setPadding(0, dp(3), 0, dp(3))
+    }
+
+    /** Ligne mise en avant (info clé) : bleu accent + gras. */
+    private fun accentKv(k: String, v: String) = TextView(this).apply {
+        text = "$k : $v"
+        textSize = 14f
+        setTypeface(typeface, Typeface.BOLD)
+        setTextColor(ContextCompat.getColor(this@CompetitorDetailActivity, R.color.action))
+        setPadding(0, dp(4), 0, dp(4))
+    }
+
+    private fun accentLine(text: String) = TextView(this).apply {
+        this.text = text
+        textSize = 14f
+        setTypeface(typeface, Typeface.BOLD)
+        setTextColor(ContextCompat.getColor(this@CompetitorDetailActivity, R.color.action))
+        setPadding(0, dp(2), 0, dp(4))
     }
 
     private fun profilColor(profil: String): Int = when (profil) {
