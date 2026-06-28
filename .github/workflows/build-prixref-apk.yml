@@ -41,31 +41,34 @@ jobs:
       - name: Stage APK
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk dist/PrixRef-AO-Maroc.apk
+          cp app/build/outputs/apk/release/app-release.apk dist/BMarche-v1.0.1.apk
           ls -la dist
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PrixRef-AO-Maroc-apk
-          path: dist/PrixRef-AO-Maroc.apk
+          name: BMarche-apk
+          path: dist/BMarche-v1.0.1.apk
           if-no-files-found: error
 
       - name: Publish APK to a Release (direct download link)
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: prixref-v${{ github.run_number }}
-          name: PrixRef AO Maroc APK (build ${{ github.run_number }})
+          tag_name: bmarche-v${{ github.run_number }}
+          name: B Marche v1.0 — Commercial Clean Build (build ${{ github.run_number }})
           body: |
-            APK release signé, compilé depuis `${{ github.sha }}`.
+            **B Marche – Calcul Prix Référence** — APK release signé (versionName 1.0.1),
+            compilé depuis `${{ github.sha }}`.
 
-            Téléchargez **PrixRef-AO-Maroc.apk** ci-dessous, puis installez-le
-            sur un appareil Android (activez « Installer des applications inconnues »).
+            Téléchargez **BMarche-v1.0.1.apk** ci-dessous, puis installez-le sur un
+            appareil Android (activez « Installer des applications inconnues »).
 
-            Toutes les versions sont signées avec la même clé : une nouvelle
-            version s'installe par-dessus l'ancienne sans désinstallation, et
-            n'affecte aucune autre application installée.
+            B Marche fonctionne **localement** sur votre téléphone : aucune donnée
+            n'est envoyée vers un serveur.
 
-            Cette application n'est pas officielle et n'est pas affiliée à
-            marchespublics.gov.ma. Les résultats sont indicatifs.
-          files: dist/PrixRef-AO-Maroc.apk
+            Toutes les versions sont signées avec la même clé : une nouvelle version
+            s'installe par-dessus l'ancienne sans désinstallation.
+
+            Application non officielle, non affiliée à marchespublics.gov.ma.
+            Résultats indicatifs ; ne garantit pas l'attribution du marché.
+          files: dist/BMarche-v1.0.1.apk

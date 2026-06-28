@@ -13,9 +13,9 @@ android {
         // Android 8.0 (Oreo) et plus.
         minSdk = 26
         targetSdk = 34
-        // versionCode auto-incrémenté en CI (-PappVersionCode=<run_number>) ; 1 par défaut en local.
-        versionCode = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 1
-        versionName = "1.0"
+        // versionCode auto-incrémenté en CI (-PappVersionCode=<run_number>) ; 2 par défaut en local.
+        versionCode = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 2
+        versionName = "1.0.1"
     }
 
     signingConfigs {
