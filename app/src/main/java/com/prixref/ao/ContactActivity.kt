@@ -14,7 +14,7 @@ class ContactActivity : AppCompatActivity() {
 
     // Numéro WhatsApp/téléphone (format international sans « + », ex. 2126XXXXXXXX).
     // Laisser vide tant qu'il n'est pas configuré.
-    private val phoneNumber = ""
+    private val phoneNumber = "212700029736"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

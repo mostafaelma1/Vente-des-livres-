@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 android:layout_marginStart="6dp"
-                android:text="B Marche — Calcul Prix Référence. Pour toute question, suggestion ou abonnement Premium, contactez-nous."
+                android:text="B Marche — Calcul Prix Référence. Pour toute question ou suggestion, contactez-nous."
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
