@@ -110,20 +110,27 @@ class AccountActivity : AppCompatActivity() {
         binding.tvPhone.text = a.phone
         binding.tvVille.text = listOfNotNull(a.ville, a.domaine).joinToString(" · ").ifBlank { "—" }
 
-        if (a.isPremium) {
-            binding.tvPlan.text = "PREMIUM"
-            binding.tvPlan.backgroundTintList =
-                ContextCompat.getColorStateList(this, R.color.positive)
-            binding.tvPremiumInfo.text = when {
-                a.premiumExpiry.isNullOrBlank() -> "Premium à vie. Accès complet aux statistiques globales."
-                else -> "Premium actif jusqu'au ${formatDate(a.premiumExpiry)}."
+        when {
+            a.isPremium -> {
+                binding.tvPlan.text = "PREMIUM"
+                binding.tvPlan.backgroundTintList = ContextCompat.getColorStateList(this, R.color.positive)
+                binding.tvPremiumInfo.text = when {
+                    a.premiumExpiry.isNullOrBlank() -> "Premium à vie. Accès complet à toutes les statistiques."
+                    else -> "Premium actif jusqu'au ${formatDate(a.premiumExpiry)}."
+                }
             }
-        } else {
-            binding.tvPlan.text = "GRATUIT"
-            binding.tvPlan.backgroundTintList =
-                ContextCompat.getColorStateList(this, R.color.text_secondary)
-            binding.tvPremiumInfo.text =
-                "Compte gratuit : calcul du prix de référence et statistiques locales."
+            a.trialActive() -> {
+                binding.tvPlan.text = "ESSAI"
+                binding.tvPlan.backgroundTintList = ContextCompat.getColorStateList(this, R.color.action)
+                binding.tvPremiumInfo.text =
+                    "Période d'essai : ${a.trialDaysLeft()} jour(s) restant(s). Accès complet à toutes les fonctions."
+            }
+            else -> {
+                binding.tvPlan.text = "GRATUIT"
+                binding.tvPlan.backgroundTintList = ContextCompat.getColorStateList(this, R.color.text_secondary)
+                binding.tvPremiumInfo.text =
+                    "Essai terminé. Nouvelle analyse et Historique restent gratuits ; passez Premium pour les statistiques."
+            }
         }
         binding.tvStats.text = "Analyses envoyées : ${a.analysesCount}"
         binding.btnAdmin.visibility = if (a.isAdmin) View.VISIBLE else View.GONE

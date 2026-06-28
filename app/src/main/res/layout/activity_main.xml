@@ -33,6 +33,21 @@
                 android:textSize="13sp"
                 android:gravity="center" />
 
+            <TextView
+                android:id="@+id/tvAccessStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_pill_white"
+                android:backgroundTint="@color/primary_light"
+                android:gravity="center"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/primary"
+                android:textSize="12.5sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <!-- CTA principal : Nouvelle analyse par lien -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnUrl"
@@ -112,20 +127,6 @@
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_competitors" />
                         <TextView style="@style/HomeCardSub" android:text="Statistiques locales (gratuit)" />
-                    </LinearLayout>
-                    <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnGlobal" style="@style/HomeCard">
-                <LinearLayout style="@style/HomeCardRow">
-                    <FrameLayout style="@style/HomeIconWrap" android:background="@drawable/circle_amber">
-                        <ImageView style="@style/HomeIcon" android:src="@drawable/ic_trending" />
-                    </FrameLayout>
-                    <LinearLayout style="@style/HomeCardText">
-                        <TextView style="@style/HomeCardTitle" android:text="@string/home_global" />
-                        <TextView style="@style/HomeCardSub" android:text="Concurrents et tendances du marché (Premium)" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>

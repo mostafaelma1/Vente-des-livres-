@@ -82,17 +82,27 @@ alter table public.analyses enable row level security;
 -- ----------------------------------------------------------------------------
 -- 2. INSCRIPTION / CONNEXION + BLOCAGE MULTI-APPAREIL
 -- ----------------------------------------------------------------------------
+-- Paramètres globaux (durée d'essai par défaut, en jours).
+create table if not exists public.app_settings (key text primary key, value text);
+insert into public.app_settings(key, value) values ('trial_days', '7')
+    on conflict (key) do nothing;
+alter table public.app_settings enable row level security;
+
+-- Date d'expiration de la période d'essai de chaque utilisateur.
+alter table public.users add column if not exists trial_expiry timestamptz;
+
 create or replace function public.register_or_login(
     p_phone text, p_name text, p_ville text, p_domaine text, p_device_id text
 ) returns jsonb
 language plpgsql security definer set search_path = public as $$
-declare u public.users;
+declare u public.users; v_days int;
 begin
+    select coalesce((select value::int from public.app_settings where key = 'trial_days'), 7) into v_days;
     select * into u from public.users where phone = p_phone;
 
     if not found then
-        insert into public.users(phone, name, ville, domaine, device_id)
-        values (p_phone, p_name, p_ville, p_domaine, p_device_id)
+        insert into public.users(phone, name, ville, domaine, device_id, trial_expiry)
+        values (p_phone, p_name, p_ville, p_domaine, p_device_id, now() + (v_days || ' days')::interval)
         returning * into u;
         return jsonb_build_object('status','ok','user', to_jsonb(u));
     end if;
@@ -276,6 +286,34 @@ begin
     update public.users set is_blocked = p_blocked where id = p_user_id returning * into u;
     return jsonb_build_object('status','ok','user', to_jsonb(u));
 end; $$;
+
+-- Durée d'essai par défaut (nouveaux comptes).
+create or replace function public.admin_set_trial_days(
+    p_admin_phone text, p_admin_device text, p_days int
+) returns jsonb
+language plpgsql security definer set search_path = public as $$
+begin
+    if not public._is_admin(p_admin_phone, p_admin_device) then raise exception 'not_admin'; end if;
+    insert into public.app_settings(key, value) values ('trial_days', p_days::text)
+        on conflict (key) do update set value = excluded.value;
+    return jsonb_build_object('status','ok','trial_days', p_days);
+end; $$;
+
+-- Prolonge / redémarre l'essai d'un utilisateur précis.
+create or replace function public.admin_set_user_trial(
+    p_admin_phone text, p_admin_device text, p_user_id uuid, p_days int
+) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare u public.users;
+begin
+    if not public._is_admin(p_admin_phone, p_admin_device) then raise exception 'not_admin'; end if;
+    update public.users set trial_expiry = now() + (p_days || ' days')::interval
+    where id = p_user_id returning * into u;
+    return jsonb_build_object('status','ok','user', to_jsonb(u));
+end; $$;
+
+grant execute on function public.admin_set_trial_days(text,text,integer)      to anon, authenticated;
+grant execute on function public.admin_set_user_trial(text,text,uuid,integer) to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
 -- 5. STATISTIQUES GLOBALES — PREMIUM uniquement

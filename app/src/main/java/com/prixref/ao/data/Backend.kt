@@ -156,6 +156,14 @@ object Backend {
             addProperty("p_user_id", userId); addProperty("p_blocked", blocked)
         }
 
+    suspend fun adminSetTrialDays(adminPhone: String, adminDevice: String, days: Int): Boolean =
+        adminCall("admin_set_trial_days", adminPhone, adminDevice) { addProperty("p_days", days) }
+
+    suspend fun adminSetUserTrial(adminPhone: String, adminDevice: String, userId: String, days: Int): Boolean =
+        adminCall("admin_set_user_trial", adminPhone, adminDevice) {
+            addProperty("p_user_id", userId); addProperty("p_days", days)
+        }
+
     private suspend fun adminCall(
         fn: String, adminPhone: String, adminDevice: String, extra: JsonObject.() -> Unit,
     ): Boolean {

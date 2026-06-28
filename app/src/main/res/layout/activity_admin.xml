@@ -27,6 +27,15 @@
             android:layout_marginTop="6dp"
             android:background="@drawable/bg_title_underline" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTrialDays"
+            style="@style/FilterChipButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Durée d'essai par défaut" />
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"

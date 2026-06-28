@@ -33,6 +33,7 @@ class AdminActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.btnBack.setOnClickListener { finish() }
         binding.etSearch.doAfterTextChanged { load(it?.toString().orEmpty()) }
+        binding.btnTrialDays.setOnClickListener { setTrialDaysDialog() }
 
         if (!Backend.isConfigured) {
             toast("Backend non configuré.")
@@ -68,8 +69,17 @@ class AdminActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(14), dp(16), dp(14))
         }
-        ll.addView(bold("${u.name}  ·  ${if (u.isPremium) "PREMIUM" else "GRATUIT"}",
-            if (u.isPremium) R.color.positive else R.color.text_primary))
+        val statut = when {
+            u.isPremium -> "PREMIUM"
+            u.trialActive() -> "ESSAI (${u.trialDaysLeft()} j)"
+            else -> "ESSAI TERMINÉ"
+        }
+        val statutColor = when {
+            u.isPremium -> R.color.positive
+            u.trialActive() -> R.color.action
+            else -> R.color.warning
+        }
+        ll.addView(bold("${u.name}  ·  $statut", statutColor))
         ll.addView(plain(u.phone))
         ll.addView(plain(listOfNotNull(u.ville, u.domaine).joinToString(" · ").ifBlank { "—" }))
         ll.addView(plain("Analyses : ${u.analysesCount}   ·   Appareil : ${if (u.deviceId.isNullOrBlank()) "non lié" else "lié"}"))
@@ -88,6 +98,7 @@ class AdminActivity : AppCompatActivity() {
         val actions = arrayOf(
             "Activer Premium",
             "Désactiver Premium",
+            "Prolonger l'essai",
             "Réinitialiser l'appareil",
             if (u.isBlocked) "Débloquer le compte" else "Bloquer le compte",
         )
@@ -97,8 +108,9 @@ class AdminActivity : AppCompatActivity() {
                 when (which) {
                     0 -> choosePremiumDuration(u)
                     1 -> run("Premium désactivé") { Backend.adminDisablePremium(adminPhone, deviceId, u.id) }
-                    2 -> run("Appareil réinitialisé") { Backend.adminResetDevice(adminPhone, deviceId, u.id) }
-                    3 -> run(if (u.isBlocked) "Compte débloqué" else "Compte bloqué") {
+                    2 -> chooseTrialDuration(u)
+                    3 -> run("Appareil réinitialisé") { Backend.adminResetDevice(adminPhone, deviceId, u.id) }
+                    4 -> run(if (u.isBlocked) "Compte débloqué" else "Compte bloqué") {
                         Backend.adminSetBlocked(adminPhone, deviceId, u.id, !u.isBlocked)
                     }
                 }
@@ -114,6 +126,39 @@ class AdminActivity : AppCompatActivity() {
             .setItems(labels) { _, i ->
                 run("Premium activé (${labels[i]})") {
                     Backend.adminSetPremium(adminPhone, deviceId, u.id, months[i])
+                }
+            }
+            .show()
+    }
+
+    private fun chooseTrialDuration(u: Account) {
+        val labels = arrayOf("3 jours", "7 jours", "14 jours", "30 jours")
+        val days = arrayOf(3, 7, 14, 30)
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Prolonger l'essai")
+            .setItems(labels) { _, i ->
+                run("Essai prolongé (${labels[i]})") {
+                    Backend.adminSetUserTrial(adminPhone, deviceId, u.id, days[i])
+                }
+            }
+            .show()
+    }
+
+    private fun setTrialDaysDialog() {
+        val input = android.widget.EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER
+            hint = "Nombre de jours (ex. 7)"
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Durée d'essai par défaut")
+            .setMessage("S'applique aux nouveaux comptes.")
+            .setView(input)
+            .setNegativeButton("Annuler", null)
+            .setPositiveButton("Enregistrer") { _, _ ->
+                val d = input.text?.toString()?.toIntOrNull()
+                if (d == null || d <= 0) { toast("Valeur invalide."); return@setPositiveButton }
+                run("Durée d'essai par défaut : $d jours") {
+                    Backend.adminSetTrialDays(adminPhone, deviceId, d)
                 }
             }
             .show()
