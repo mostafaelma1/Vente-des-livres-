@@ -432,6 +432,30 @@ grant execute on function public.global_trends(uuid,text,text,text,integer)     
 grant execute on function public.global_compare_offer(uuid,text,text,text,text,numeric)    to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
+-- 7ter. PURGE AUTOMATIQUE — suppression des données de plus de 2 mois
+--       (les statistiques ne gardent qu'une fenêtre glissante de 2 mois)
+-- ----------------------------------------------------------------------------
+create extension if not exists pg_cron;
+
+create or replace function public.purge_old_data() returns void
+language plpgsql security definer set search_path = public as $$
+begin
+    -- Journal des soumissions de plus de 2 mois.
+    delete from public.analyses where created_at < now() - interval '2 months';
+    -- Appels d'offres enregistrés il y a plus de 2 mois (supprime aussi leurs
+    -- analyses liées via ON DELETE CASCADE).
+    delete from public.tenders  where first_analysis_at < now() - interval '2 months';
+end; $$;
+
+-- Planifie la purge tous les jours à 03:00 UTC (remplace l'ancienne si elle existe).
+do $$
+begin
+    perform cron.unschedule('bmarche_purge_2m');
+exception when others then null;
+end $$;
+select cron.schedule('bmarche_purge_2m', '0 3 * * *', $$ select public.purge_old_data(); $$);
+
+-- ----------------------------------------------------------------------------
 -- 7. CRÉER LE PREMIER ADMIN
 --    Après ta 1re inscription dans l'app, récupère ton téléphone et exécute :
 --      update public.users set is_admin = true where phone = '+2126XXXXXXXX';
