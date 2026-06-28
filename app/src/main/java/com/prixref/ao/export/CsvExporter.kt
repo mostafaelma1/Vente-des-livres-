@@ -40,9 +40,13 @@ object CsvExporter {
             "Écart / estimation (DH)", "Écart / estimation (%)", "Observation", "Risque"
         )
         for (o in result.ranking) {
+            val refDh = o.amount - result.referencePrice
+            val refPct = if (result.referencePrice > 0) (o.amount - result.referencePrice) / result.referencePrice * 100 else 0.0
+            val estDh = o.amount - input.estimation
+            val estPct = if (input.estimation > 0) (o.amount - input.estimation) / input.estimation * 100 else 0.0
             line(
-                o.rank.toString(), o.name, num(o.amount), num(o.gap), num(o.gapPercent),
-                num(o.gapEstimation), num(o.gapEstimationPercent), o.observation, o.risk
+                o.rank.toString(), o.name, num(o.amount), snum(refDh), snum(refPct),
+                snum(estDh), snum(estPct), o.observation, o.risk
             )
         }
 
@@ -68,4 +72,7 @@ object CsvExporter {
         } else value
 
     private fun num(value: Double): String = String.format("%.2f", value).replace('.', ',')
+
+    /** Nombre signé (+ devant les positifs ; le « - » est déjà géré pour les négatifs). */
+    private fun snum(value: Double): String = (if (value > 0) "+" else "") + num(value)
 }

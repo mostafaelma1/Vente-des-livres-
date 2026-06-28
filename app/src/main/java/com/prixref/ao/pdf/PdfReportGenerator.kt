@@ -135,8 +135,9 @@ object PdfReportGenerator {
             canvas.drawText(offer.rank.toString(), cols[0] + 6, y + 12, cellPaint)
             canvas.drawText(ellipsize(offer.name, 24), cols[1] + 3, y + 12, cellPaint)
             canvas.drawText(Format.money(offer.amount), cols[2] + 3, y + 12, cellPaint)
-            canvas.drawText(Format.money(offer.gap), cols[3] + 3, y + 12, cellPaint)
-            canvas.drawText(Format.percent(offer.gapPercent), cols[4] + 3, y + 12, cellPaint)
+            val refPct = if (result.referencePrice > 0) (offer.amount - result.referencePrice) / result.referencePrice * 100.0 else 0.0
+            canvas.drawText(Format.signedMoney(offer.amount - result.referencePrice), cols[3] + 3, y + 12, cellPaint)
+            canvas.drawText(Format.signedPercent(refPct), cols[4] + 3, y + 12, cellPaint)
             canvas.drawText(offer.observation, cols[5] + 3, y + 12, cellPaint)
             y += rowH
         }
@@ -162,8 +163,9 @@ object PdfReportGenerator {
             }
             canvas.drawText("• ${ellipsize(offer.name, 28)} : ${offer.risk}", MARGIN, y, riskPaint)
             y += 12
+            val estPct = if (input.estimation > 0) (offer.amount - input.estimation) / input.estimation * 100.0 else 0.0
             canvas.drawText(
-                "   Écart / estimation : ${Format.money(offer.gapEstimation)} (${Format.percent(offer.gapEstimationPercent)})",
+                "   Écart / estimation : ${Format.signedMoney(offer.amount - input.estimation)} (${Format.signedPercent(estPct)})",
                 MARGIN, y, small,
             )
             y += 14

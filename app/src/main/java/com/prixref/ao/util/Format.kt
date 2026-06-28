@@ -25,6 +25,9 @@ object Format {
         return sign + percentFormat.format(value) + " %"
     }
 
+    /** Montant signé (ex. « +12 000,00 DH » / « -3 500,00 DH »). */
+    fun signedMoney(value: Double): String = (if (value > 0) "+" else "") + money(value)
+
     fun date(timestamp: Long): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE).format(Date(timestamp))
 

@@ -68,7 +68,7 @@ class ResultActivity : AppCompatActivity() {
         // Offre la plus proche du prix de référence (plus petit écart absolu).
         val closest = result.ranking.minByOrNull { it.gap }
         binding.tvClosest.text = closest?.let {
-            "Offre la plus proche : ${it.name} (${Format.money(it.amount)}, écart ${Format.percent(it.gapPercent)})"
+            "Offre la plus proche : ${it.name} (${Format.money(it.amount)}, écart ${Format.signedPercent(signedPct(it.amount, result.referencePrice))})"
         }.orEmpty()
         binding.tvCounts.text =
             "Offres retenues : ${result.retainedCount} • écartées : ${result.excludedCount}"
@@ -89,10 +89,13 @@ class ResultActivity : AppCompatActivity() {
         row.tvRank.text = offer.rank.toString()
         row.tvName.text = if (offer.isProbableWinner) "★ ${offer.name}" else offer.name
         row.tvAmount.text = Format.money(offer.amount)
-        row.tvGap.text = Format.money(offer.gap)
-        row.tvGapPercent.text = Format.percent(offer.gapPercent)
+        // Écarts SIGNÉS (+ au-dessus, - en dessous).
+        val ref = result.referencePrice
+        val est = result.input.estimation
+        row.tvGap.text = Format.signedMoney(offer.amount - ref)
+        row.tvGapPercent.text = Format.signedPercent(signedPct(offer.amount, ref))
         row.tvGapEstimation.text =
-            "Écart vs estimation : ${Format.money(offer.gapEstimation)} (${Format.percent(offer.gapEstimationPercent)})"
+            "Écart vs estimation : ${Format.signedMoney(offer.amount - est)} (${Format.signedPercent(signedPct(offer.amount, est))})"
         row.tvObservation.text = offer.observation
 
         val obsColor = when (offer.observation) {
@@ -153,6 +156,10 @@ class ResultActivity : AppCompatActivity() {
             }
         }
     }
+
+    /** Écart signé en % par rapport à une base ((valeur - base)/base*100). */
+    private fun signedPct(amount: Double, base: Double): Double =
+        if (base > 0.0) (amount - base) / base * 100.0 else 0.0
 
     private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
 }
