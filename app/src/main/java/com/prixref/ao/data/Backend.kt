@@ -293,6 +293,30 @@ object Backend {
         return out
     }
 
+    /** Déclenche le robot SERVEUR (workflow GitHub) via l'Edge Function. Retourne le statut. */
+    suspend fun triggerServerRobot(account: Account, deviceId: String, target: Int): String = withContext(Dispatchers.IO) {
+        if (!isConfigured) return@withContext "not_configured"
+        val url = BuildConfig.SUPABASE_URL.trimEnd('/') + "/functions/v1/trigger-robot"
+        val body = JsonObject().apply {
+            addProperty("phone", account.phone); addProperty("device", deviceId); addProperty("target", target)
+        }
+        try {
+            val req = Request.Builder().url(url)
+                .post(body.toString().toRequestBody(JSON))
+                .addHeader("apikey", BuildConfig.SUPABASE_ANON_KEY)
+                .addHeader("Authorization", "Bearer " + BuildConfig.SUPABASE_ANON_KEY)
+                .addHeader("Content-Type", "application/json")
+                .build()
+            client.newCall(req).execute().use { resp ->
+                val b = resp.body?.string().orEmpty()
+                runCatching { JsonParser.parseString(b).asJsonObject.get("status")?.asString }.getOrNull()
+                    ?: if (resp.isSuccessful) "ok" else "error"
+            }
+        } catch (e: Exception) {
+            "error"
+        }
+    }
+
     /** Couples (réf|acronyme) déjà visités par le robot — pour ne jamais y revenir. */
     suspend fun visitedPairs(account: Account, deviceId: String): Set<String> {
         val arr = rpcArray("robot_visited_pairs", JsonObject().apply {
