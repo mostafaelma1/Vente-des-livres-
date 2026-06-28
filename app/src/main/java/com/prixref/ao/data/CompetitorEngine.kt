@@ -14,9 +14,10 @@ import kotlin.math.sqrt
 object CompetitorEngine {
 
     const val DISCLAIMER =
-        "Les résultats fournis par B Marche sont indicatifs. Ils aident à l'analyse " +
-            "de prix mais ne garantissent pas l'attribution du marché. Vérifiez toujours " +
-            "vos coûts réels, votre marge, le règlement de consultation et la conformité."
+        "Les résultats fournis par B Marche sont indicatifs. Ils servent à aider " +
+            "l'utilisateur dans son analyse de prix, mais ne garantissent pas l'attribution " +
+            "du marché. L'utilisateur reste responsable de son offre, de ses coûts et de sa " +
+            "conformité administrative et technique."
 
     /** Une analyse source (date d'enregistrement + résultat complet). */
     data class Source(val date: Long, val result: AnalysisResult)

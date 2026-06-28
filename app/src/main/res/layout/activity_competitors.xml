@@ -5,12 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/bg">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/app_name"
-        android:scaleType="fitXY"
-        android:src="@drawable/bg_app" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -118,6 +112,17 @@
             android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:visibility="gone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="18dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="12dp"
+            android:text="@string/disclaimer"
+            android:textColor="@color/text_secondary"
+            android:textSize="10.5sp"
+            android:textStyle="italic" />
     </LinearLayout>
 
     <ImageButton

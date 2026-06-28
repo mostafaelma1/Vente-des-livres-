@@ -28,7 +28,7 @@
     <string name="save_history">Enregistrer dans l\'historique</string>
     <string name="add_competitor">+ Ajouter un concurrent</string>
     <string name="delete">Supprimer</string>
-    <string name="disclaimer">Cet outil fournit une estimation analytique interne. Il ne remplace pas les décisions officielles des commissions d\'appel d\'offres.</string>
+    <string name="disclaimer">Les résultats fournis par B Marche sont indicatifs. Ils servent à aider l\'utilisateur dans son analyse de prix, mais ne garantissent pas l\'attribution du marché. L\'utilisateur reste responsable de son offre, de ses coûts et de sa conformité administrative et technique.</string>
 
     <!-- Champs -->
     <string name="f_reference">Référence AO</string>

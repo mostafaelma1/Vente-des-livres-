@@ -96,15 +96,17 @@ class ResultActivity : AppCompatActivity() {
         row.tvGapPercent.text = Format.signedPercent(signedPct(offer.amount, ref))
         row.tvGapEstimation.text =
             "Écart vs estimation : ${Format.signedMoney(offer.amount - est)} (${Format.signedPercent(signedPct(offer.amount, est))})"
-        row.tvObservation.text = offer.observation
-
-        val obsColor = when (offer.observation) {
-            "Très proche", "Proche" -> R.color.positive
-            "Moyen" -> R.color.warning
-            else -> R.color.danger
+        // Badge de positionnement vs prix de référence : Proche PR / Basse / Haute / Élevée.
+        val pr = signedPct(offer.amount, ref)
+        val (badge, badgeColor) = when {
+            pr in -3.0..3.0 -> "Proche PR" to R.color.positive
+            pr < -3.0 -> "Basse" to R.color.action
+            pr <= 10.0 -> "Haute" to R.color.warning
+            else -> "Élevée" to R.color.danger
         }
+        row.tvObservation.text = badge
         row.tvObservation.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(this, obsColor))
+            ColorStateList.valueOf(ContextCompat.getColor(this, badgeColor))
 
         row.tvRisk.text = offer.risk
         val riskColor = when {

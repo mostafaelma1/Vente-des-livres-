@@ -5,12 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/bg">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/app_name"
-        android:scaleType="fitXY"
-        android:src="@drawable/bg_app" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -148,43 +142,6 @@
                         <TextView style="@style/HomeCardSub" android:text="Nous écrire / nous joindre" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Bannière Premium (discrète) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/btnPremium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                app:cardCornerRadius="22dp"
-                app:cardElevation="3dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_premium_gradient"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-                    <ImageView android:layout_width="34dp" android:layout_height="34dp"
-                        android:src="@drawable/ic_star" android:tint="@color/white" />
-                    <LinearLayout android:layout_width="0dp" android:layout_weight="1"
-                        android:layout_height="wrap_content" android:layout_marginStart="12dp"
-                        android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="@string/home_premium_title" android:textColor="@color/white"
-                            android:textSize="16sp" android:textStyle="bold" />
-                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp" android:alpha="0.95"
-                            android:text="@string/home_premium_sub" android:textColor="@color/white"
-                            android:textSize="11sp" />
-                    </LinearLayout>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_white" android:paddingHorizontal="12dp"
-                        android:paddingVertical="5dp" android:text="Bientôt" android:textColor="@color/white"
-                        android:textSize="11sp" android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

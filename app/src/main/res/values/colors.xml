@@ -1,54 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== Palette « B Marche » (blanc cassé + orange + brun) ===== -->
-    <color name="bg">#FDF9F3</color>
+    <!-- ===== Palette « B Marche » — business bleu professionnel ===== -->
+    <color name="bg">#F5F7FA</color>
     <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#FFF7EC</color>
-    <color name="stroke">#EFE8DF</color>
+    <color name="surface_variant">#EEF2F7</color>
+    <color name="stroke">#E5E7EB</color>
 
-    <!-- Couleur principale (marque « B Marche » : ardoise foncée) -->
-    <color name="primary">#33373D</color>
-    <color name="primary_dark">#26292E</color>
-    <color name="primary_light">#FBEEDF</color>
-    <color name="gradient_start">#3E444C</color>
-    <color name="gradient_end">#26292E</color>
+    <!-- Bleu foncé principal -->
+    <color name="primary">#123A5D</color>
+    <color name="primary_dark">#0E2E49</color>
+    <color name="primary_light">#E7EEF6</color>
+    <color name="gradient_start">#1B4E78</color>
+    <color name="gradient_end">#123A5D</color>
     <color name="on_primary">#FFFFFF</color>
 
+    <!-- Bleu action -->
+    <color name="action">#2F80ED</color>
+    <color name="action_dark">#2566C0</color>
+
     <!-- Texte -->
-    <color name="text_primary">#1F2329</color>
-    <color name="text_secondary">#5F6368</color>
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
     <color name="on_primary_dim">#C7D3E5</color>
 
     <!-- Résultats / statuts -->
-    <color name="positive">#16A34A</color>
-    <color name="positive_tint">#E4F6EA</color>
-    <color name="warning">#D9741B</color>
-    <color name="warning_tint">#FBEFE0</color>
-    <color name="danger">#DC2626</color>
-    <color name="danger_tint">#FBE9E9</color>
+    <color name="positive">#27AE60</color>
+    <color name="positive_tint">#E6F6EC</color>
+    <color name="warning">#F2994A</color>
+    <color name="warning_tint">#FDF0E3</color>
+    <color name="danger">#EB5757</color>
+    <color name="danger_tint">#FBEAEA</color>
 
     <!-- Compatibilité avec les drawables existants -->
-    <color name="paid">#16A34A</color>
-    <color name="paid_tint">#E4F6EA</color>
-    <color name="partial">#D9741B</color>
-    <color name="partial_tint">#FBEFE0</color>
-    <color name="unpaid">#DC2626</color>
-    <color name="unpaid_tint">#FBE9E9</color>
-    <color name="tint_indigo">#E6ECF5</color>
-    <color name="tint_green">#E4F6EA</color>
-    <color name="tint_amber">#FBEFE0</color>
+    <color name="paid">#27AE60</color>
+    <color name="paid_tint">#E6F6EC</color>
+    <color name="partial">#F2994A</color>
+    <color name="partial_tint">#FDF0E3</color>
+    <color name="unpaid">#EB5757</color>
+    <color name="unpaid_tint">#FBEAEA</color>
+    <color name="tint_indigo">#E7EEF6</color>
+    <color name="tint_green">#E6F6EC</color>
+    <color name="tint_amber">#FDF0E3</color>
     <color name="tint_teal">#E1F2F0</color>
     <color name="teal">#0E8E8E</color>
 
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
 
-    <!-- ===== Marque « B Marche » (d'après le brief design) ===== -->
-    <color name="brand_orange">#E86F00</color>
-    <color name="brand_orange_dark">#C75F03</color>
-    <color name="brand_brown">#8B4F1D</color>
-    <color name="brand_slate">#24272E</color>
-    <color name="brand_orange_tint">#FFF7EC</color>
-    <color name="brand_amber">#F5A623</color>
-    <color name="brand_green">#0B7A3B</color>
+    <!-- ===== Accents (badges, icônes) ===== -->
+    <!-- brand_orange* repointés vers le bleu action pour cohérence du thème -->
+    <color name="brand_orange">#2F80ED</color>
+    <color name="brand_orange_dark">#2566C0</color>
+    <color name="brand_brown">#1E8E50</color>
+    <color name="brand_slate">#374151</color>
+    <color name="brand_orange_tint">#E7EEF6</color>
+    <color name="brand_amber">#F2994A</color>
+    <color name="brand_green">#27AE60</color>
+    <color name="brand_violet">#9B51E0</color>
 </resources>

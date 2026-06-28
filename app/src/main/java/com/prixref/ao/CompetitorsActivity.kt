@@ -115,11 +115,13 @@ class CompetitorsActivity : AppCompatActivity() {
     }
 
     private fun profilColor(profil: String): Int = when (profil) {
-        CompetitorEngine.PROFIL_STRATEGIQUE -> R.color.brand_green
+        CompetitorEngine.PROFIL_STRATEGIQUE -> R.color.action
         CompetitorEngine.PROFIL_AGRESSIF -> R.color.danger
-        CompetitorEngine.PROFIL_LOCAL -> R.color.brand_orange_dark
+        CompetitorEngine.PROFIL_STABLE -> R.color.positive
+        CompetitorEngine.PROFIL_IRREGULIER -> R.color.warning
+        CompetitorEngine.PROFIL_LOCAL -> R.color.brand_violet
         CompetitorEngine.PROFIL_FAIBLE -> R.color.text_secondary
-        else -> R.color.brand_slate
+        else -> R.color.primary
     }
 
     private fun adapter(items: List<String>) =
