@@ -178,8 +178,10 @@ class BatchAnalysisActivity : AppCompatActivity() {
     private fun loadCurrent() {
         if (index >= queue.size) { done(); return }
         val (ref, org) = queue[index]
+        val url = "$BASE&refConsultation=$ref&orgAcronyme=$org"
         status("Analyse ${index + 1}/${queue.size} (réf. $ref)…")
-        binding.webView.loadUrl("$BASE&refConsultation=$ref&orgAcronyme=$org")
+        log("→ $url")
+        binding.webView.loadUrl(url)
     }
 
     private fun extractCurrent() {
