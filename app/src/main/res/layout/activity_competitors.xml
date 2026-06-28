@@ -31,24 +31,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="12dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="14dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnTop" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:id="@+id/btnTop"
+                style="@style/FilterChipButton"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp" android:insetTop="0dp" android:insetBottom="0dp"
-                android:textSize="11sp" android:text="Top domaine" />
+                android:layout_marginEnd="6dp"
+                android:text="Top domaine" />
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSociety" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:id="@+id/btnSociety"
+                style="@style/FilterChipButton"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-                android:layout_marginHorizontal="4dp" android:insetTop="0dp" android:insetBottom="0dp"
-                android:textSize="11sp" android:text="Par société" />
+                android:layout_marginHorizontal="0dp"
+                android:text="Par société" />
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCategory" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:id="@+id/btnCategory"
+                style="@style/FilterChipButton"
                 android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
-                android:layout_marginStart="4dp" android:insetTop="0dp" android:insetBottom="0dp"
-                android:textSize="11sp" android:text="Par catégorie" />
+                android:layout_marginStart="6dp"
+                android:text="Par catégorie" />
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
