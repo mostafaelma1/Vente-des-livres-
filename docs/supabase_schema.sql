@@ -370,8 +370,18 @@ begin
     return query select * from public.tenders order by updated_at desc limit p_limit;
 end; $$;
 
+-- Références déjà présentes (anti-doublon du robot : ne pas refaire).
+create or replace function public.robot_seen_refs(p_user_id uuid, p_device text, p_limit int default 3000)
+returns setof text language plpgsql security definer set search_path = public as $$
+begin
+    if not public._has_access(p_user_id, p_device) then raise exception 'no_access'; end if;
+    return query select distinct reference from public.tenders
+                 where reference is not null and reference <> '' limit p_limit;
+end; $$;
+
 grant execute on function public._has_access(uuid,text)              to anon, authenticated;
 grant execute on function public.fetch_tenders(uuid,text,integer)    to anon, authenticated;
+grant execute on function public.robot_seen_refs(uuid,text,integer)  to anon, authenticated;
 
 -- ----------------------------------------------------------------------------
 -- 6. DROITS : la clé "anon" ne peut appeler QUE ces fonctions.

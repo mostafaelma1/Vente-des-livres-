@@ -293,6 +293,14 @@ object Backend {
         return out
     }
 
+    /** Références déjà en base (pour que le robot ne refasse pas les mêmes). */
+    suspend fun seenRefs(account: Account, deviceId: String): Set<String> {
+        val arr = rpcArray("robot_seen_refs", JsonObject().apply {
+            addProperty("p_user_id", account.id); addProperty("p_device", deviceId); addProperty("p_limit", 3000)
+        }) ?: return emptySet()
+        return arr.mapNotNull { runCatching { it.asString }.getOrNull() }.toSet()
+    }
+
     data class MarketRow(
         val reference: String, val ville: String, val dateLimite: String,
         val estimation: Double?, val rang: Int, val amount: Double?, val ecartEstim: Double?,
