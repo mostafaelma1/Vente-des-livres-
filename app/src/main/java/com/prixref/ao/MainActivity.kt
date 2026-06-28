@@ -63,17 +63,17 @@ class MainActivity : AppCompatActivity() {
             acc == null || acc.isLocalOnly -> tv.visibility = View.GONE
             acc.isPremium -> {
                 tv.visibility = View.VISIBLE
-                tv.text = "Premium actif — accès complet"
+                tv.text = getString(R.string.access_premium)
                 tint(tv, R.color.positive)
             }
             acc.trialActive() -> {
                 tv.visibility = View.VISIBLE
-                tv.text = "Période d'essai : ${acc.trialDaysLeft()} jour(s) restant(s)"
+                tv.text = getString(R.string.access_trial, acc.trialDaysLeft())
                 tint(tv, R.color.action)
             }
             else -> {
                 tv.visibility = View.VISIBLE
-                tv.text = "Essai terminé — passez Premium pour débloquer les statistiques"
+                tv.text = getString(R.string.access_expired)
                 tint(tv, R.color.warning)
             }
         }
@@ -91,15 +91,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun upgradeDialog() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Fonction Premium")
-            .setMessage(
-                "Votre période d'essai est terminée. La Nouvelle analyse et l'Historique restent gratuits.\n\n" +
-                    "Pour débloquer les statistiques et la simulation, passez Premium en nous contactant au " +
-                    "${getString(R.string.contact_phone)}."
-            )
-            .setNegativeButton("Fermer", null)
-            .setNeutralButton("Mon compte") { _, _ -> open(AccountActivity::class.java) }
-            .setPositiveButton("WhatsApp") { _, _ ->
+            .setTitle(getString(R.string.up_title))
+            .setMessage(getString(R.string.up_msg, getString(R.string.contact_phone)))
+            .setNegativeButton(getString(R.string.btn_close), null)
+            .setNeutralButton(getString(R.string.home_account)) { _, _ -> open(AccountActivity::class.java) }
+            .setPositiveButton(getString(R.string.btn_whatsapp)) { _, _ ->
                 runCatching {
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/212700029736")))
                 }

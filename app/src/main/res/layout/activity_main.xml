@@ -90,7 +90,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:alpha="0.95"
-                            android:text="Coller le lien et lancer l'analyse"
+                            android:text="@string/home_new_analysis_sub"
                             android:textColor="@color/white"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -112,7 +112,7 @@
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_simulation" />
-                        <TextView style="@style/HomeCardSub" android:text="Comparer votre offre au prix de référence" />
+                        <TextView style="@style/HomeCardSub" android:text="@string/home_simulation_sub" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -126,7 +126,7 @@
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_competitors" />
-                        <TextView style="@style/HomeCardSub" android:text="Statistiques locales (gratuit)" />
+                        <TextView style="@style/HomeCardSub" android:text="@string/home_competitors_sub" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -140,7 +140,7 @@
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_history" />
-                        <TextView style="@style/HomeCardSub" android:text="Toutes vos analyses enregistrées" />
+                        <TextView style="@style/HomeCardSub" android:text="@string/home_history_sub" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -154,7 +154,7 @@
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_account" />
-                        <TextView style="@style/HomeCardSub" android:text="Profil, abonnement Premium" />
+                        <TextView style="@style/HomeCardSub" android:text="@string/home_account_sub" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>
@@ -168,7 +168,7 @@
                     </FrameLayout>
                     <LinearLayout style="@style/HomeCardText">
                         <TextView style="@style/HomeCardTitle" android:text="@string/home_contact" />
-                        <TextView style="@style/HomeCardSub" android:text="Nous écrire / nous joindre" />
+                        <TextView style="@style/HomeCardSub" android:text="@string/home_contact_sub" />
                     </LinearLayout>
                     <ImageView style="@style/HomeChevron" android:src="@drawable/ic_chevron" />
                 </LinearLayout>

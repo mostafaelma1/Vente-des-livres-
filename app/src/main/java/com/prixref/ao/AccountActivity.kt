@@ -33,6 +33,8 @@ class AccountActivity : AppCompatActivity() {
         binding.btnAdmin.setOnClickListener {
             startActivity(Intent(this, AdminActivity::class.java))
         }
+        binding.btnLangFr.setOnClickListener { setLang(com.prixref.ao.util.LanguageManager.FR) }
+        binding.btnLangAr.setOnClickListener { setLang(com.prixref.ao.util.LanguageManager.AR) }
 
         val account = AccountStore.get(this)
         if (account == null) showRegister() else {
@@ -46,14 +48,21 @@ class AccountActivity : AppCompatActivity() {
         binding.groupProfile.visibility = View.GONE
     }
 
+    /** Change la langue de l'application ; l'écran se recrée automatiquement. */
+    private fun setLang(lang: String) {
+        if (com.prixref.ao.util.LanguageManager.current() != lang) {
+            com.prixref.ao.util.LanguageManager.set(lang)
+        }
+    }
+
     private fun register() {
         val phone = binding.etPhone.text?.toString()?.trim().orEmpty()
         val name = binding.etName.text?.toString()?.trim().orEmpty()
         val ville = binding.etVille.text?.toString()?.trim().orEmpty()
         val domaine = binding.etDomaine.text?.toString()?.trim().orEmpty()
-        if (phone.length < 6) { toast("Entrez un numéro de téléphone valide."); return }
-        if (name.isEmpty()) { toast("Entrez votre nom ou société."); return }
-        if (ville.isEmpty()) { toast("Entrez votre ville."); return }
+        if (phone.length < 6) { toast(getString(R.string.acc_err_phone)); return }
+        if (name.isEmpty()) { toast(getString(R.string.acc_err_name)); return }
+        if (ville.isEmpty()) { toast(getString(R.string.acc_err_ville)); return }
 
         // Backend non configuré : compte local seul, l'app reste utilisable.
         if (!Backend.isConfigured) {
@@ -77,7 +86,7 @@ class AccountActivity : AppCompatActivity() {
                 }
                 "blocked_device" -> blockedDeviceDialog()
                 "blocked_account" -> blockedAccountDialog()
-                else -> toast("Connexion impossible. Réessayez.")
+                else -> toast(getString(R.string.acc_err_login))
             }
         }
     }
@@ -112,36 +121,34 @@ class AccountActivity : AppCompatActivity() {
 
         when {
             a.isPremium -> {
-                binding.tvPlan.text = "PREMIUM"
+                binding.tvPlan.text = getString(R.string.acc_plan_premium)
                 binding.tvPlan.backgroundTintList = ContextCompat.getColorStateList(this, R.color.positive)
                 binding.tvPremiumInfo.text = when {
-                    a.premiumExpiry.isNullOrBlank() -> "Premium à vie. Accès complet à toutes les statistiques."
-                    else -> "Premium actif jusqu'au ${formatDate(a.premiumExpiry)}."
+                    a.premiumExpiry.isNullOrBlank() -> getString(R.string.acc_premium_lifetime)
+                    else -> getString(R.string.acc_premium_until, formatDate(a.premiumExpiry))
                 }
             }
             a.trialActive() -> {
-                binding.tvPlan.text = "ESSAI"
+                binding.tvPlan.text = getString(R.string.acc_plan_trial)
                 binding.tvPlan.backgroundTintList = ContextCompat.getColorStateList(this, R.color.action)
-                binding.tvPremiumInfo.text =
-                    "Période d'essai : ${a.trialDaysLeft()} jour(s) restant(s). Accès complet à toutes les fonctions."
+                binding.tvPremiumInfo.text = getString(R.string.acc_trial_info, a.trialDaysLeft())
             }
             else -> {
-                binding.tvPlan.text = "GRATUIT"
+                binding.tvPlan.text = getString(R.string.acc_plan_free)
                 binding.tvPlan.backgroundTintList = ContextCompat.getColorStateList(this, R.color.text_secondary)
-                binding.tvPremiumInfo.text =
-                    "Essai terminé. Nouvelle analyse et Historique restent gratuits ; passez Premium pour les statistiques."
+                binding.tvPremiumInfo.text = getString(R.string.acc_free_info)
             }
         }
-        binding.tvStats.text = "Analyses envoyées : ${a.analysesCount}"
+        binding.tvStats.text = getString(R.string.acc_analyses_sent, a.analysesCount)
         binding.btnAdmin.visibility = if (a.isAdmin) View.VISIBLE else View.GONE
     }
 
     private fun logout() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Se déconnecter")
-            .setMessage("Voulez-vous vous déconnecter de ce compte ?")
-            .setNegativeButton("Annuler", null)
-            .setPositiveButton("Se déconnecter") { _, _ -> logoutSilent(); showRegister() }
+            .setTitle(getString(R.string.acc_logout_btn))
+            .setMessage(getString(R.string.acc_logout_confirm))
+            .setNegativeButton(getString(R.string.btn_cancel), null)
+            .setPositiveButton(getString(R.string.acc_logout_btn)) { _, _ -> logoutSilent(); showRegister() }
             .show()
     }
 
@@ -149,17 +156,17 @@ class AccountActivity : AppCompatActivity() {
 
     private fun blockedDeviceDialog() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Compte déjà activé")
-            .setMessage("Ce compte est déjà activé sur un autre téléphone. Pour changer de téléphone, contactez l'assistance.")
-            .setPositiveButton("OK", null)
+            .setTitle(getString(R.string.acc_blocked_device_title))
+            .setMessage(getString(R.string.acc_blocked_device_msg))
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 
     private fun blockedAccountDialog() {
         MaterialAlertDialogBuilder(this)
-            .setTitle("Compte bloqué")
-            .setMessage("Ce compte a été bloqué. Contactez l'assistance.")
-            .setPositiveButton("OK", null)
+            .setTitle(getString(R.string.acc_blocked_account_title))
+            .setMessage(getString(R.string.acc_blocked_account_msg))
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 

@@ -47,4 +47,56 @@
     <string name="f_company">Nom de la société</string>
     <string name="f_amount">Montant de l\'offre (DH)</string>
     <string name="f_retained">Offre retenue</string>
+
+    <!-- Langue -->
+    <string name="lang_section">Langue</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_arabic">العربية</string>
+
+    <!-- Accueil (sous-titres) -->
+    <string name="home_new_analysis_sub">Coller le lien et lancer l\'analyse</string>
+    <string name="home_simulation_sub">Comparer votre offre au prix de référence</string>
+    <string name="home_competitors_sub">Statistiques locales (gratuit)</string>
+    <string name="home_history_sub">Toutes vos analyses enregistrées</string>
+    <string name="home_account_sub">Profil, abonnement Premium</string>
+    <string name="home_contact_sub">Nous écrire / nous joindre</string>
+
+    <!-- Statut d\'accès (accueil) -->
+    <string name="access_premium">Premium actif — accès complet</string>
+    <string name="access_trial">Période d\'essai : %1$d jour(s) restant(s)</string>
+    <string name="access_expired">Essai terminé — passez Premium pour débloquer les statistiques</string>
+    <string name="up_title">Fonction Premium</string>
+    <string name="up_msg">Votre période d\'essai est terminée. La Nouvelle analyse et l\'Historique restent gratuits.\n\nPour débloquer les statistiques et la simulation, passez Premium en nous contactant au %1$s.</string>
+
+    <!-- Boutons communs -->
+    <string name="btn_close">Fermer</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="btn_whatsapp">WhatsApp</string>
+
+    <!-- Mon compte -->
+    <string name="acc_register_intro">Inscrivez-vous avec votre numéro de téléphone pour utiliser B Marche.</string>
+    <string name="acc_phone_hint">Téléphone (ex. +2126XXXXXXXX)</string>
+    <string name="acc_name_hint">Nom ou société</string>
+    <string name="acc_ville_hint">Ville</string>
+    <string name="acc_domaine_hint">Domaine principal (optionnel)</string>
+    <string name="acc_register_btn">S\'inscrire / Se connecter</string>
+    <string name="acc_admin_btn">Panneau administrateur</string>
+    <string name="acc_logout_btn">Se déconnecter</string>
+    <string name="acc_plan_premium">PREMIUM</string>
+    <string name="acc_plan_trial">ESSAI</string>
+    <string name="acc_plan_free">GRATUIT</string>
+    <string name="acc_premium_lifetime">Premium à vie. Accès complet à toutes les statistiques.</string>
+    <string name="acc_premium_until">Premium actif jusqu\'au %1$s.</string>
+    <string name="acc_trial_info">Période d\'essai : %1$d jour(s) restant(s). Accès complet à toutes les fonctions.</string>
+    <string name="acc_free_info">Essai terminé. Nouvelle analyse et Historique restent gratuits ; passez Premium pour les statistiques.</string>
+    <string name="acc_analyses_sent">Analyses envoyées : %1$d</string>
+    <string name="acc_logout_confirm">Voulez-vous vous déconnecter de ce compte ?</string>
+    <string name="acc_blocked_device_title">Compte déjà activé</string>
+    <string name="acc_blocked_device_msg">Ce compte est déjà activé sur un autre téléphone. Pour changer de téléphone, contactez l\'assistance.</string>
+    <string name="acc_blocked_account_title">Compte bloqué</string>
+    <string name="acc_blocked_account_msg">Ce compte a été bloqué. Contactez l\'assistance.</string>
+    <string name="acc_err_phone">Entrez un numéro de téléphone valide.</string>
+    <string name="acc_err_name">Entrez votre nom ou société.</string>
+    <string name="acc_err_ville">Entrez votre ville.</string>
+    <string name="acc_err_login">Connexion impossible. Réessayez.</string>
 </resources>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">B Marche</string>
+    <string name="slogan">حساب السعر المرجعي</string>
+
+    <!-- الرئيسية -->
+    <string name="home_new_analysis">تحليل جديد عبر الرابط</string>
+    <string name="home_manual">الوضع اليدوي</string>
+    <string name="home_history">سجل التحليلات</string>
+    <string name="home_advanced">إحصائيات متقدمة</string>
+    <string name="home_contact">اتصال / دعم</string>
+    <string name="home_competitors">تحليل المنافسين</string>
+    <string name="home_top">أفضل المنافسين حسب المجال</string>
+    <string name="contact_email">bmaffaire@gmail.com</string>
+    <string name="contact_phone">+212 7 00 02 97 36</string>
+    <string name="home_companies">إحصائيات حسب الفئة</string>
+    <string name="home_society">إحصائيات حسب الشركة</string>
+    <string name="home_premium_title">الترقية إلى Premium</string>
+    <string name="home_premium_sub">تحليلات غير محدودة · تقارير PDF · إحصائيات متقدمة</string>
+    <string name="home_simulation">اختبر سعرك قبل الإيداع</string>
+    <string name="home_account">حسابي</string>
+    <string name="home_global">إحصائيات B Marche العامة</string>
+    <string name="home_value">حلّل طلب عروض، احسب السعر المرجعي وحدّد موقع عرضك قبل الإيداع.</string>
+    <string name="trust_local">الحساب والسجل والإحصائيات المحلية تبقى على هاتفك. تُستعمل فقط بيانات طلبات العروض المحلَّلة لتغذية الإحصائيات العامة.</string>
+    <string name="privacy_sync">التحليلات المُرسَلة إلى الخادم تخص بيانات طلبات العروض المحلَّلة لتحسين إحصائيات B Marche العامة. بيانات المحاكاة الخاصة بالمستخدم لا تتم مشاركتها. النتائج إرشادية ولا تضمن الحصول على الصفقة.</string>
+    <string name="stats_local_note">تستند هذه الإحصائيات فقط إلى تحليلاتك المسجَّلة على هذا الهاتف.</string>
+    <string name="stats_global_note">تستند الإحصائيات العامة إلى تحليلات جميع مستخدمي B Marche. تتيح التعرف على المنافسين المعتادين وأنماط الأسعار والاتجاهات حسب المجال والمدينة.</string>
+
+    <!-- مشترك -->
+    <string name="calculate">احسب السعر المرجعي</string>
+    <string name="generate_pdf">إنشاء تقرير PDF</string>
+    <string name="export_excel">تصدير Excel (CSV)</string>
+    <string name="save_history">حفظ في السجل</string>
+    <string name="add_competitor">+ إضافة منافس</string>
+    <string name="delete">حذف</string>
+    <string name="disclaimer">النتائج التي يقدمها B Marche إرشادية. تساعد المستخدم في تحليل الأسعار، لكنها لا تضمن الحصول على الصفقة. يبقى المستخدم مسؤولاً عن عرضه وتكاليفه ومطابقته الإدارية والتقنية.</string>
+
+    <!-- الحقول -->
+    <string name="f_reference">مرجع طلب العروض</string>
+    <string name="f_objet">الموضوع</string>
+    <string name="f_maitre">صاحب المشروع</string>
+    <string name="f_type">نوع الصفقة</string>
+    <string name="f_lieu">مكان التنفيذ</string>
+    <string name="f_estimation">تقدير صاحب المشروع (درهم)</string>
+    <string name="f_lot_num">رقم الحصة</string>
+    <string name="f_lot_desig">تسمية الحصة</string>
+    <string name="f_company">اسم الشركة</string>
+    <string name="f_amount">مبلغ العرض (درهم)</string>
+    <string name="f_retained">عرض مقبول</string>
+
+    <!-- اللغة -->
+    <string name="lang_section">اللغة</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_arabic">العربية</string>
+
+    <!-- الرئيسية (عناوين فرعية) -->
+    <string name="home_new_analysis_sub">الصق الرابط وابدأ التحليل</string>
+    <string name="home_simulation_sub">قارن عرضك بالسعر المرجعي</string>
+    <string name="home_competitors_sub">إحصائيات محلية (مجانية)</string>
+    <string name="home_history_sub">كل تحليلاتك المحفوظة</string>
+    <string name="home_account_sub">الملف الشخصي، اشتراك Premium</string>
+    <string name="home_contact_sub">راسلنا / تواصل معنا</string>
+
+    <!-- حالة الوصول (الرئيسية) -->
+    <string name="access_premium">Premium مُفعّل — وصول كامل</string>
+    <string name="access_trial">الفترة التجريبية: %1$d يوم متبقٍ</string>
+    <string name="access_expired">انتهت الفترة التجريبية — اشترك في Premium لفتح الإحصائيات</string>
+    <string name="up_title">ميزة Premium</string>
+    <string name="up_msg">انتهت فترتك التجريبية. التحليل الجديد والسجل يبقيان مجانيين.\n\nلفتح الإحصائيات والمحاكاة، اشترك في Premium عبر الاتصال بنا على %1$s.</string>
+
+    <!-- أزرار مشتركة -->
+    <string name="btn_close">إغلاق</string>
+    <string name="btn_cancel">إلغاء</string>
+    <string name="btn_whatsapp">واتساب</string>
+
+    <!-- حسابي -->
+    <string name="acc_register_intro">سجّل برقم هاتفك لاستعمال B Marche.</string>
+    <string name="acc_phone_hint">الهاتف (مثال +2126XXXXXXXX)</string>
+    <string name="acc_name_hint">الاسم أو الشركة</string>
+    <string name="acc_ville_hint">المدينة</string>
+    <string name="acc_domaine_hint">المجال الرئيسي (اختياري)</string>
+    <string name="acc_register_btn">التسجيل / الدخول</string>
+    <string name="acc_admin_btn">لوحة المشرف</string>
+    <string name="acc_logout_btn">تسجيل الخروج</string>
+    <string name="acc_plan_premium">PREMIUM</string>
+    <string name="acc_plan_trial">تجريبي</string>
+    <string name="acc_plan_free">مجاني</string>
+    <string name="acc_premium_lifetime">Premium مدى الحياة. وصول كامل لجميع الإحصائيات.</string>
+    <string name="acc_premium_until">Premium مُفعّل حتى %1$s.</string>
+    <string name="acc_trial_info">الفترة التجريبية: %1$d يوم متبقٍ. وصول كامل لجميع الميزات.</string>
+    <string name="acc_free_info">انتهت الفترة التجريبية. التحليل الجديد والسجل مجانيان؛ اشترك في Premium للإحصائيات.</string>
+    <string name="acc_analyses_sent">التحليلات المُرسَلة: %1$d</string>
+    <string name="acc_logout_confirm">هل تريد تسجيل الخروج من هذا الحساب؟</string>
+    <string name="acc_blocked_device_title">حساب مُفعّل مسبقاً</string>
+    <string name="acc_blocked_device_msg">هذا الحساب مُفعّل بالفعل على هاتف آخر. لتغيير الهاتف، تواصل مع الدعم.</string>
+    <string name="acc_blocked_account_title">حساب محظور</string>
+    <string name="acc_blocked_account_msg">تم حظر هذا الحساب. تواصل مع الدعم.</string>
+    <string name="acc_err_phone">أدخل رقم هاتف صحيح.</string>
+    <string name="acc_err_name">أدخل اسمك أو شركتك.</string>
+    <string name="acc_err_ville">أدخل مدينتك.</string>
+    <string name="acc_err_login">تعذّر الاتصال. أعد المحاولة.</string>
+</resources>
