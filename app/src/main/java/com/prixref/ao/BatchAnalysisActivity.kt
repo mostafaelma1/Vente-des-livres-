@@ -61,6 +61,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
         const val MAX = 150              // candidats max à parcourir pour atteindre TARGET
         const val DAYS_MIN = 3           // date limite passée d'au moins 3 jours
         const val DAYS_MAX = 8           // … et au plus 8 jours
+        const val WINDOW = 2             // largeur de la sous-fenêtre tirée au hasard
         const val EXTRACT_TRIES = 8      // tentatives d'extraction par consultation
         const val RETRY_MS = 2500L       // comme "Nouvelle analyse par lien"
         const val FIRST_MS = 2500L
@@ -93,11 +94,12 @@ class BatchAnalysisActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView?, url: String?) = onPage()
         }
 
-        // Fenêtre fixe : date limite passée entre 3 et 8 jours. La variété entre
-        // exécutions vient du mélange aléatoire des résultats trouvés.
-        winFrom = dateMinus(DAYS_MAX)
-        winTo = dateMinus(DAYS_MIN)
-        log("Fenêtre date limite : $winFrom → $winTo")
+        // Sous-fenêtre tirée AU HASARD dans [3,8] jours → résultats différents
+        // à chaque exécution (variété même si le reste échoue).
+        val offset = (DAYS_MIN..(DAYS_MAX - WINDOW)).random()
+        winFrom = dateMinus(offset + WINDOW)
+        winTo = dateMinus(offset)
+        log("Fenêtre date limite (aléatoire) : $winFrom → $winTo")
         status("Chargement des références déjà analysées…")
         lifecycleScope.launch {
             seenRefs = runCatching { Backend.seenRefs(account, deviceId) }.getOrDefault(emptySet())
@@ -193,6 +195,7 @@ class BatchAnalysisActivity : AppCompatActivity() {
                     for(var j=0;j<s.options.length;j++){
                       if(parseInt((s.options[j].value||s.options[j].text||'').trim(),10)===max){ s.selectedIndex=j; break; }
                     }
+                    s.dispatchEvent(new Event('input',{bubbles:true}));
                     s.dispatchEvent(new Event('change',{bubbles:true}));
                     if(typeof s.onchange==='function'){ s.onchange(); }
                     return 'perpage='+max;
