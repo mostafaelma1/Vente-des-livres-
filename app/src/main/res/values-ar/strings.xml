@@ -112,6 +112,9 @@
     <string name="url_choose_columns">اختيار الأعمدة</string>
     <string name="url_retry">إعادة المحاولة</string>
     <string name="url_export_debug">تصدير البيانات (تتبّع)</string>
+    <string name="url_debug_view">مشاهدة الصفحة + التحليل (وضع المسؤول)</string>
+    <string name="url_debug_reread">إعادة القراءة</string>
+    <string name="url_debug_waiting">في انتظار تحميل الصفحة…</string>
     <string name="url_invalid">رابط غير صالح. الصق رابط متابعة استشارة صحيحاً.</string>
     <string name="url_fail_incomplete">التحليل التلقائي غير مكتمل. يمكنك إكمال المعلومات يدوياً في أقل من دقيقة.</string>
     <string name="url_table_label">جدول %1$d — %2$d سطر، %3$d عمود</string>

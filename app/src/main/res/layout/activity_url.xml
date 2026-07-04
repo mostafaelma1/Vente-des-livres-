@@ -135,10 +135,19 @@
             android:layout_marginTop="10dp"
             android:visibility="gone"
             android:text="@string/url_export_debug" />
+
+        <!-- Admin uniquement : affiche la vraie page + ce que l'analyse comprend. -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDebugLot"
+            style="@style/OutlineButton"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:text="@string/url_debug_view" />
     </LinearLayout>
 
-    <!-- ÉCRAN 3 (marché à plusieurs lots) : la WebView redevient visible le temps
-         que l'utilisateur choisisse le lot voulu sur la page officielle. -->
+    <!-- ÉCRAN 3 (marché à plusieurs lots / debug) : la WebView redevient visible le
+         temps que l'utilisateur choisisse le lot voulu sur la page officielle, ou
+         pour observer (admin) ce que l'analyse locale comprend de la vraie page. -->
     <LinearLayout
         android:id="@+id/lotTopBar"
         android:layout_width="match_parent"
@@ -149,12 +158,17 @@
         android:padding="14dp"
         android:visibility="gone">
 
-        <TextView
-            android:id="@+id/tvLotInstruction"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/on_primary"
-            android:textSize="13sp" />
+            android:layout_height="150dp">
+
+            <TextView
+                android:id="@+id/tvLotInstruction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/on_primary"
+                android:textSize="13sp" />
+        </ScrollView>
     </LinearLayout>
 
     <LinearLayout

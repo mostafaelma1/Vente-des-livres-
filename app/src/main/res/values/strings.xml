@@ -112,6 +112,9 @@
     <string name="url_choose_columns">Choisir les colonnes</string>
     <string name="url_retry">Réessayer</string>
     <string name="url_export_debug">Exporter les données (debug)</string>
+    <string name="url_debug_view">Voir la page + l\'analyse (debug admin)</string>
+    <string name="url_debug_reread">Relire</string>
+    <string name="url_debug_waiting">En attente de chargement de la page…</string>
     <string name="url_invalid">Lien invalide. Collez un lien de suivi de consultation valide.</string>
     <string name="url_fail_incomplete">Analyse automatique incomplète. Vous pouvez compléter les informations manuellement en moins d\'une minute.</string>
     <string name="url_table_label">Tableau %1$d — %2$d ligne(s), %3$d colonne(s)</string>

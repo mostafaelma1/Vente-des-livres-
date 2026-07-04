@@ -24,6 +24,7 @@ import com.prixref.ao.analyze.PageData
 import com.prixref.ao.analyze.WebExtraction
 import com.prixref.ao.calc.ReferenceCalculator
 import com.prixref.ao.calc.parseMarchesPublicsUrl
+import com.prixref.ao.data.AccountStore
 import com.prixref.ao.data.JsonStore
 import com.prixref.ao.databinding.ActivityUrlBinding
 import com.prixref.ao.databinding.DialogColumnPickerBinding
@@ -59,6 +60,11 @@ class UrlAnalysisActivity : AppCompatActivity() {
     private var lotSwitchActive = false
     private var targetLotNumero = -1
 
+    // Mode debug (admin) : affiche la vraie page + ce que l'analyse locale en comprend,
+    // pour diagnostiquer les erreurs d'extraction (ex. marché à plusieurs lots).
+    private var debugModeActive = false
+    private val isAdmin by lazy { AccountStore.get(this)?.isAdmin == true }
+
     private companion object {
         const val MAX_AUTO_ATTEMPTS = 8
         const val AUTO_DELAY_MS = 2500L
@@ -93,8 +99,10 @@ class UrlAnalysisActivity : AppCompatActivity() {
         binding.btnColumns.setOnClickListener { showColumnPicker() }
         binding.btnRetry.setOnClickListener { startAnalysis() }
         binding.btnExport.setOnClickListener { exportRaw() }
-        binding.btnLotCancel.setOnClickListener { cancelLotSwitch() }
-        binding.btnLotContinue.setOnClickListener { retryLotSwitchExtraction() }
+        binding.btnLotCancel.setOnClickListener { if (debugModeActive) closeDebugView() else cancelLotSwitch() }
+        binding.btnLotContinue.setOnClickListener { if (debugModeActive) refreshDebugView() else retryLotSwitchExtraction() }
+        binding.btnDebugLot.setOnClickListener { startDebugView() }
+        binding.btnDebugLot.visibility = if (isAdmin) View.VISIBLE else View.GONE
     }
 
     // ------------------------------------------------------------------ //
@@ -170,6 +178,11 @@ class UrlAnalysisActivity : AppCompatActivity() {
         lastPage = page
         val result = LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl)
         lastInput = result.input
+
+        if (debugModeActive) {
+            updateDebugText(page, result)
+            return
+        }
 
         if (lotSwitchActive) {
             if (result.input.lotNumero.toIntOrNull() == targetLotNumero) {
@@ -256,6 +269,83 @@ class UrlAnalysisActivity : AppCompatActivity() {
     private fun cancelLotSwitch() {
         val page = lastPage
         endLotSwitch()
+        if (page != null) {
+            proceedOrFallback(LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl))
+        } else {
+            failLocal()
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    // Mode debug (admin) : voir la vraie page + ce que l'analyse en comprend
+    // ------------------------------------------------------------------ //
+    private fun startDebugView() {
+        debugModeActive = true
+        handler.removeCallbacksAndMessages(null)
+        stopPulse()
+        stopCountdown()
+        binding.setupPanel.visibility = View.GONE
+        binding.loadingPanel.visibility = View.GONE
+        binding.btnLotContinue.text = getString(R.string.url_debug_reread)
+        binding.btnLotCancel.text = getString(R.string.btn_cancel)
+        binding.lotTopBar.visibility = View.VISIBLE
+        binding.lotBottomBar.visibility = View.VISIBLE
+        val page = lastPage
+        if (page != null) updateDebugText(page, LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl))
+        else binding.tvLotInstruction.text = getString(R.string.url_debug_waiting)
+    }
+
+    private fun refreshDebugView() {
+        binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
+            handler.postDelayed({
+                binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
+                    val page = parsePage(value)
+                    if (page != null) {
+                        lastPage = page
+                        val result = LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl)
+                        lastInput = result.input
+                        updateDebugText(page, result)
+                    } else {
+                        binding.tvLotInstruction.text = getString(R.string.url_debug_waiting)
+                    }
+                }
+            }, 1000)
+        }
+    }
+
+    private fun updateDebugText(page: PageData, result: LocalAnalyzer.Result) {
+        val input = result.input
+        binding.tvLotInstruction.text = buildString {
+            append("URL : ").append(page.url).append('\n')
+            append("Lots détectés (Allotissement) : ").append(result.lotCount).append('\n')
+            append("Libellé lu dans le menu « Lot » : ")
+                .append(page.activeLotLabel.ifBlank { "(non détecté)" }).append('\n')
+            append("→ Lot retenu par l'analyse : ").append(input.lotNumero).append('\n')
+            append("→ Désignation retenue : ").append(input.lotDesignation.take(150)).append('\n')
+            append("→ Estimation retenue : ")
+                .append(if (input.estimation > 0.0) Format.money(input.estimation) else "0 (non détectée)").append('\n')
+            append("Offres détectées : ").append(result.offersDetected)
+                .append(" (").append(input.competitors.size).append(")\n")
+            if (result.lotOptions.isNotEmpty()) {
+                append("\nDétail par lot :\n")
+                result.lotOptions.forEach { o ->
+                    append("  Lot ").append(o.numero).append(" — ")
+                        .append(o.designation.ifBlank { "?" }.take(80))
+                        .append(" — est. ")
+                        .append(if (o.estimation > 0.0) Format.money(o.estimation) else "?")
+                        .append('\n')
+                }
+            }
+        }
+    }
+
+    private fun closeDebugView() {
+        debugModeActive = false
+        binding.lotTopBar.visibility = View.GONE
+        binding.lotBottomBar.visibility = View.GONE
+        binding.btnLotContinue.text = getString(R.string.lot_switch_continue)
+        binding.loadingPanel.visibility = View.VISIBLE
+        val page = lastPage
         if (page != null) {
             proceedOrFallback(LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl))
         } else {
