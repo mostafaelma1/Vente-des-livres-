@@ -120,6 +120,16 @@
     <string name="url_no_valid_cols">لا يوجد عرض صالح بهذه الأعمدة. أعد المحاولة أو أكمل يدوياً.</string>
     <string name="btn_validate">تأكيد</string>
 
+    <!-- صفقة متعددة الحصص (اللوطات) -->
+    <string name="lot_multi_title">هذه الصفقة تحتوي على %1$d حصص (لوطات) — اختر حصة</string>
+    <string name="lot_item_format">الحصة %1$d — %2$s\nالتقدير: %3$s</string>
+    <string name="lot_estimation_unknown">غير محدد (أدخله يدوياً)</string>
+    <string name="lot_no_designation">(الوصف غير محدد)</string>
+    <string name="lot_current_suffix">— المعروضة حالياً</string>
+    <string name="lot_switch_instruction">في الصفحة أسفله، افتح قائمة « Lot : » واختر الحصة %1$d، ثم اضغط متابعة.</string>
+    <string name="lot_switch_continue">متابعة</string>
+    <string name="lot_switch_wrong">الحصة المعروضة ليست بعد الحصة %1$d. اخترها ثم أعد المحاولة.</string>
+
     <!-- النتيجة -->
     <string name="result_title">نتيجة التحليل</string>
     <string name="result_estimation_label">التقدير</string>
@@ -128,6 +138,7 @@
     <string name="result_best_label">الأفضل موقعاً (حسب الحساب)</string>
     <string name="result_ranking_title">ترتيب العروض</string>
     <string name="result_ref_prefix">المرجع: %1$s</string>
+    <string name="result_lot_suffix">الحصة %1$d</string>
     <string name="result_objet_empty">الموضوع غير محدد</string>
     <string name="result_maitre_empty">صاحب المشروع غير محدد</string>
     <string name="result_closest">أقرب عرض: %1$s (%2$s، الفارق %3$s)</string>

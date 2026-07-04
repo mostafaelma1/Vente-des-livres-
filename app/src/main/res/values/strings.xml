@@ -120,6 +120,16 @@
     <string name="url_no_valid_cols">Aucune offre valide avec ces colonnes. Réessayez ou complétez en mode manuel.</string>
     <string name="btn_validate">Valider</string>
 
+    <!-- Marché à plusieurs lots -->
+    <string name="lot_multi_title">Ce marché comporte %1$d lots — choisissez un lot</string>
+    <string name="lot_item_format">Lot %1$d — %2$s\nEstimation : %3$s</string>
+    <string name="lot_estimation_unknown">non détectée (à saisir)</string>
+    <string name="lot_no_designation">(désignation non détectée)</string>
+    <string name="lot_current_suffix">— actuellement affiché</string>
+    <string name="lot_switch_instruction">Sur la page ci-dessous, ouvrez le menu « Lot : » et choisissez le Lot %1$d, puis appuyez sur Continuer.</string>
+    <string name="lot_switch_continue">Continuer</string>
+    <string name="lot_switch_wrong">Le lot affiché ne correspond pas encore au Lot %1$d. Sélectionnez-le puis réessayez.</string>
+
     <!-- Résultat -->
     <string name="result_title">Résultat de l\'analyse</string>
     <string name="result_estimation_label">Estimation</string>
@@ -128,6 +138,7 @@
     <string name="result_best_label">MIEUX POSITIONNÉE (SELON LE CALCUL)</string>
     <string name="result_ranking_title">Classement des offres</string>
     <string name="result_ref_prefix">Réf. : %1$s</string>
+    <string name="result_lot_suffix">Lot %1$d</string>
     <string name="result_objet_empty">Objet non renseigné</string>
     <string name="result_maitre_empty">Maître d\'ouvrage non renseigné</string>
     <string name="result_closest">Offre la plus proche : %1$s (%2$s, écart %3$s)</string>

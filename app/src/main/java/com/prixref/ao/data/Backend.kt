@@ -115,10 +115,10 @@ object Backend {
         }
     }
 
-    /** Clé d'unicité d'un AO : reference|acheteur|ville|date_limite|estimation. */
+    /** Clé d'unicité d'un AO : reference|acheteur|ville|date_limite|estimation|lot. */
     fun dedupKey(result: AnalysisResult): String {
         val i = result.input
-        val raw = listOf(i.reference, i.maitreOuvrage, i.lieu, i.dateLimite, i.estimation.toString())
+        val raw = listOf(i.reference, i.maitreOuvrage, i.lieu, i.dateLimite, i.estimation.toString(), i.lotNumero)
             .joinToString("|") { it.trim().lowercase() }
         return sha256(raw)
     }

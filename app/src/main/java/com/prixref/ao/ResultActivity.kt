@@ -75,7 +75,13 @@ class ResultActivity : AppCompatActivity() {
 
     private fun render() {
         val input = result.input
-        binding.tvHeaderRef.text = getString(R.string.result_ref_prefix, input.reference.ifBlank { "—" })
+        val refText = getString(R.string.result_ref_prefix, input.reference.ifBlank { "—" })
+        val lotNum = input.lotNumero.toIntOrNull()
+        // N'affiche « Lot N » que pour un marché réellement allotie (désignation propre au lot,
+        // différente de l'objet général) — un marché à lot unique n'a pas besoin de ce suffixe.
+        binding.tvHeaderRef.text = if (lotNum != null && input.lotDesignation.isNotBlank() && input.lotDesignation != input.objet) {
+            "$refText — " + getString(R.string.result_lot_suffix, lotNum)
+        } else refText
         binding.tvHeaderObjet.text = input.objet.ifBlank { getString(R.string.result_objet_empty) }
         binding.tvHeaderMaitre.text = input.maitreOuvrage.ifBlank { getString(R.string.result_maitre_empty) }
         binding.tvEstimation.text = Format.money(input.estimation)

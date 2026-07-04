@@ -25,7 +25,14 @@ object LocalAnalyzer {
         val guessedNameCol: Int,
         val guessedAmountCol: Int,
         val guessedStatusCol: Int,
+        /** Nombre de lots de la consultation (1 si non allotie / non détecté). */
+        val lotCount: Int = 1,
+        /** Un lot par numéro, avec désignation et estimation (si détectées). Vide si lotCount <= 1. */
+        val lotOptions: List<LotOption> = emptyList(),
     )
+
+    /** Un lot d'une consultation allotie : numéro, désignation et estimation propres. */
+    data class LotOption(val numero: Int, val designation: String, val estimation: Double)
 
     private val K_NAME = listOf(
         "entreprise", "société", "societe", "soumissionnaire", "concurrent",
@@ -64,6 +71,11 @@ object LocalAnalyzer {
         "date et heure limite de remise des plis", "date limite de remise des plis",
         "date limite des plis", "limite de remise des plis", "date limite",
     )
+    private val LABELS_ALLOTISSEMENT = listOf("allotissement")
+
+    /** Repère « Lot N°xx » (ou variantes) et capture le numéro du lot. */
+    private val LOT_HEADER_RE = Regex("""lot\s*n?[°o]?\s*0*(\d+)\s*[:\-]\s*""", RegexOption.IGNORE_CASE)
+    private val LOT_CELL_RE = Regex("""lot\s*n?[°o]?\s*0*(\d+)""", RegexOption.IGNORE_CASE)
 
     /**
      * Tous les libellés connus de la fiche de consultation marchespublics.gov.ma.
@@ -84,6 +96,7 @@ object LocalAnalyzer {
         "qualifications", "qualification", "préqualification", "prequalification",
         "réunion", "reunion", "visite des lieux", "visite", "variante",
         "contact administratif", "contact", "dématérialisation", "dematerialisation",
+        "allotissement",
     )
 
     private val AMOUNT_RE = Regex("""\d[\d\s  .,]*\d|\d""")
@@ -103,6 +116,21 @@ object LocalAnalyzer {
         val typeMarche = mapType(categorieText.ifBlank { domaineText })
         val domaine = parseDomaine(domaineText)
         val dateLimite = labelValue(page, LABELS_DATE_LIMITE)
+
+        // Consultation à plusieurs lots : chaque lot a sa PROPRE désignation et
+        // (souvent) sa PROPRE estimation — il ne faut pas mélanger les lots.
+        val allotissementText = labelValue(page, LABELS_ALLOTISSEMENT)
+        val lotCount = parseLotCount(allotissementText)
+        val lotDesignations = if (lotCount >= 2) parseLotDesignations(objet) else emptyMap()
+        val lotEstimations = if (lotCount >= 2) parseLotEstimations(page) else emptyMap()
+        val activeLot = if (lotCount >= 2) (activeLotNumber(page) ?: 1) else 1
+        val resolvedLotDesignation = if (lotCount >= 2) lotDesignations[activeLot].orEmpty() else objet
+        val resolvedEstimation = if (lotCount >= 2) (lotEstimations[activeLot] ?: estimation) else estimation
+        val lotOptions = if (lotCount >= 2) {
+            (1..lotCount).map { n ->
+                LotOption(numero = n, designation = lotDesignations[n].orEmpty(), estimation = lotEstimations[n] ?: 0.0)
+            }
+        } else emptyList()
 
         // Choix du tableau d'offres : celui qui produit le plus d'offres valides.
         var best: List<Competitor> = emptyList()
@@ -149,9 +177,9 @@ object LocalAnalyzer {
             maitreOuvrage = acheteur,
             typeMarche = typeMarche,
             lieu = lieu,
-            estimation = estimation,
-            lotNumero = "1",
-            lotDesignation = objet,
+            estimation = resolvedEstimation,
+            lotNumero = activeLot.toString(),
+            lotDesignation = resolvedLotDesignation.ifBlank { objet },
             competitors = competitors,
             dateLimite = dateLimite,
             categorieLabel = typeMarche.label,
@@ -159,7 +187,11 @@ object LocalAnalyzer {
         )
 
         val summary = when {
-            offersDetected && estimation > 0.0 ->
+            lotCount >= 2 && offersDetected && resolvedEstimation > 0.0 ->
+                "Lot $activeLot/$lotCount — ${competitors.size} offre(s) et l'estimation de ce lot détectées. Vérifiez puis calculez."
+            lotCount >= 2 && offersDetected ->
+                "Lot $activeLot/$lotCount — ${competitors.size} offre(s) détectée(s). Renseignez l'estimation de ce lot, vérifiez puis calculez."
+            offersDetected && resolvedEstimation > 0.0 ->
                 "${competitors.size} offre(s) et l'estimation détectées. Vérifiez puis calculez."
             offersDetected ->
                 "${competitors.size} offre(s) détectée(s). Renseignez l'estimation, vérifiez puis calculez."
@@ -180,6 +212,8 @@ object LocalAnalyzer {
             guessedNameCol = bestNameCol,
             guessedAmountCol = bestAmountCol,
             guessedStatusCol = bestStatusCol,
+            lotCount = lotCount,
+            lotOptions = lotOptions,
         )
     }
 
@@ -367,6 +401,67 @@ object LocalAnalyzer {
         }
         return ""
     }
+
+    /** Nombre de lots depuis le texte du champ « Allotissement » (ex. « 2 Lots »). 1 si absent/non allotie. */
+    private fun parseLotCount(allotissementText: String): Int {
+        if (allotissementText.isBlank()) return 1
+        val n = Regex("""(\d+)\s*lots?""", RegexOption.IGNORE_CASE).find(allotissementText)
+            ?.groupValues?.get(1)?.toIntOrNull()
+        return (n ?: 1).coerceAtLeast(1)
+    }
+
+    /**
+     * Découpe l'Objet en désignations par lot. Le site écrit typiquement :
+     * « … EN DEUX LOTS SEPARES. • Lot N°01 : … • Lot N°02 : … ».
+     */
+    private fun parseLotDesignations(objet: String): Map<Int, String> {
+        if (objet.isBlank()) return emptyMap()
+        val matches = LOT_HEADER_RE.findAll(objet).toList()
+        if (matches.isEmpty()) return emptyMap()
+        val result = LinkedHashMap<Int, String>()
+        for ((idx, m) in matches.withIndex()) {
+            val numero = m.groupValues[1].toIntOrNull() ?: continue
+            val start = m.range.last + 1
+            val end = if (idx + 1 < matches.size) matches[idx + 1].range.first else objet.length
+            if (start >= end) continue
+            val desc = clean(objet.substring(start, end)).trim('•', '-', '.', ' ')
+            if (desc.isNotBlank()) result[numero] = desc.take(300)
+        }
+        return result
+    }
+
+    /**
+     * Estimation par lot, si un tableau/segment « Lot N°xx … montant » est présent
+     * sur la page (ex. après ouverture du détail d'allotissement). Best-effort :
+     * si rien n'est trouvé, l'appelant retombe sur l'estimation globale du marché.
+     */
+    private fun parseLotEstimations(page: PageData): Map<Int, Double> {
+        val result = LinkedHashMap<Int, Double>()
+        for (table in page.tables) {
+            for (row in table.rows) {
+                var numero: Int? = null
+                var lotCellIdx = -1
+                for ((i, cell) in row.withIndex()) {
+                    val m = LOT_CELL_RE.find(cell)
+                    if (m != null) {
+                        numero = m.groupValues[1].toIntOrNull()
+                        lotCellIdx = i
+                        break
+                    }
+                }
+                if (numero == null) continue
+                val amount = row.withIndex()
+                    .filter { (i, _) -> i != lotCellIdx }
+                    .firstNotNullOfOrNull { (_, v) -> if (looksLikeAmount(v)) parseAmount(v) else null }
+                if (amount != null && amount > 0.0) result[numero] = amount
+            }
+        }
+        return result
+    }
+
+    /** Numéro du lot actuellement affiché, déduit du libellé lu dans le menu « Lot : ». */
+    private fun activeLotNumber(page: PageData): Int? =
+        LOT_CELL_RE.find(page.activeLotLabel)?.groupValues?.get(1)?.toIntOrNull()
 
     fun parseAmount(text: String?): Double? {
         if (text.isNullOrBlank()) return null

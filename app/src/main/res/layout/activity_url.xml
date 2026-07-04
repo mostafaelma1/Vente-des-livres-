@@ -136,4 +136,52 @@
             android:visibility="gone"
             android:text="@string/url_export_debug" />
     </LinearLayout>
+
+    <!-- ÉCRAN 3 (marché à plusieurs lots) : la WebView redevient visible le temps
+         que l'utilisateur choisisse le lot voulu sur la page officielle. -->
+    <LinearLayout
+        android:id="@+id/lotTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/primary"
+        android:orientation="vertical"
+        android:padding="14dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvLotInstruction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/on_primary"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lotBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/surface"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:visibility="gone">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLotCancel"
+            style="@style/OutlineButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="@string/btn_cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLotContinue"
+            style="@style/PrimaryButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/lot_switch_continue" />
+    </LinearLayout>
 </FrameLayout>

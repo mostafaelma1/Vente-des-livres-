@@ -22,6 +22,13 @@ data class PageData(
     val titles: List<String> = emptyList(),
     val tables: List<ExtractedTable> = emptyList(),
     val amounts: List<String> = emptyList(),
+    /**
+     * Libellé du lot actuellement affiché (ex. « Lot 1 : La prestation… »), quand
+     * la consultation comporte plusieurs lots (menu déroulant « Lot : » sur la
+     * fiche). Vide si la consultation n'a qu'un seul lot ou si le libellé n'a pas
+     * pu être détecté.
+     */
+    val activeLotLabel: String = "",
 )
 
 /**
@@ -47,7 +54,7 @@ object WebExtraction {
             return t.trim();
           }
           try {
-            var hint = /plus|expand|toggle|détail|detail|deplier|déplier|afficher|voir|more|collaps/i;
+            var hint = /plus|expand|toggle|détail|detail|deplier|déplier|afficher|voir|more|collaps|allotissement|loupe/i;
             var els = document.querySelectorAll('a,span,div,button,img,i,td,th,li,p');
             var clicked = 0;
             for (var k = 0; k < els.length && clicked < 80; k++) {
@@ -117,15 +124,39 @@ object WebExtraction {
               if (amounts.length >= 250) break;
             }
 
+            // Consultation a plusieurs lots : menu "Lot :" - on lit le libelle
+            // du lot ACTUELLEMENT affiche (aucun clic, lecture seule).
+            var activeLotLabel = '';
+            var lotRe = /lot\s*n?\s*\u00b0?\s*0*\d+/i;
+            var sels = document.querySelectorAll('select');
+            for (var s = 0; s < sels.length && !activeLotLabel; s++) {
+              var opts = sels[s].options;
+              for (var o = 0; o < opts.length; o++) {
+                if (lotRe.test(opts[o].text || '')) {
+                  var sel = opts[sels[s].selectedIndex];
+                  if (sel) activeLotLabel = clean(sel.text || '');
+                  break;
+                }
+              }
+            }
+            if (!activeLotLabel) {
+              var cands = document.querySelectorAll('a,span,div,button,td');
+              for (var c = 0; c < cands.length && !activeLotLabel; c++) {
+                var tx = clean(cands[c].innerText || '');
+                if (lotRe.test(tx) && tx.length > 3 && tx.length < 300 && tx.indexOf(':') > 0) activeLotLabel = tx;
+              }
+            }
+
             return {
               url: location.href,
               rawText: bodyText.substring(0, 20000),
               titles: titles,
               tables: tables,
-              amounts: amounts
+              amounts: amounts,
+              activeLotLabel: activeLotLabel
             };
           } catch (e) {
-            return { url: location.href, rawText: '', titles: [], tables: [], amounts: [] };
+            return { url: location.href, rawText: '', titles: [], tables: [], amounts: [], activeLotLabel: '' };
           }
         })();
     """.trimIndent()

@@ -29,6 +29,7 @@ import com.prixref.ao.databinding.ActivityUrlBinding
 import com.prixref.ao.databinding.DialogColumnPickerBinding
 import com.prixref.ao.model.AnalysisInput
 import com.prixref.ao.model.TypeMarche
+import com.prixref.ao.util.Format
 import com.prixref.ao.util.Sharing
 import java.io.File
 
@@ -52,6 +53,11 @@ class UrlAnalysisActivity : AppCompatActivity() {
     private var autoDone = false
     private var pulse: ObjectAnimator? = null
     private var countDown: CountDownTimer? = null
+
+    // Marché à plusieurs lots : lot demandé par l'utilisateur en attente de confirmation
+    // (l'utilisateur bascule lui-même le menu « Lot : » sur la page, WebView visible).
+    private var lotSwitchActive = false
+    private var targetLotNumero = -1
 
     private companion object {
         const val MAX_AUTO_ATTEMPTS = 8
@@ -87,6 +93,8 @@ class UrlAnalysisActivity : AppCompatActivity() {
         binding.btnColumns.setOnClickListener { showColumnPicker() }
         binding.btnRetry.setOnClickListener { startAnalysis() }
         binding.btnExport.setOnClickListener { exportRaw() }
+        binding.btnLotCancel.setOnClickListener { cancelLotSwitch() }
+        binding.btnLotContinue.setOnClickListener { retryLotSwitchExtraction() }
     }
 
     // ------------------------------------------------------------------ //
@@ -163,13 +171,95 @@ class UrlAnalysisActivity : AppCompatActivity() {
         val result = LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl)
         lastInput = result.input
 
+        if (lotSwitchActive) {
+            if (result.input.lotNumero.toIntOrNull() == targetLotNumero) {
+                endLotSwitch()
+                proceedOrFallback(result)
+            } else {
+                binding.tvLotInstruction.text = getString(R.string.lot_switch_wrong, targetLotNumero)
+            }
+            return
+        }
+
+        if (result.lotCount >= 2 && result.offersDetected) {
+            showLotChoice(result)
+            return
+        }
+
+        proceedOrFallback(result)
+    }
+
+    private fun proceedOrFallback(result: LocalAnalyzer.Result) {
         when {
             // Offres avec montants : calcul direct, ou manuel si estimation manque.
             result.offersDetected -> proceed(result)
             // Infos partielles (sociétés sans montant et/ou estimation) : manuel pré-rempli.
             result.input.estimation > 0.0 || result.input.competitors.isNotEmpty() -> openManual()
             // Rien d'exploitable : on propose colonnes / manuel / réessayer.
-            else -> showFallback(result.summary, page.tables.isNotEmpty())
+            else -> showFallback(result.summary, result.tables.isNotEmpty())
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    // Marché à plusieurs lots
+    // ------------------------------------------------------------------ //
+    private fun showLotChoice(result: LocalAnalyzer.Result) {
+        val active = result.input.lotNumero.toIntOrNull() ?: 1
+        val items = result.lotOptions.map { opt ->
+            val est = if (opt.estimation > 0.0) Format.money(opt.estimation) else getString(R.string.lot_estimation_unknown)
+            val label = opt.designation.ifBlank { getString(R.string.lot_no_designation) }
+            val suffix = if (opt.numero == active) " " + getString(R.string.lot_current_suffix) else ""
+            getString(R.string.lot_item_format, opt.numero, label, est) + suffix
+        }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.lot_multi_title, result.lotCount))
+            .setItems(items) { _, which ->
+                val chosen = result.lotOptions[which].numero
+                if (chosen == active) proceed(result) else startLotSwitch(chosen)
+            }
+            .setOnCancelListener { proceed(result) }
+            .show()
+    }
+
+    /** Rend la WebView visible : l'utilisateur bascule lui-même le menu « Lot : » sur la vraie page. */
+    private fun startLotSwitch(target: Int) {
+        targetLotNumero = target
+        lotSwitchActive = true
+        binding.loadingPanel.visibility = View.GONE
+        binding.tvLotInstruction.text = getString(R.string.lot_switch_instruction, target)
+        binding.lotTopBar.visibility = View.VISIBLE
+        binding.lotBottomBar.visibility = View.VISIBLE
+    }
+
+    private fun retryLotSwitchExtraction() {
+        binding.webView.evaluateJavascript(WebExtraction.EXPAND_SCRIPT) {
+            handler.postDelayed({
+                binding.webView.evaluateJavascript(WebExtraction.SCRIPT) { value ->
+                    val page = parsePage(value) ?: return@evaluateJavascript
+                    handlePage(page)
+                }
+            }, 1000)
+        }
+    }
+
+    private fun endLotSwitch() {
+        lotSwitchActive = false
+        targetLotNumero = -1
+        binding.lotTopBar.visibility = View.GONE
+        binding.lotBottomBar.visibility = View.GONE
+        binding.loadingPanel.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        hideFallbackButtons()
+    }
+
+    private fun cancelLotSwitch() {
+        val page = lastPage
+        endLotSwitch()
+        if (page != null) {
+            proceedOrFallback(LocalAnalyzer.analyze(page, fallbackReference, orgAcronyme, sourceUrl))
+        } else {
+            failLocal()
         }
     }
 
