@@ -39,9 +39,9 @@ object DocumentExporter {
         val periode: String get() = Format.period(year, month)
     }
 
-    // ---- Layout constants ---------------------------------------------
-    private const val PAGE_W = 595
-    private const val PAGE_H = 842
+    // ---- Layout constants (A4 landscape) ------------------------------
+    private const val PAGE_W = 842
+    private const val PAGE_H = 595
     private const val MARGIN = 36f
     private val RIGHT = PAGE_W - MARGIN
     private val CONTENT_W = PAGE_W - 2 * MARGIN
@@ -54,9 +54,9 @@ object DocumentExporter {
     private val DARK = Color.parseColor("#2A1D13")
     private val GRAY = Color.parseColor("#8A7867")
 
-    // N° | Nom | Lieu | CIN | Compte/Tél | Salaire | Vir.  (sums to CONTENT_W = 523)
-    private val COLS = floatArrayOf(24f, 118f, 82f, 74f, 96f, 66f, 63f)
-    private val HEADERS = arrayOf("N°", "Nom & Prénom", "Lieu", "N° C.I.N.", "Compte / Tél.", "Salaire", "Vir.")
+    // N° | Nom | Lieu | CIN | N° Compte (24) | Salaire | Type  (sums to CONTENT_W = 770)
+    private val COLS = floatArrayOf(28f, 165f, 130f, 95f, 150f, 90f, 112f)
+    private val HEADERS = arrayOf("N°", "Nom & Prénom", "Lieu de travail", "N° C.I.N.", "N° Compte / Tél.", "Salaire", "Type de virement")
     private const val ROW_H = 21f
     private const val HEAD_H = 24f
 
@@ -267,7 +267,7 @@ object DocumentExporter {
             e.carteNationale,
             e.numeroCompte.ifBlank { e.telephone },
             Format.amount(row.salaireAPayer),
-            typeAbbrev(e.typeVirement)
+            typeLabel(e.typeVirement)
         )
         var x = MARGIN
         cells.forEachIndexed { i, t ->
@@ -284,7 +284,7 @@ object DocumentExporter {
         return top + ROW_H
     }
 
-    private fun typeAbbrev(type: String) = if (type == "VIREMENT") "Vir." else "M.D."
+    private fun typeLabel(type: String) = if (type == "VIREMENT") "Virement" else "Mise à disposition"
 
     private fun drawTotalRow(c: Canvas, total: Double, top: Float): Float {
         val h = 26f

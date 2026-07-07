@@ -64,10 +64,11 @@
             android:layout_marginTop="8dp"
             android:hint="@string/emp_lieu">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/lieu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:completionThreshold="1"
                 android:inputType="textCapWords" />
         </com.google.android.material.textfield.TextInputLayout>
 

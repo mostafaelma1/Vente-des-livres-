@@ -31,6 +31,9 @@ class EmployeesActivity : AppCompatActivity() {
             uri?.let { importFrom(it) }
         }
 
+    /** Distinct work sites already used, offered as suggestions in the dialog. */
+    private var siteSuggestions: List<String> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityListBinding.inflate(layoutInflater)
@@ -66,6 +69,7 @@ class EmployeesActivity : AppCompatActivity() {
     private fun refresh() = lifecycleScope.launch {
         val list = withContext(Dispatchers.IO) { dao.employees() }
         adapter.submit(list)
+        siteSuggestions = list.map { it.lieuTravail.trim() }.filter { it.isNotBlank() }.distinct().sorted()
         binding.empty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
     }
 
@@ -75,6 +79,9 @@ class EmployeesActivity : AppCompatActivity() {
         d.prenom.setText(existing?.prenom ?: "")
         d.poste.setText(existing?.poste ?: "")
         d.lieu.setText(existing?.lieuTravail ?: "")
+        d.lieu.setAdapter(
+            android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, siteSuggestions)
+        )
         d.phone.setText(existing?.telephone ?: "")
         d.cin.setText(existing?.carteNationale ?: "")
         d.compte.setText(existing?.numeroCompte ?: "")
@@ -101,6 +108,12 @@ class EmployeesActivity : AppCompatActivity() {
                     d.nom.error = getString(R.string.err_name_required)
                     return@setOnClickListener
                 }
+                // Account number, if given, must be a valid 24-digit RIB.
+                val compte = d.compte.text?.toString()?.replace(" ", "")?.trim().orEmpty()
+                if (compte.isNotEmpty() && !(compte.length == 24 && compte.all { it.isDigit() })) {
+                    d.compte.error = getString(R.string.emp_compte_24)
+                    return@setOnClickListener
+                }
                 val type = if (d.typeGroup.checkedButtonId == d.typeVirement.id)
                     Employee.TYPE_VIREMENT else Employee.TYPE_MISE_DISPOSITION
                 val emp = (existing ?: Employee(nom = nom)).copy(
@@ -110,7 +123,7 @@ class EmployeesActivity : AppCompatActivity() {
                     lieuTravail = d.lieu.text?.toString()?.trim().orEmpty(),
                     telephone = d.phone.text?.toString()?.trim().orEmpty(),
                     carteNationale = d.cin.text?.toString()?.trim().orEmpty(),
-                    numeroCompte = d.compte.text?.toString()?.trim().orEmpty(),
+                    numeroCompte = compte,
                     salaireMensuel = Format.parseNumber(d.salaire.text?.toString()),
                     typeVirement = type,
                     actif = d.actif.isChecked

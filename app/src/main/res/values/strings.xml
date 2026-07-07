@@ -108,4 +108,5 @@
 
     <!-- Validation -->
     <string name="err_name_required">Le nom est obligatoire · الاسم إجباري</string>
+    <string name="emp_compte_24">Le N° de compte doit contenir 24 chiffres · رقم الحساب 24 رقم</string>
 </resources>
