@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ventelivres.app.data.Employee
 import com.ventelivres.app.data.Pointage
 import com.ventelivres.app.databinding.ActivityVirementBinding
@@ -28,6 +29,9 @@ class VirementActivity : AppCompatActivity() {
 
     /** "" = all, else "VIREMENT" / "MISE DISPOSITION". */
     private var typeFilter = ""
+
+    /** "" = all sites, else a specific lieu de travail. */
+    private var lieuFilter = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +67,28 @@ class VirementActivity : AppCompatActivity() {
             }
             refresh()
         }
+
+        binding.siteBtn.text = getString(R.string.site_all)
+        binding.siteBtn.setOnClickListener { showSitePicker() }
+    }
+
+    private fun showSitePicker() = lifecycleScope.launch {
+        val sites = withContext(Dispatchers.IO) {
+            dao.activeEmployees().map { it.lieuTravail.trim() }.filter { it.isNotBlank() }.distinct().sorted()
+        }
+        val options = listOf(getString(R.string.site_all_option)) + sites
+        val checked = if (lieuFilter.isBlank()) 0 else options.indexOf(lieuFilter).coerceAtLeast(0)
+        MaterialAlertDialogBuilder(this@VirementActivity)
+            .setTitle(R.string.site_dialog_title)
+            .setSingleChoiceItems(options.toTypedArray(), checked) { d, which ->
+                lieuFilter = if (which == 0) "" else options[which]
+                binding.siteBtn.text =
+                    if (lieuFilter.isBlank()) getString(R.string.site_all) else getString(R.string.site_pick, lieuFilter)
+                d.dismiss()
+                refresh()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     override fun onResume() {
@@ -108,6 +134,7 @@ class VirementActivity : AppCompatActivity() {
         return withContext(Dispatchers.IO) {
             val employees = dao.activeEmployees()
                 .filter { typeFilter.isEmpty() || it.typeVirement == typeFilter }
+                .filter { lieuFilter.isEmpty() || it.lieuTravail.trim() == lieuFilter }
             val pointages = dao.pointages(year, month).associateBy { it.employeeId }
             employees.map { e ->
                 PayrollRow(e, pointages[e.id]?.jours ?: Pointage.DEFAULT_JOURS, base)
@@ -137,7 +164,8 @@ class VirementActivity : AppCompatActivity() {
             year = year,
             month = month,
             rows = rows,
-            typeFilter = typeFilter
+            typeFilter = typeFilter,
+            lieuFilter = lieuFilter
         )
 
         try {

@@ -33,6 +33,29 @@ object EmployeeCsv {
         return file
     }
 
+    /** The current list of employees as fillable CSV (same columns as import). */
+    fun export(employees: List<Employee>): String {
+        val sb = StringBuilder()
+        sb.append('﻿')
+        sb.append(HEADERS.joinToString(";") { csvCell(it) }).append("\r\n")
+        employees.forEach { e ->
+            sb.append(
+                row(
+                    e.nom, e.prenom, e.poste, e.lieuTravail, e.telephone,
+                    e.carteNationale, e.numeroCompte, Format.amount(e.salaireMensuel), e.typeVirement
+                )
+            )
+        }
+        return sb.toString()
+    }
+
+    fun writeExport(context: Context, employees: List<Employee>): File {
+        val dir = File(context.cacheDir, "exports").apply { mkdirs() }
+        val file = File(dir, "Salaries_Reco.csv")
+        file.writeText(export(employees), Charsets.UTF_8)
+        return file
+    }
+
     /** Parses the file content into employees (id = 0, to be merged by caller). */
     fun parse(text: String): List<Employee> {
         val clean = text.removePrefix("﻿")

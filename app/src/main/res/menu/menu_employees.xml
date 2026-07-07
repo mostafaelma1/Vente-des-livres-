@@ -8,6 +8,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_export"
+        android:title="@string/emp_export"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_template"
         android:title="@string/emp_template"
         app:showAsAction="never" />

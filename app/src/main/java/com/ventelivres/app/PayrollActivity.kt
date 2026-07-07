@@ -5,9 +5,12 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.Toast
 import com.ventelivres.app.data.Pointage
 import com.ventelivres.app.databinding.ActivityPayrollBinding
 import com.ventelivres.app.ui.PayrollAdapter
+import com.ventelivres.app.util.DataExport
+import com.ventelivres.app.util.DocumentExporter
 import com.ventelivres.app.util.Format
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,6 +37,11 @@ class PayrollActivity : AppCompatActivity() {
         binding.toolbar.title = getString(R.string.payroll_title)
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back)
         binding.toolbar.setNavigationOnClickListener { finish() }
+
+        binding.toolbar.inflateMenu(R.menu.menu_payroll)
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == R.id.action_export_payroll) { exportMonth(); true } else false
+        }
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
@@ -81,6 +89,19 @@ class PayrollActivity : AppCompatActivity() {
 
     private fun updateTotal() {
         binding.totalLabel.text = Format.money(adapter.total())
+    }
+
+    /** Exports the current month's pointage + salaries as an Excel-compatible CSV. */
+    private fun exportMonth() {
+        if (currentRows.isEmpty()) {
+            Toast.makeText(this, R.string.no_employees, Toast.LENGTH_SHORT).show()
+            return
+        }
+        saveCurrent()
+        val items = currentRows.map { it.employee to it.jours }
+        val content = DataExport.payrollCsv(settings.societe, Format.period(year, month), settings.joursBase, items)
+        val file = DataExport.writeCache(this, "Pointage_${year}_${month}.csv", content)
+        DocumentExporter.share(this, file, "text/csv")
     }
 
     /** Persists the worked days of every row for the current month. */

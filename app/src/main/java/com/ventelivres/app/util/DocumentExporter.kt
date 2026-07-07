@@ -31,7 +31,9 @@ object DocumentExporter {
         val month: Int,
         val rows: List<PayrollRow>,
         /** Empty for all employees, else "VIREMENT" / "MISE DISPOSITION". */
-        val typeFilter: String = ""
+        val typeFilter: String = "",
+        /** Empty for all sites, else a specific "lieu de travail". */
+        val lieuFilter: String = ""
     ) {
         val total: Double get() = rows.sumOf { it.salaireAPayer }
         val periode: String get() = Format.period(year, month)
@@ -52,9 +54,9 @@ object DocumentExporter {
     private val DARK = Color.parseColor("#2A1D13")
     private val GRAY = Color.parseColor("#8A7867")
 
-    // N° | Nom & Prénom | CIN | Compte / Tél | Salaire | Virement  (sums to CONTENT_W)
-    private val COLS = floatArrayOf(34f, 150f, 92f, 123f, 72f, 52f)
-    private val HEADERS = arrayOf("N°", "Nom & Prénom", "N° C.I.N.", "Compte / Tél.", "Salaire", "Virement")
+    // N° | Nom | Lieu | CIN | Compte/Tél | Salaire | Vir.  (sums to CONTENT_W = 523)
+    private val COLS = floatArrayOf(24f, 118f, 82f, 74f, 96f, 66f, 63f)
+    private val HEADERS = arrayOf("N°", "Nom & Prénom", "Lieu", "N° C.I.N.", "Compte / Tél.", "Salaire", "Vir.")
     private const val ROW_H = 21f
     private const val HEAD_H = 24f
 
@@ -120,11 +122,12 @@ object DocumentExporter {
         line("Compte à débiter", data.accountLabel, data.accountRib)
         if (data.reference.isNotBlank()) line("Référence", data.reference)
         line("")
-        line("N°", "Nom & Prénom", "N° C.I.N.", "Compte / Téléphone", "Salaire", "Type de virement")
+        line("N°", "Nom & Prénom", "Lieu de travail", "N° C.I.N.", "Compte / Téléphone", "Salaire", "Type de virement")
         data.rows.forEachIndexed { i, r ->
             line(
                 (i + 1).toString(),
                 r.employee.nomComplet,
+                r.employee.lieuTravail,
                 r.employee.carteNationale,
                 r.employee.numeroCompte,
                 Format.amount(r.salaireAPayer),
@@ -132,7 +135,7 @@ object DocumentExporter {
             )
         }
         line("")
-        line("", "TOTAL", "", "", Format.amount(data.total), "")
+        line("", "TOTAL", "", "", "", Format.amount(data.total), "")
         line("Montant en lettres", MoneyWords.money(data.total))
 
         val file = outFile(context, "Ordre_virement_${safe(data.periode)}${typeTag(data)}.csv")
@@ -208,8 +211,9 @@ object DocumentExporter {
             "MISE DISPOSITION" -> "  ·  Mise à disposition"
             else -> ""
         }
+        val lieuSuffix = if (data.lieuFilter.isNotBlank()) "  ·  ${data.lieuFilter}" else ""
         c.drawText(
-            "Salaires du mois de ${data.periode}$typeSuffix", PAGE_W / 2f, y,
+            "Salaires du mois de ${data.periode}$typeSuffix$lieuSuffix", PAGE_W / 2f, y,
             paint(10.5f, GRAY).apply { textAlign = Paint.Align.CENTER }
         )
         return y + 8f
@@ -243,10 +247,10 @@ object DocumentExporter {
     private fun drawTableHead(c: Canvas, top: Float): Float {
         fillRoundRect(c, MARGIN, top, RIGHT, top + HEAD_H, 6f, ORANGE)
         c.drawRect(MARGIN, top + HEAD_H / 2, RIGHT, top + HEAD_H, fill(ORANGE)) // square the bottom
-        val tp = paint(9f, Color.WHITE, SANS_BOLD)
+        val tp = paint(8.5f, Color.WHITE, SANS_BOLD)
         var x = MARGIN
         HEADERS.forEachIndexed { i, h ->
-            cell(c, h, x, top, COLS[i], HEAD_H, tp, align = if (i == 1) Paint.Align.LEFT else Paint.Align.CENTER)
+            cell(c, h, x, top, COLS[i], HEAD_H, tp, align = if (i == 1 || i == 2) Paint.Align.LEFT else Paint.Align.CENTER)
             x += COLS[i]
         }
         return top + HEAD_H
@@ -254,38 +258,41 @@ object DocumentExporter {
 
     private fun drawRow(c: Canvas, index: Int, row: PayrollRow, top: Float, zebra: Boolean): Float {
         if (zebra) c.drawRect(MARGIN, top, RIGHT, top + ROW_H, fill(ZEBRA))
-        val tp = paint(9f, DARK)
+        val tp = paint(8.5f, DARK)
+        val e = row.employee
         val cells = arrayOf(
             index.toString(),
-            row.employee.nomComplet,
-            row.employee.carteNationale,
-            row.employee.numeroCompte.ifBlank { row.employee.telephone },
+            e.nomComplet,
+            e.lieuTravail,
+            e.carteNationale,
+            e.numeroCompte.ifBlank { e.telephone },
             Format.amount(row.salaireAPayer),
-            row.employee.typeVirement
+            typeAbbrev(e.typeVirement)
         )
         var x = MARGIN
         cells.forEachIndexed { i, t ->
             val align = when (i) {
-                1, 2, 3 -> Paint.Align.LEFT
-                4 -> Paint.Align.RIGHT
+                1, 2, 3, 4 -> Paint.Align.LEFT
+                5 -> Paint.Align.RIGHT
                 else -> Paint.Align.CENTER
             }
-            val p = if (i == 4) paint(9f, DARK, SANS_BOLD) else tp
+            val p = if (i == 5) paint(8.5f, DARK, SANS_BOLD) else tp
             cell(c, t, x, top, COLS[i], ROW_H, p, align)
             x += COLS[i]
         }
-        // light separators
         c.drawLine(MARGIN, top + ROW_H, RIGHT, top + ROW_H, stroke(LINE, 0.5f))
         return top + ROW_H
     }
 
+    private fun typeAbbrev(type: String) = if (type == "VIREMENT") "Vir." else "M.D."
+
     private fun drawTotalRow(c: Canvas, total: Double, top: Float): Float {
         val h = 26f
         fillRoundRect(c, MARGIN, top, RIGHT, top + h, 6f, CREAM)
-        val labelW = COLS[0] + COLS[1] + COLS[2] + COLS[3]
+        val labelW = COLS[0] + COLS[1] + COLS[2] + COLS[3] + COLS[4]
         cell(c, "TOTAL NET À PAYER", MARGIN, top, labelW, h, paint(10.5f, ORANGE_DK, SANS_BOLD), Paint.Align.RIGHT, padEnd = 12f)
-        cell(c, Format.amount(total), MARGIN + labelW, top, COLS[4], h, paint(11f, DARK, SANS_BOLD), Paint.Align.RIGHT)
-        cell(c, "DH", MARGIN + labelW + COLS[4], top, COLS[5], h, paint(10.5f, ORANGE_DK, SANS_BOLD), Paint.Align.CENTER)
+        cell(c, Format.amount(total), MARGIN + labelW, top, COLS[5], h, paint(11f, DARK, SANS_BOLD), Paint.Align.RIGHT)
+        cell(c, "DH", MARGIN + labelW + COLS[5], top, COLS[6], h, paint(10.5f, ORANGE_DK, SANS_BOLD), Paint.Align.CENTER)
         c.drawRoundRect(RectF(MARGIN, top, RIGHT, top + h), 6f, 6f, stroke(ORANGE, 1f))
         return top + h
     }
@@ -400,10 +407,14 @@ object DocumentExporter {
 
     private fun safe(s: String) = s.replace(Regex("[^A-Za-z0-9]+"), "_")
 
-    private fun typeTag(data: OrderData) = when (data.typeFilter) {
-        "VIREMENT" -> "_Virement"
-        "MISE DISPOSITION" -> "_MiseDisposition"
-        else -> ""
+    private fun typeTag(data: OrderData): String {
+        val t = when (data.typeFilter) {
+            "VIREMENT" -> "_Virement"
+            "MISE DISPOSITION" -> "_MiseDisposition"
+            else -> ""
+        }
+        val l = if (data.lieuFilter.isNotBlank()) "_" + safe(data.lieuFilter) else ""
+        return t + l
     }
 
     private fun escape(s: String): String =

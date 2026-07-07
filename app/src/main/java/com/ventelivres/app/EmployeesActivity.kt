@@ -44,6 +44,7 @@ class EmployeesActivity : AppCompatActivity() {
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_import -> { importLauncher.launch(arrayOf("*/*")); true }
+                R.id.action_export -> { exportList(); true }
                 R.id.action_template -> { shareTemplate(); true }
                 else -> false
             }
@@ -141,6 +142,17 @@ class EmployeesActivity : AppCompatActivity() {
     private fun shareTemplate() {
         val file = EmployeeCsv.writeTemplate(this)
         DocumentExporter.share(this, file, "text/csv")
+    }
+
+    /** Exports the current employees as CSV (Excel-compatible) and shares it. */
+    private fun exportList() = lifecycleScope.launch {
+        val employees = withContext(Dispatchers.IO) { dao.employees() }
+        if (employees.isEmpty()) {
+            Toast.makeText(this@EmployeesActivity, R.string.no_employees, Toast.LENGTH_SHORT).show()
+            return@launch
+        }
+        val file = withContext(Dispatchers.IO) { EmployeeCsv.writeExport(this@EmployeesActivity, employees) }
+        DocumentExporter.share(this@EmployeesActivity, file, "text/csv")
     }
 
     /**

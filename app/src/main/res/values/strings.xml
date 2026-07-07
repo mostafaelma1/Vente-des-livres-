@@ -43,9 +43,19 @@
     <string name="emp_type_virement">Type de virement · نوع التحويل</string>
     <string name="emp_actif">Salarié actif · أجير نشيط</string>
     <string name="emp_import">Importer (Excel/CSV) · استيراد</string>
+    <string name="emp_export">Exporter (Excel) · تصدير</string>
     <string name="emp_template">Modèle Excel · نموذج إكسل</string>
     <string name="import_result">%1$d ajoutés · %2$d mis à jour</string>
     <string name="import_empty">Fichier vide ou illisible · ملف فارغ</string>
+
+    <!-- Export / backup -->
+    <string name="payroll_export">Exporter le mois (Excel) · تصدير الشهر</string>
+    <string name="set_data">Données · البيانات</string>
+    <string name="set_backup">Sauvegarde complète · نسخة احتياطية</string>
+    <string name="set_restore">Restaurer une sauvegarde · استرجاع</string>
+    <string name="restore_confirm">Remplacer TOUTES les données par la sauvegarde ? · استبدال كل البيانات؟</string>
+    <string name="restore_done">Données restaurées · تم الاسترجاع</string>
+    <string name="restore_error">Fichier de sauvegarde invalide · ملف غير صالح</string>
 
     <!-- Payroll / pointage -->
     <string name="payroll_title">Pointage &amp; Salaires · التنقيط</string>
@@ -69,6 +79,10 @@
     <string name="filter_all">Tous · الكل</string>
     <string name="filter_virement">Virement · تحويل</string>
     <string name="filter_mise">Mise dispo. · وضع رهن</string>
+    <string name="site_all">Lieu : Tous les sites · كل المواقع</string>
+    <string name="site_pick">Lieu : %1$s</string>
+    <string name="site_all_option">Tous les lieux · كل المواقع</string>
+    <string name="site_dialog_title">Choisir un lieu · اختر المكان</string>
 
     <!-- History -->
     <string name="history_title">Historique · الأرشيف</string>

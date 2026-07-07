@@ -21,6 +21,9 @@ interface AppDao {
     @Delete
     suspend fun deleteEmployee(employee: Employee)
 
+    @Query("DELETE FROM employees")
+    suspend fun deleteAllEmployees()
+
     // ---- Pointages (monthly attendance) ----
     @Query("SELECT * FROM pointages WHERE year = :year AND month = :month")
     suspend fun pointages(year: Int, month: Int): List<Pointage>
@@ -46,4 +49,7 @@ interface AppDao {
 
     @Delete
     suspend fun deleteAccount(account: CompanyAccount)
+
+    @Query("DELETE FROM company_accounts")
+    suspend fun deleteAllAccounts()
 }
